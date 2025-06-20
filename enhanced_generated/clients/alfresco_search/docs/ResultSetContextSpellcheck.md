@@ -1,0 +1,10 @@
+# ResultSetContextSpellcheck
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**suggestion** | **list[str]** | A suggested alternative query | [optional] 
+**type** | **str** |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+

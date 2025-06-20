@@ -1,0 +1,222 @@
+basePath: /alfresco/api/-default-/public/search/versions/1
+consumes:
+- application/json
+definitions:
+  Error:
+    properties:
+      error:
+        properties:
+          briefSummary:
+            type: string
+          descriptionURL:
+            type: string
+          errorKey:
+            type: string
+          logId:
+            type: string
+          stackTrace:
+            type: string
+          statusCode:
+            format: int32
+            type: integer
+        type: object
+    required:
+    - error
+    type: object
+  Pagination:
+    properties:
+      count:
+        description: 'The number of objects in the entries array.
+
+          '
+        format: int64
+        type: integer
+      hasMoreItems:
+        description: 'A boolean value which is **true** if there are more entities
+          in the collection
+
+          beyond those in this response. A true value means a request with a larger
+          value
+
+          for the **skipCount** or the **maxItems** parameter will return more entities.
+
+          '
+        type: boolean
+      maxItems:
+        description: 'The value of the **maxItems** parameter used to generate this
+          list,
+
+          or if there was no **maxItems** parameter the default value is 100
+
+          '
+        format: int64
+        type: integer
+      skipCount:
+        description: 'An integer describing how many entities exist in the collection
+          before
+
+          those included in this list.
+
+          '
+        format: int64
+        type: integer
+      totalItems:
+        description: 'An integer describing the total number of entities in the collection.
+
+          The API might not be able to determine this value,
+
+          in which case this property will not be present.
+
+          '
+        format: int64
+        type: integer
+    required:
+    - count
+    - hasMoreItems
+    - skipCount
+    - maxItems
+    type: object
+  SQLResultSetPaging:
+    description: Query results
+    properties:
+      list:
+        properties:
+          entries:
+            items:
+              $ref: '#/definitions/SQLResultSetRowEntry'
+            type: array
+          pagination:
+            $ref: '#/definitions/Pagination'
+        type: object
+    type: object
+  SQLResultSetRowEntry:
+    properties:
+      label:
+        type: string
+      value:
+        type: string
+    type: object
+  SQLSearchRequest:
+    properties:
+      filterQueries:
+        items:
+          type: string
+        type: array
+      format:
+        type: string
+      includeMetadata:
+        type: boolean
+      locales:
+        items:
+          type: string
+        type: array
+      stmt:
+        type: string
+      timezone:
+        type: string
+    type: object
+  SolrResultSet:
+    description: SQL results in Solr formatting
+    properties:
+      result-set:
+        $ref: '#/definitions/docs'
+        type: object
+    type: object
+  docs:
+    description: Array of documents returned by the query, note that this is a Solr
+      convention.
+    items:
+      properties:
+        label:
+          type: string
+        value:
+          type: string
+      type: object
+    type: array
+info:
+  description: '**Search SQL API**
+
+    A Solr SQL passthrough, this feature provides the ability to use SQL to query
+    Solr.
+
+    '
+  title: Alfresco Insight Engine REST API
+  version: '1'
+paths:
+  /sql:
+    post:
+      description: "**Note**: this endpoint is available in Alfresco 6.0 and newer\
+        \ versions.\nThis will require Insight Engine and will not work with Alfresco\
+        \ Search Services.\n\n**You specify all the parameters in this API in a JSON\
+        \ body**,\nA basic query looks like this:\n\n```JSON\n{\n  \"stmt\": \"select\
+        \ * from alfresco\",\n  \"locales\": [\"en_UK\"],\n  \"timezone\": \"Europe/London\"\
+        ,\n  \"includeMetadata\":true\n}\n```\n\n**Note:** the minimum possible query\
+        \ parameter required.\n```JSON\n{\n  \"stmt\":\n}\n```\nThe expected reponse\
+        \ will appear in the Alfresco format as seen below.\n```JSON\n{\n  \"list\"\
+        : {\n    \"pagination\": {\n      \"count\": 1,\n      \"hasMoreItems\": false,\n\
+        \      \"totalItems\": 1,\n      \"skipCount\": 0,\n      \"maxItems\": 100\n\
+        \  },\n  \"entries\": [{\n    \"entry\": [\n      {\n        \"label\": \"\
+        aliases\",\n        \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"\n      },\n\
+        \      {\n        \"label\": \"isMetadata\",\n        \"value\": \"true\"\n\
+        \      },\n      {\n        \"label\": \"fields\",\n        \"value\": \"\
+        [\\\"SITE\\\"]\"\n      }\n    ]\n  }]}}\n  ```\n  To override the default\
+        \ format set the format to solr.\n  ```JSON\n  {\n    \"stmt\": \"select *\
+        \ from alfresco\",\n    \"format\": \"solr\"\n  }\n```\nThis will return Solr's\
+        \ output response.\n```JSON\n{\n  \"result-set\": {\n  \"docs\": [\n    {\n\
+        \      \"aliases\": {\n      \"SITE\": \"site\"\n    },\n      \"isMetadata\"\
+        : true,\n      \"fields\": [ \"SITE\"]\n    },\n    {\n        \"RESPONSE_TIME\"\
+        : 23,\n        \"EOF\": true\n    }\n  ]}\n}\n```\n\n\nYou can use the **locales\
+        \ parameter** to filter results based on locale.\n```JSON\n\"locales\": [\"\
+        en_UK\", \"en_US\"]\n```\n\nTo include timezone in the query add the **timezone\
+        \ parameter**.\n```JSON\n\"timezone\": \"Japan\"\n```\n\nTo include custom\
+        \ filter queries add the **filterQueries parameter**.\n```JSON\n\"filterQueries\"\
+        : [\"-SITE:swsdp\"]\n```\n\nYou can use the **includeMetadata parameter**\
+        \ to include addtional  information, this is by default set to false.\n\n\
+        ```JSON\n\"includeMetadata\": \"false\"\n```\nPlease note that if its set\
+        \ to true the first entry will represent the metdata requested\n\n ```JSON\n\
+        \ {\n   \"stmt\": \"select site from alfresco limit 2\",\n   \"includeMetadata\"\
+        :true\n }\n```\nThe expected response:\n```JSON\n\"entries\": [\n  {\n   \
+        \ #First entry holds the Metadata infromation as set by {includeMetadata:true}\n\
+        \    \"entry\": [\n      {\n        \"label\": \"aliases\",\n        \"value\"\
+        : \"{\\\"SITE\\\":\\\"site\\\"}\"\n\n      },\n      {\n        \"label\"\
+        : \"isMetadata\",\n        \"value\": \"true\"\n      },\n      {\n      \
+        \  \"label\": \"fields\",\n        \"value\": \"[\\\"SITE\\\"]\"\n      }\n\
+        \    ]\n    #end of Metadata\n  },\n  {\n    #Query result entry value.\n\
+        \    \"entry\": [\n      {\n        \"label\": \"site\",\n        \"value\"\
+        : \"[\\\"test\\\"]\"\n      }\n    ]\n  },\n  {\n    \"entry\": [\n    {\n\
+        \      \"label\": \"site\",\n      \"value\": \"[\\\"test\\\"]\"\n    }\n\
+        \    ]\n  }\n]\n```\n"
+      operationId: search
+      parameters:
+      - description: 'Generic query API
+
+          '
+        in: body
+        name: queryBody
+        required: true
+        schema:
+          $ref: '#/definitions/SQLSearchRequest'
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/SQLResultSetPaging'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Alfresco Insight Engine SQL Passthrough
+      tags:
+      - sql
+      x-alfresco-since: '6.0'
+produces:
+- application/json
+security:
+- basicAuth: []
+securityDefinitions:
+  basicAuth:
+    description: HTTP Basic Authentication
+    type: basic
+swagger: '2.0'

@@ -1,0 +1,73 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code
+*.py text eol=lf
+*.pyx text eol=lf
+*.pyi text eol=lf
+*.pyw text eol=lf
+
+# Configuration files
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.cfg text eol=lf
+*.ini text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.rst text eol=lf
+*.txt text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Requirements files
+requirements*.txt text eol=lf
+Pipfile text eol=lf
+Pipfile.lock text eol=lf
+
+# Git files
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# License files
+LICENSE text eol=lf
+COPYING text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.eot binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.zip binary
+*.tar.gz binary
+*.tgz binary
+*.jar binary
+*.so binary
+*.dll binary
+*.exe binary
+*.dylib binary
+
+# Jupyter Notebooks (treat as text but don't normalize EOL to avoid conflicts)
+*.ipynb text -diff
+
+# OpenAPI specs - ensure consistent line endings
+*.openapi3.yaml text eol=lf
+*.preprocessed.yaml text eol=lf
+
+# Generated code - mark as linguist-generated for GitHub language detection
+enhanced_generated/** linguist-generated=true 
