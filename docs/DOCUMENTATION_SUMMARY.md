@@ -89,9 +89,6 @@ Located in `enhanced_generated/clients/` - All have comprehensive documentation:
 | **alfresco-model** | ✅ Complete | ✅ Available | ✅ Full docs | Content models/types |
 | **alfresco-search-sql** | ✅ Complete | ✅ Available | ✅ Full docs | SQL-based search |
 
-### Legacy Generated Clients
-**Note**: The legacy `alfresco_client/` directory has been removed from the project. All functionality is now provided through the enhanced generated clients in `enhanced_generated/clients/`.
-
 ## 🎯 Documentation Features
 
 ### Comprehensive Coverage
