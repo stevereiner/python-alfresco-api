@@ -45,7 +45,7 @@ class TagsApi:
     def create_tag_for_node(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        tag_body_create: Annotated[TagBody, Field(description="The new tag")],
+        tag_body: Annotated[TagBody, Field(description="The new tag")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -66,8 +66,8 @@ class TagsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param tag_body_create: The new tag (required)
-        :type tag_body_create: TagBody
+        :param tag_body: The new tag (required)
+        :type tag_body: TagBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -94,7 +94,7 @@ class TagsApi:
 
         _param = self._create_tag_for_node_serialize(
             node_id=node_id,
-            tag_body_create=tag_body_create,
+            tag_body=tag_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -125,7 +125,7 @@ class TagsApi:
     def create_tag_for_node_with_http_info(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        tag_body_create: Annotated[TagBody, Field(description="The new tag")],
+        tag_body: Annotated[TagBody, Field(description="The new tag")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -146,8 +146,8 @@ class TagsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param tag_body_create: The new tag (required)
-        :type tag_body_create: TagBody
+        :param tag_body: The new tag (required)
+        :type tag_body: TagBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -174,7 +174,7 @@ class TagsApi:
 
         _param = self._create_tag_for_node_serialize(
             node_id=node_id,
-            tag_body_create=tag_body_create,
+            tag_body=tag_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -205,7 +205,7 @@ class TagsApi:
     def create_tag_for_node_without_preload_content(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        tag_body_create: Annotated[TagBody, Field(description="The new tag")],
+        tag_body: Annotated[TagBody, Field(description="The new tag")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -226,8 +226,8 @@ class TagsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param tag_body_create: The new tag (required)
-        :type tag_body_create: TagBody
+        :param tag_body: The new tag (required)
+        :type tag_body: TagBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -254,7 +254,7 @@ class TagsApi:
 
         _param = self._create_tag_for_node_serialize(
             node_id=node_id,
-            tag_body_create=tag_body_create,
+            tag_body=tag_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -280,7 +280,7 @@ class TagsApi:
     def _create_tag_for_node_serialize(
         self,
         node_id,
-        tag_body_create,
+        tag_body,
         fields,
         _request_auth,
         _content_type,
@@ -314,8 +314,8 @@ class TagsApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if tag_body_create is not None:
-            _body_params = tag_body_create
+        if tag_body is not None:
+            _body_params = tag_body
 
 
         # set the HTTP header `Accept`
@@ -1584,7 +1584,7 @@ class TagsApi:
     def update_tag(
         self,
         tag_id: Annotated[StrictStr, Field(description="The identifier of a tag.")],
-        tag_body_update: Annotated[TagBody, Field(description="The updated tag")],
+        tag_body: Annotated[TagBody, Field(description="The updated tag")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1605,8 +1605,8 @@ class TagsApi:
 
         :param tag_id: The identifier of a tag. (required)
         :type tag_id: str
-        :param tag_body_update: The updated tag (required)
-        :type tag_body_update: TagBody
+        :param tag_body: The updated tag (required)
+        :type tag_body: TagBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1633,7 +1633,7 @@ class TagsApi:
 
         _param = self._update_tag_serialize(
             tag_id=tag_id,
-            tag_body_update=tag_body_update,
+            tag_body=tag_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1662,7 +1662,7 @@ class TagsApi:
     def update_tag_with_http_info(
         self,
         tag_id: Annotated[StrictStr, Field(description="The identifier of a tag.")],
-        tag_body_update: Annotated[TagBody, Field(description="The updated tag")],
+        tag_body: Annotated[TagBody, Field(description="The updated tag")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1683,8 +1683,8 @@ class TagsApi:
 
         :param tag_id: The identifier of a tag. (required)
         :type tag_id: str
-        :param tag_body_update: The updated tag (required)
-        :type tag_body_update: TagBody
+        :param tag_body: The updated tag (required)
+        :type tag_body: TagBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1711,7 +1711,7 @@ class TagsApi:
 
         _param = self._update_tag_serialize(
             tag_id=tag_id,
-            tag_body_update=tag_body_update,
+            tag_body=tag_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1740,7 +1740,7 @@ class TagsApi:
     def update_tag_without_preload_content(
         self,
         tag_id: Annotated[StrictStr, Field(description="The identifier of a tag.")],
-        tag_body_update: Annotated[TagBody, Field(description="The updated tag")],
+        tag_body: Annotated[TagBody, Field(description="The updated tag")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1761,8 +1761,8 @@ class TagsApi:
 
         :param tag_id: The identifier of a tag. (required)
         :type tag_id: str
-        :param tag_body_update: The updated tag (required)
-        :type tag_body_update: TagBody
+        :param tag_body: The updated tag (required)
+        :type tag_body: TagBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1789,7 +1789,7 @@ class TagsApi:
 
         _param = self._update_tag_serialize(
             tag_id=tag_id,
-            tag_body_update=tag_body_update,
+            tag_body=tag_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1813,7 +1813,7 @@ class TagsApi:
     def _update_tag_serialize(
         self,
         tag_id,
-        tag_body_update,
+        tag_body,
         fields,
         _request_auth,
         _content_type,
@@ -1847,8 +1847,8 @@ class TagsApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if tag_body_update is not None:
-            _body_params = tag_body_update
+        if tag_body is not None:
+            _body_params = tag_body
 
 
         # set the HTTP header `Accept`

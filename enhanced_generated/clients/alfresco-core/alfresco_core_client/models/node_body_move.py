@@ -37,8 +37,8 @@ class NodeBodyMove(BaseModel):
         if value is None:
             return value
 
-        if not re.match(r"^(?!(.*[\\\"*\\><\?/:\|]+.*)|(.*[.]?.*[.]+$)|(.*[ ]+$))", value):
-            raise ValueError(r"must validate the regular expression /^(?!(.*[\\\"*\\><\?/:\|]+.*)|(.*[.]?.*[.]+$)|(.*[ ]+$))/")
+        if not re.match(r"^(?!(.*[\\\"\\*\\\\>\\<\\?\\/\\:\\|]+.*)|(.*[\.]?.*[\.]+$)|(.*[ ]+$))", value):
+            raise ValueError(r"must validate the regular expression /^(?!(.*[\\\"\\*\\\\>\\<\\?\\/\\:\\|]+.*)|(.*[\.]?.*[\.]+$)|(.*[ ]+$))/")
         return value
 
     model_config = ConfigDict(

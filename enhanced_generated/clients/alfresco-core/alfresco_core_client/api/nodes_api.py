@@ -398,7 +398,7 @@ class NodesApi:
     def create_association(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a source node.")],
-        association_body_create: Annotated[AssociationBody, Field(description="The target node id and assoc type.")],
+        association_body: Annotated[AssociationBody, Field(description="The target node id and assoc type.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -419,8 +419,8 @@ class NodesApi:
 
         :param node_id: The identifier of a source node. (required)
         :type node_id: str
-        :param association_body_create: The target node id and assoc type. (required)
-        :type association_body_create: AssociationBody
+        :param association_body: The target node id and assoc type. (required)
+        :type association_body: AssociationBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -447,7 +447,7 @@ class NodesApi:
 
         _param = self._create_association_serialize(
             node_id=node_id,
-            association_body_create=association_body_create,
+            association_body=association_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -479,7 +479,7 @@ class NodesApi:
     def create_association_with_http_info(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a source node.")],
-        association_body_create: Annotated[AssociationBody, Field(description="The target node id and assoc type.")],
+        association_body: Annotated[AssociationBody, Field(description="The target node id and assoc type.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -500,8 +500,8 @@ class NodesApi:
 
         :param node_id: The identifier of a source node. (required)
         :type node_id: str
-        :param association_body_create: The target node id and assoc type. (required)
-        :type association_body_create: AssociationBody
+        :param association_body: The target node id and assoc type. (required)
+        :type association_body: AssociationBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -528,7 +528,7 @@ class NodesApi:
 
         _param = self._create_association_serialize(
             node_id=node_id,
-            association_body_create=association_body_create,
+            association_body=association_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -560,7 +560,7 @@ class NodesApi:
     def create_association_without_preload_content(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a source node.")],
-        association_body_create: Annotated[AssociationBody, Field(description="The target node id and assoc type.")],
+        association_body: Annotated[AssociationBody, Field(description="The target node id and assoc type.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -581,8 +581,8 @@ class NodesApi:
 
         :param node_id: The identifier of a source node. (required)
         :type node_id: str
-        :param association_body_create: The target node id and assoc type. (required)
-        :type association_body_create: AssociationBody
+        :param association_body: The target node id and assoc type. (required)
+        :type association_body: AssociationBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -609,7 +609,7 @@ class NodesApi:
 
         _param = self._create_association_serialize(
             node_id=node_id,
-            association_body_create=association_body_create,
+            association_body=association_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -636,7 +636,7 @@ class NodesApi:
     def _create_association_serialize(
         self,
         node_id,
-        association_body_create,
+        association_body,
         fields,
         _request_auth,
         _content_type,
@@ -670,8 +670,8 @@ class NodesApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if association_body_create is not None:
-            _body_params = association_body_create
+        if association_body is not None:
+            _body_params = association_body
 
 
         # set the HTTP header `Accept`
@@ -1127,7 +1127,7 @@ class NodesApi:
     def create_secondary_child_association(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a parent node.")],
-        secondary_child_association_body_create: Annotated[ChildAssociationBody, Field(description="The child node id and assoc type.")],
+        child_association_body: Annotated[ChildAssociationBody, Field(description="The child node id and assoc type.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1148,8 +1148,8 @@ class NodesApi:
 
         :param node_id: The identifier of a parent node. (required)
         :type node_id: str
-        :param secondary_child_association_body_create: The child node id and assoc type. (required)
-        :type secondary_child_association_body_create: ChildAssociationBody
+        :param child_association_body: The child node id and assoc type. (required)
+        :type child_association_body: ChildAssociationBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1176,7 +1176,7 @@ class NodesApi:
 
         _param = self._create_secondary_child_association_serialize(
             node_id=node_id,
-            secondary_child_association_body_create=secondary_child_association_body_create,
+            child_association_body=child_association_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1208,7 +1208,7 @@ class NodesApi:
     def create_secondary_child_association_with_http_info(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a parent node.")],
-        secondary_child_association_body_create: Annotated[ChildAssociationBody, Field(description="The child node id and assoc type.")],
+        child_association_body: Annotated[ChildAssociationBody, Field(description="The child node id and assoc type.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1229,8 +1229,8 @@ class NodesApi:
 
         :param node_id: The identifier of a parent node. (required)
         :type node_id: str
-        :param secondary_child_association_body_create: The child node id and assoc type. (required)
-        :type secondary_child_association_body_create: ChildAssociationBody
+        :param child_association_body: The child node id and assoc type. (required)
+        :type child_association_body: ChildAssociationBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1257,7 +1257,7 @@ class NodesApi:
 
         _param = self._create_secondary_child_association_serialize(
             node_id=node_id,
-            secondary_child_association_body_create=secondary_child_association_body_create,
+            child_association_body=child_association_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1289,7 +1289,7 @@ class NodesApi:
     def create_secondary_child_association_without_preload_content(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a parent node.")],
-        secondary_child_association_body_create: Annotated[ChildAssociationBody, Field(description="The child node id and assoc type.")],
+        child_association_body: Annotated[ChildAssociationBody, Field(description="The child node id and assoc type.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1310,8 +1310,8 @@ class NodesApi:
 
         :param node_id: The identifier of a parent node. (required)
         :type node_id: str
-        :param secondary_child_association_body_create: The child node id and assoc type. (required)
-        :type secondary_child_association_body_create: ChildAssociationBody
+        :param child_association_body: The child node id and assoc type. (required)
+        :type child_association_body: ChildAssociationBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1338,7 +1338,7 @@ class NodesApi:
 
         _param = self._create_secondary_child_association_serialize(
             node_id=node_id,
-            secondary_child_association_body_create=secondary_child_association_body_create,
+            child_association_body=child_association_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1365,7 +1365,7 @@ class NodesApi:
     def _create_secondary_child_association_serialize(
         self,
         node_id,
-        secondary_child_association_body_create,
+        child_association_body,
         fields,
         _request_auth,
         _content_type,
@@ -1399,8 +1399,8 @@ class NodesApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if secondary_child_association_body_create is not None:
-            _body_params = secondary_child_association_body_create
+        if child_association_body is not None:
+            _body_params = child_association_body
 
 
         # set the HTTP header `Accept`
@@ -6166,7 +6166,7 @@ class NodesApi:
     def update_node_content(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        content_body_update: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
+        body: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
         major_version: Annotated[Optional[StrictBool], Field(description="If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned. ")] = None,
         comment: Annotated[Optional[StrictStr], Field(description="Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned. ")] = None,
         name: Annotated[Optional[Annotated[str, Field(strict=True)]], Field(description="Optional new name. This should include the file extension. The name must not contain spaces or the following special characters: * \" < > \\ / ? : and |. The character `.` must not be used at the end of the name. ")] = None,
@@ -6191,8 +6191,8 @@ class NodesApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param content_body_update: The binary content (required)
-        :type content_body_update: bytearray
+        :param body: The binary content (required)
+        :type body: bytearray
         :param major_version: If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned. 
         :type major_version: bool
         :param comment: Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned. 
@@ -6227,7 +6227,7 @@ class NodesApi:
 
         _param = self._update_node_content_serialize(
             node_id=node_id,
-            content_body_update=content_body_update,
+            body=body,
             major_version=major_version,
             comment=comment,
             name=name,
@@ -6265,7 +6265,7 @@ class NodesApi:
     def update_node_content_with_http_info(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        content_body_update: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
+        body: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
         major_version: Annotated[Optional[StrictBool], Field(description="If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned. ")] = None,
         comment: Annotated[Optional[StrictStr], Field(description="Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned. ")] = None,
         name: Annotated[Optional[Annotated[str, Field(strict=True)]], Field(description="Optional new name. This should include the file extension. The name must not contain spaces or the following special characters: * \" < > \\ / ? : and |. The character `.` must not be used at the end of the name. ")] = None,
@@ -6290,8 +6290,8 @@ class NodesApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param content_body_update: The binary content (required)
-        :type content_body_update: bytearray
+        :param body: The binary content (required)
+        :type body: bytearray
         :param major_version: If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned. 
         :type major_version: bool
         :param comment: Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned. 
@@ -6326,7 +6326,7 @@ class NodesApi:
 
         _param = self._update_node_content_serialize(
             node_id=node_id,
-            content_body_update=content_body_update,
+            body=body,
             major_version=major_version,
             comment=comment,
             name=name,
@@ -6364,7 +6364,7 @@ class NodesApi:
     def update_node_content_without_preload_content(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        content_body_update: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
+        body: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
         major_version: Annotated[Optional[StrictBool], Field(description="If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned. ")] = None,
         comment: Annotated[Optional[StrictStr], Field(description="Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned. ")] = None,
         name: Annotated[Optional[Annotated[str, Field(strict=True)]], Field(description="Optional new name. This should include the file extension. The name must not contain spaces or the following special characters: * \" < > \\ / ? : and |. The character `.` must not be used at the end of the name. ")] = None,
@@ -6389,8 +6389,8 @@ class NodesApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param content_body_update: The binary content (required)
-        :type content_body_update: bytearray
+        :param body: The binary content (required)
+        :type body: bytearray
         :param major_version: If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned. 
         :type major_version: bool
         :param comment: Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned. 
@@ -6425,7 +6425,7 @@ class NodesApi:
 
         _param = self._update_node_content_serialize(
             node_id=node_id,
-            content_body_update=content_body_update,
+            body=body,
             major_version=major_version,
             comment=comment,
             name=name,
@@ -6458,7 +6458,7 @@ class NodesApi:
     def _update_node_content_serialize(
         self,
         node_id,
-        content_body_update,
+        body,
         major_version,
         comment,
         name,
@@ -6513,16 +6513,16 @@ class NodesApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if content_body_update is not None:
+        if body is not None:
             # convert to byte array if the input is a file name (str)
-            if isinstance(content_body_update, str):
-                with open(content_body_update, "rb") as _fp:
+            if isinstance(body, str):
+                with open(body, "rb") as _fp:
                     _body_params = _fp.read()
-            elif isinstance(content_body_update, tuple):
+            elif isinstance(body, tuple):
                 # drop the filename from the tuple
-                _body_params = content_body_update[1]
+                _body_params = body[1]
             else:
-                _body_params = content_body_update
+                _body_params = body
 
 
         # set the HTTP header `Accept`

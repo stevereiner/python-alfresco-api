@@ -37,7 +37,8 @@ def main():
             print(f"  Name: {getattr(repo, 'name', 'Unknown')}")
             print(f"  Version: {getattr(repo.version, 'display', 'Unknown') if hasattr(repo, 'version') else 'Unknown'}")
             print(f"  Edition: {getattr(repo, 'edition', 'Unknown')}")
-            print(f"  Status: {'Read-only' if getattr(repo.status, 'isReadOnly', False) if hasattr(repo, 'status') else False else 'Read-write'}")
+            status = 'Read-only' if (hasattr(repo, 'status') and getattr(repo.status, 'isReadOnly', False)) else 'Read-write'
+            print(f"  Status: {status}")
             
             # Show license info if available
             if hasattr(repo_info.entry, 'license'):

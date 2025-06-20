@@ -59,8 +59,8 @@ class ResultNode(BaseModel):
     @field_validator('name')
     def name_validate_regular_expression(cls, value):
         """Validates the regular expression"""
-        if not re.match(r"^(?!(.*[\\\"*\\><\?/:\|]+.*)|(.*[.]?.*[.]+$)|(.*[ ]+$))", value):
-            raise ValueError(r"must validate the regular expression /^(?!(.*[\\\"*\\><\?/:\|]+.*)|(.*[.]?.*[.]+$)|(.*[ ]+$))/")
+        if not re.match(r"^(?!(.*[\\\"\\*\\\\>\\<\\?\\/\\:\\|]+.*)|(.*[\.]?.*[\.]+$)|(.*[ ]+$))", value):
+            raise ValueError(r"must validate the regular expression /^(?!(.*[\\\"\\*\\\\>\\<\\?\\/\\:\\|]+.*)|(.*[\.]?.*[\.]+$)|(.*[ ]+$))/")
         return value
 
     model_config = ConfigDict(

@@ -80,7 +80,7 @@ configuration = alfresco_auth_client.Configuration(
 with alfresco_auth_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_auth_client.AuthenticationApi(api_client)
-    ticket_body = alfresco_auth_client.TicketBody() # TicketBody | 
+    ticket_body = alfresco_auth_client.TicketBody() # TicketBody | The user credential.
 
     try:
         # Create ticket (login)

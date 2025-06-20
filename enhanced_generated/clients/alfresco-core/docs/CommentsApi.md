@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 
 # **create_comment**
-> CommentEntry create_comment(node_id, comment_body_create, fields=fields)
+> CommentEntry create_comment(node_id, comment_body, fields=fields)
 
 Create a comment
 
@@ -98,12 +98,12 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_core_client.CommentsApi(api_client)
     node_id = 'node_id_example' # str | The identifier of a node.
-    comment_body_create = alfresco_core_client.CommentBody() # CommentBody | The comment text. Note that you can also provide a list of comments.
+    comment_body = alfresco_core_client.CommentBody() # CommentBody | The comment text. Note that you can also provide a list of comments.
     fields = ['fields_example'] # List[str] | A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  (optional)
 
     try:
         # Create a comment
-        api_response = api_instance.create_comment(node_id, comment_body_create, fields=fields)
+        api_response = api_instance.create_comment(node_id, comment_body, fields=fields)
         print("The response of CommentsApi->create_comment:\n")
         pprint(api_response)
     except Exception as e:
@@ -118,7 +118,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **node_id** | **str**| The identifier of a node. | 
- **comment_body_create** | [**CommentBody**](CommentBody.md)| The comment text. Note that you can also provide a list of comments. | 
+ **comment_body** | [**CommentBody**](CommentBody.md)| The comment text. Note that you can also provide a list of comments. | 
  **fields** | [**List[str]**](str.md)| A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  | [optional] 
 
 ### Return type
@@ -323,7 +323,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **update_comment**
-> CommentEntry update_comment(node_id, comment_id, comment_body_update, fields=fields)
+> CommentEntry update_comment(node_id, comment_id, comment_body, fields=fields)
 
 Update a comment
 
@@ -363,12 +363,12 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
     api_instance = alfresco_core_client.CommentsApi(api_client)
     node_id = 'node_id_example' # str | The identifier of a node.
     comment_id = 'comment_id_example' # str | The identifier of a comment.
-    comment_body_update = alfresco_core_client.CommentBody() # CommentBody | The JSON representing the comment to be updated.
+    comment_body = alfresco_core_client.CommentBody() # CommentBody | The JSON representing the comment to be updated.
     fields = ['fields_example'] # List[str] | A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  (optional)
 
     try:
         # Update a comment
-        api_response = api_instance.update_comment(node_id, comment_id, comment_body_update, fields=fields)
+        api_response = api_instance.update_comment(node_id, comment_id, comment_body, fields=fields)
         print("The response of CommentsApi->update_comment:\n")
         pprint(api_response)
     except Exception as e:
@@ -384,7 +384,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **node_id** | **str**| The identifier of a node. | 
  **comment_id** | **str**| The identifier of a comment. | 
- **comment_body_update** | [**CommentBody**](CommentBody.md)| The JSON representing the comment to be updated. | 
+ **comment_body** | [**CommentBody**](CommentBody.md)| The JSON representing the comment to be updated. | 
  **fields** | [**List[str]**](str.md)| A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  | [optional] 
 
 ### Return type

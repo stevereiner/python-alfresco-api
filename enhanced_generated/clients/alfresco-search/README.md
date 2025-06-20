@@ -80,10 +80,11 @@ configuration = alfresco_search_client.Configuration(
 with alfresco_search_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_search_client.SearchApi(api_client)
+    search_request = alfresco_search_client.SearchRequest() # SearchRequest | Generic query API 
 
     try:
         # Searches Alfresco
-        api_response = api_instance.search()
+        api_response = api_instance.search(search_request)
         print("The response of SearchApi->search:\n")
         pprint(api_response)
     except ApiException as e:

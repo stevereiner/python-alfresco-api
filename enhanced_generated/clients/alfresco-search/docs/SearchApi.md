@@ -8,7 +8,7 @@ Method | HTTP request | Description
 
 
 # **search**
-> ResultSetPaging search()
+> ResultSetPaging search(search_request)
 
 Searches Alfresco
 
@@ -329,6 +329,7 @@ The hightlight information is added in each node entry response; here is an exam
 ```python
 import alfresco_search_client
 from alfresco_search_client.models.result_set_paging import ResultSetPaging
+from alfresco_search_client.models.search_request import SearchRequest
 from alfresco_search_client.rest import ApiException
 from pprint import pprint
 
@@ -353,10 +354,11 @@ configuration = alfresco_search_client.Configuration(
 with alfresco_search_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_search_client.SearchApi(api_client)
+    search_request = alfresco_search_client.SearchRequest() # SearchRequest | Generic query API 
 
     try:
         # Searches Alfresco
-        api_response = api_instance.search()
+        api_response = api_instance.search(search_request)
         print("The response of SearchApi->search:\n")
         pprint(api_response)
     except Exception as e:
@@ -367,7 +369,10 @@ with alfresco_search_client.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **search_request** | [**SearchRequest**](SearchRequest.md)| Generic query API  | 
 
 ### Return type
 
@@ -379,7 +384,7 @@ This endpoint does not need any parameter.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 ### HTTP response details

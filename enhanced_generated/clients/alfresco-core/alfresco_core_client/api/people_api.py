@@ -2143,7 +2143,7 @@ class PeopleApi:
     def update_avatar_image(
         self,
         person_id: Annotated[StrictStr, Field(description="The identifier of a person.")],
-        content_body_update: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
+        body: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2163,8 +2163,8 @@ class PeopleApi:
 
         :param person_id: The identifier of a person. (required)
         :type person_id: str
-        :param content_body_update: The binary content (required)
-        :type content_body_update: bytearray
+        :param body: The binary content (required)
+        :type body: bytearray
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2189,7 +2189,7 @@ class PeopleApi:
 
         _param = self._update_avatar_image_serialize(
             person_id=person_id,
-            content_body_update=content_body_update,
+            body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -2221,7 +2221,7 @@ class PeopleApi:
     def update_avatar_image_with_http_info(
         self,
         person_id: Annotated[StrictStr, Field(description="The identifier of a person.")],
-        content_body_update: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
+        body: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2241,8 +2241,8 @@ class PeopleApi:
 
         :param person_id: The identifier of a person. (required)
         :type person_id: str
-        :param content_body_update: The binary content (required)
-        :type content_body_update: bytearray
+        :param body: The binary content (required)
+        :type body: bytearray
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2267,7 +2267,7 @@ class PeopleApi:
 
         _param = self._update_avatar_image_serialize(
             person_id=person_id,
-            content_body_update=content_body_update,
+            body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -2299,7 +2299,7 @@ class PeopleApi:
     def update_avatar_image_without_preload_content(
         self,
         person_id: Annotated[StrictStr, Field(description="The identifier of a person.")],
-        content_body_update: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
+        body: Annotated[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]], Field(description="The binary content")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -2319,8 +2319,8 @@ class PeopleApi:
 
         :param person_id: The identifier of a person. (required)
         :type person_id: str
-        :param content_body_update: The binary content (required)
-        :type content_body_update: bytearray
+        :param body: The binary content (required)
+        :type body: bytearray
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -2345,7 +2345,7 @@ class PeopleApi:
 
         _param = self._update_avatar_image_serialize(
             person_id=person_id,
-            content_body_update=content_body_update,
+            body=body,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -2372,7 +2372,7 @@ class PeopleApi:
     def _update_avatar_image_serialize(
         self,
         person_id,
-        content_body_update,
+        body,
         _request_auth,
         _content_type,
         _headers,
@@ -2400,16 +2400,16 @@ class PeopleApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if content_body_update is not None:
+        if body is not None:
             # convert to byte array if the input is a file name (str)
-            if isinstance(content_body_update, str):
-                with open(content_body_update, "rb") as _fp:
+            if isinstance(body, str):
+                with open(body, "rb") as _fp:
                     _body_params = _fp.read()
-            elif isinstance(content_body_update, tuple):
+            elif isinstance(body, tuple):
                 # drop the filename from the tuple
-                _body_params = content_body_update[1]
+                _body_params = body[1]
             else:
-                _body_params = content_body_update
+                _body_params = body
 
 
         # set the HTTP header `Accept`

@@ -718,7 +718,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **update_audit_app**
-> AuditApp update_audit_app(audit_application_id, audit_app_body_update, fields=fields)
+> AuditApp update_audit_app(audit_application_id, audit_body_update, fields=fields)
 
 Update audit application info
 
@@ -768,12 +768,12 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_core_client.AuditApi(api_client)
     audit_application_id = 'audit_application_id_example' # str | The identifier of an audit application.
-    audit_app_body_update = alfresco_core_client.AuditBodyUpdate() # AuditBodyUpdate | The audit application to update.
+    audit_body_update = alfresco_core_client.AuditBodyUpdate() # AuditBodyUpdate | The audit application to update.
     fields = ['fields_example'] # List[str] | A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  (optional)
 
     try:
         # Update audit application info
-        api_response = api_instance.update_audit_app(audit_application_id, audit_app_body_update, fields=fields)
+        api_response = api_instance.update_audit_app(audit_application_id, audit_body_update, fields=fields)
         print("The response of AuditApi->update_audit_app:\n")
         pprint(api_response)
     except Exception as e:
@@ -788,7 +788,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **audit_application_id** | **str**| The identifier of an audit application. | 
- **audit_app_body_update** | [**AuditBodyUpdate**](AuditBodyUpdate.md)| The audit application to update. | 
+ **audit_body_update** | [**AuditBodyUpdate**](AuditBodyUpdate.md)| The audit application to update. | 
  **fields** | [**List[str]**](str.md)| A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  | [optional] 
 
 ### Return type

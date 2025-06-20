@@ -165,7 +165,7 @@ if isinstance(client.core, dict) and 'actions' in client.core:
 
 ### Master Client Examples
 - **[Master Client Examples](../examples/master_client_examples.py)** - **Primary example** - Complete usage of all 7 APIs
-- **[Enhanced Client Usage](../enhanced_generated/clients/examples/master_client_usage.py)** - Enhanced generated client examples
+- **[Master Client Usage](../examples/master_client_usage.py)** - Master client with all APIs examples
 
 ### Individual API Examples (All Working)
 
@@ -239,8 +239,8 @@ Each enhanced client includes:
 - Pydantic models for type safety
 
 ### Client Features
-- ✅ **OpenAPI 3.0 Generated**: Pydantic models are generated using generated OpenAPI 3.0
-- ✅ **Pydantic Models**: Are hooked up with generated clients from preprocessed OpenAPI 2.0
+- ✅ **OpenAPI 3.0 Generated**: Both Pydantic models and API clients generated from OpenAPI 3.0 specifications  
+- ✅ **Professional Conversion**: Uses swagger2openapi for superior Swagger 2.0 → OpenAPI 3.0 conversion
 - ✅ **Pydantic Models** - Type-safe request/response handling
 - ✅ **Comprehensive Documentation** - Auto-generated from OpenAPI specs
 - ✅ **Python 3.9+ Support** - Modern Python features

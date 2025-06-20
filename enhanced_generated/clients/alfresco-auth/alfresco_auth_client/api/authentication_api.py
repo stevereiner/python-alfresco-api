@@ -16,6 +16,8 @@ from pydantic import validate_call, Field, StrictFloat, StrictStr, StrictInt
 from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
 
+from pydantic import Field
+from typing_extensions import Annotated
 from alfresco_auth_client.models.ticket_body import TicketBody
 from alfresco_auth_client.models.ticket_entry import TicketEntry
 from alfresco_auth_client.models.valid_ticket_entry import ValidTicketEntry
@@ -41,7 +43,7 @@ class AuthenticationApi:
     @validate_call
     def create_ticket(
         self,
-        ticket_body: TicketBody,
+        ticket_body: Annotated[TicketBody, Field(description="The user credential.")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -59,7 +61,7 @@ class AuthenticationApi:
 
         **Note:** this endpoint is available in Alfresco 5.2 and newer versions.  Logs in and returns the new authentication ticket.  The userId and password properties are mandatory in the request body. For example: ```JSON {     \"userId\": \"jbloggs\",     \"password\": \"password\" } ``` To use the ticket in future requests you should pass it in the request header. For example using Javascript:   ```Javascript     request.setRequestHeader (\"Authorization\", \"Basic \" + btoa(ticket));   ``` 
 
-        :param ticket_body: (required)
+        :param ticket_body: The user credential. (required)
         :type ticket_body: TicketBody
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
@@ -111,7 +113,7 @@ class AuthenticationApi:
     @validate_call
     def create_ticket_with_http_info(
         self,
-        ticket_body: TicketBody,
+        ticket_body: Annotated[TicketBody, Field(description="The user credential.")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -129,7 +131,7 @@ class AuthenticationApi:
 
         **Note:** this endpoint is available in Alfresco 5.2 and newer versions.  Logs in and returns the new authentication ticket.  The userId and password properties are mandatory in the request body. For example: ```JSON {     \"userId\": \"jbloggs\",     \"password\": \"password\" } ``` To use the ticket in future requests you should pass it in the request header. For example using Javascript:   ```Javascript     request.setRequestHeader (\"Authorization\", \"Basic \" + btoa(ticket));   ``` 
 
-        :param ticket_body: (required)
+        :param ticket_body: The user credential. (required)
         :type ticket_body: TicketBody
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
@@ -181,7 +183,7 @@ class AuthenticationApi:
     @validate_call
     def create_ticket_without_preload_content(
         self,
-        ticket_body: TicketBody,
+        ticket_body: Annotated[TicketBody, Field(description="The user credential.")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -199,7 +201,7 @@ class AuthenticationApi:
 
         **Note:** this endpoint is available in Alfresco 5.2 and newer versions.  Logs in and returns the new authentication ticket.  The userId and password properties are mandatory in the request body. For example: ```JSON {     \"userId\": \"jbloggs\",     \"password\": \"password\" } ``` To use the ticket in future requests you should pass it in the request header. For example using Javascript:   ```Javascript     request.setRequestHeader (\"Authorization\", \"Basic \" + btoa(ticket));   ``` 
 
-        :param ticket_body: (required)
+        :param ticket_body: The user credential. (required)
         :type ticket_body: TicketBody
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
@@ -541,6 +543,13 @@ class AuthenticationApi:
         # process the body parameter
 
 
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/json'
+                ]
+            )
 
 
         # authentication setting

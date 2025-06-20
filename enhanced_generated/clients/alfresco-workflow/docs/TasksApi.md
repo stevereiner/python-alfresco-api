@@ -1371,7 +1371,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **update_task_variable**
-> VariableEntry update_task_variable(task_id, variable_name, variable_body)
+> VariableEntry update_task_variable(task_id, variable_name, variable)
 
 Create or update a variable
 
@@ -1412,11 +1412,11 @@ with alfresco_workflow_client.ApiClient(configuration) as api_client:
     api_instance = alfresco_workflow_client.TasksApi(api_client)
     task_id = 'task_id_example' # str | The identifier of a task.
     variable_name = 'variable_name_example' # str | The name of a variable.
-    variable_body = alfresco_workflow_client.Variable() # Variable | A variable
+    variable = alfresco_workflow_client.Variable() # Variable | A variable
 
     try:
         # Create or update a variable
-        api_response = api_instance.update_task_variable(task_id, variable_name, variable_body)
+        api_response = api_instance.update_task_variable(task_id, variable_name, variable)
         print("The response of TasksApi->update_task_variable:\n")
         pprint(api_response)
     except Exception as e:
@@ -1432,7 +1432,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **task_id** | **str**| The identifier of a task. | 
  **variable_name** | **str**| The name of a variable. | 
- **variable_body** | [**Variable**](Variable.md)| A variable | 
+ **variable** | [**Variable**](Variable.md)| A variable | 
 
 ### Return type
 

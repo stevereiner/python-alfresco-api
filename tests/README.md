@@ -57,10 +57,10 @@ tests/
 
 2. **For integration tests**: Ensure Alfresco server is running on `localhost:8080` with admin/admin credentials
 
-### Running All Tests
+### Running All Tests (2-Section Approach)
 
 ```bash
-# Using the test runner
+# Using the test runner (RECOMMENDED - shows 2 sections)
 python tests/run_tests.py
 
 # Using pytest directly
@@ -69,6 +69,20 @@ pytest tests/ -v
 # With coverage
 pytest tests/ --cov=enhanced_generated --cov-report=html
 ```
+
+### ⚠️ **IMPORTANT: Generated Tests Warning**
+
+**🚫 DO NOT USE** the auto-generated test suites in `enhanced_generated/clients/*/test/`:
+- ❌ These are **hundreds of generated test files** for standalone clients
+- ❌ They use outdated import patterns (`from alfresco_auth import AuthClient`)
+- ❌ They're designed for individual clients, not the master client architecture
+- ❌ They will fail with `ModuleNotFoundError`
+
+**✅ Use instead:** The curated test suite in `tests/` directory:
+- ✅ **`python tests/run_tests.py`** - 2-section test runner (Unit + Integration)
+- ✅ Designed for master client architecture  
+- ✅ Uses proper imports and patterns
+- ✅ Comprehensive coverage with organized sections
 
 ### Running Specific Tests
 

@@ -18,7 +18,7 @@ import os
 from datetime import datetime
 
 # Add the enhanced_generated directory to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
 
 from AlfrescoClient import AlfrescoClient
 
@@ -177,8 +177,15 @@ def discovery_examples(client):
             repo_data = repo_result['data']
             if hasattr(repo_data, 'entry'):
                 entry = repo_data.entry
-                print(f"   Repository: {getattr(entry, 'repository', {}).get('name', 'Unknown')}")
-                print(f"   Version: {getattr(entry, 'repository', {}).get('version', {}).get('display', 'Unknown')}")
+                if hasattr(entry, 'repository'):
+                    repo = entry.repository
+                    repo_name = getattr(repo, 'name', 'Unknown')
+                    version_info = getattr(repo, 'version', None)
+                    version_display = getattr(version_info, 'display', 'Unknown') if version_info else 'Unknown'
+                    print(f"   Repository: {repo_name}")
+                    print(f"   Version: {version_display}")
+                else:
+                    print("   Repository: Pydantic object structure")
         else:
             print(f"⚠️ Repository info failed: {repo_result.get('error', 'Unknown error')}")
     else:

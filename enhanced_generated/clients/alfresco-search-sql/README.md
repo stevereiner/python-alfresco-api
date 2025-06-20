@@ -79,10 +79,11 @@ configuration = alfresco_search_sql_client.Configuration(
 with alfresco_search_sql_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_search_sql_client.SqlApi(api_client)
+    sql_search_request = alfresco_search_sql_client.SQLSearchRequest() # SQLSearchRequest | Generic query API 
 
     try:
         # Alfresco Insight Engine SQL Passthrough
-        api_response = api_instance.search()
+        api_response = api_instance.search(sql_search_request)
         print("The response of SqlApi->search:\n")
         pprint(api_response)
     except ApiException as e:

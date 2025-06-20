@@ -16,7 +16,10 @@ from pydantic import validate_call, Field, StrictFloat, StrictStr, StrictInt
 from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
 
+from pydantic import Field
+from typing_extensions import Annotated
 from alfresco_search_sql_client.models.sql_result_set_paging import SQLResultSetPaging
+from alfresco_search_sql_client.models.sql_search_request import SQLSearchRequest
 
 from alfresco_search_sql_client.api_client import ApiClient, RequestSerialized
 from alfresco_search_sql_client.api_response import ApiResponse
@@ -39,6 +42,7 @@ class SqlApi:
     @validate_call
     def search(
         self,
+        sql_search_request: Annotated[SQLSearchRequest, Field(description="Generic query API ")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -56,6 +60,8 @@ class SqlApi:
 
         **Note**: this endpoint is available in Alfresco 6.0 and newer versions. This will require Insight Engine and will not work with Alfresco Search Services.  **You specify all the parameters in this API in a JSON body**, A basic query looks like this:  ```JSON {   \"stmt\": \"select * from alfresco\",   \"locales\": [\"en_UK\"],   \"timezone\": \"Europe/London\",   \"includeMetadata\":true } ```  **Note:** the minimum possible query parameter required. ```JSON {   \"stmt\": } ``` The expected reponse will appear in the Alfresco format as seen below. ```JSON {   \"list\": {     \"pagination\": {       \"count\": 1,       \"hasMoreItems\": false,       \"totalItems\": 1,       \"skipCount\": 0,       \"maxItems\": 100   },   \"entries\": [{     \"entry\": [       {         \"label\": \"aliases\",         \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"       },       {         \"label\": \"isMetadata\",         \"value\": \"true\"       },       {         \"label\": \"fields\",         \"value\": \"[\\\"SITE\\\"]\"       }     ]   }]}}   ```   To override the default format set the format to solr.   ```JSON   {     \"stmt\": \"select * from alfresco\",     \"format\": \"solr\"   } ``` This will return Solr's output response. ```JSON {   \"result-set\": {   \"docs\": [     {       \"aliases\": {       \"SITE\": \"site\"     },       \"isMetadata\": true,       \"fields\": [ \"SITE\"]     },     {         \"RESPONSE_TIME\": 23,         \"EOF\": true     }   ]} } ```   You can use the **locales parameter** to filter results based on locale. ```JSON \"locales\": [\"en_UK\", \"en_US\"] ```  To include timezone in the query add the **timezone parameter**. ```JSON \"timezone\": \"Japan\" ```  To include custom filter queries add the **filterQueries parameter**. ```JSON \"filterQueries\": [\"-SITE:swsdp\"] ```  You can use the **includeMetadata parameter** to include addtional  information, this is by default set to false.  ```JSON \"includeMetadata\": \"false\" ``` Please note that if its set to true the first entry will represent the metdata requested   ```JSON  {    \"stmt\": \"select site from alfresco limit 2\",    \"includeMetadata\":true  } ``` The expected response: ```JSON \"entries\": [   {     #First entry holds the Metadata infromation as set by {includeMetadata:true}     \"entry\": [       {         \"label\": \"aliases\",         \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"        },       {         \"label\": \"isMetadata\",         \"value\": \"true\"       },       {         \"label\": \"fields\",         \"value\": \"[\\\"SITE\\\"]\"       }     ]     #end of Metadata   },   {     #Query result entry value.     \"entry\": [       {         \"label\": \"site\",         \"value\": \"[\\\"test\\\"]\"       }     ]   },   {     \"entry\": [     {       \"label\": \"site\",       \"value\": \"[\\\"test\\\"]\"     }     ]   } ] ``` 
 
+        :param sql_search_request: Generic query API  (required)
+        :type sql_search_request: SQLSearchRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -79,6 +85,7 @@ class SqlApi:
         """ # noqa: E501
 
         _param = self._search_serialize(
+            sql_search_request=sql_search_request,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -102,6 +109,7 @@ class SqlApi:
     @validate_call
     def search_with_http_info(
         self,
+        sql_search_request: Annotated[SQLSearchRequest, Field(description="Generic query API ")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -119,6 +127,8 @@ class SqlApi:
 
         **Note**: this endpoint is available in Alfresco 6.0 and newer versions. This will require Insight Engine and will not work with Alfresco Search Services.  **You specify all the parameters in this API in a JSON body**, A basic query looks like this:  ```JSON {   \"stmt\": \"select * from alfresco\",   \"locales\": [\"en_UK\"],   \"timezone\": \"Europe/London\",   \"includeMetadata\":true } ```  **Note:** the minimum possible query parameter required. ```JSON {   \"stmt\": } ``` The expected reponse will appear in the Alfresco format as seen below. ```JSON {   \"list\": {     \"pagination\": {       \"count\": 1,       \"hasMoreItems\": false,       \"totalItems\": 1,       \"skipCount\": 0,       \"maxItems\": 100   },   \"entries\": [{     \"entry\": [       {         \"label\": \"aliases\",         \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"       },       {         \"label\": \"isMetadata\",         \"value\": \"true\"       },       {         \"label\": \"fields\",         \"value\": \"[\\\"SITE\\\"]\"       }     ]   }]}}   ```   To override the default format set the format to solr.   ```JSON   {     \"stmt\": \"select * from alfresco\",     \"format\": \"solr\"   } ``` This will return Solr's output response. ```JSON {   \"result-set\": {   \"docs\": [     {       \"aliases\": {       \"SITE\": \"site\"     },       \"isMetadata\": true,       \"fields\": [ \"SITE\"]     },     {         \"RESPONSE_TIME\": 23,         \"EOF\": true     }   ]} } ```   You can use the **locales parameter** to filter results based on locale. ```JSON \"locales\": [\"en_UK\", \"en_US\"] ```  To include timezone in the query add the **timezone parameter**. ```JSON \"timezone\": \"Japan\" ```  To include custom filter queries add the **filterQueries parameter**. ```JSON \"filterQueries\": [\"-SITE:swsdp\"] ```  You can use the **includeMetadata parameter** to include addtional  information, this is by default set to false.  ```JSON \"includeMetadata\": \"false\" ``` Please note that if its set to true the first entry will represent the metdata requested   ```JSON  {    \"stmt\": \"select site from alfresco limit 2\",    \"includeMetadata\":true  } ``` The expected response: ```JSON \"entries\": [   {     #First entry holds the Metadata infromation as set by {includeMetadata:true}     \"entry\": [       {         \"label\": \"aliases\",         \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"        },       {         \"label\": \"isMetadata\",         \"value\": \"true\"       },       {         \"label\": \"fields\",         \"value\": \"[\\\"SITE\\\"]\"       }     ]     #end of Metadata   },   {     #Query result entry value.     \"entry\": [       {         \"label\": \"site\",         \"value\": \"[\\\"test\\\"]\"       }     ]   },   {     \"entry\": [     {       \"label\": \"site\",       \"value\": \"[\\\"test\\\"]\"     }     ]   } ] ``` 
 
+        :param sql_search_request: Generic query API  (required)
+        :type sql_search_request: SQLSearchRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -142,6 +152,7 @@ class SqlApi:
         """ # noqa: E501
 
         _param = self._search_serialize(
+            sql_search_request=sql_search_request,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -165,6 +176,7 @@ class SqlApi:
     @validate_call
     def search_without_preload_content(
         self,
+        sql_search_request: Annotated[SQLSearchRequest, Field(description="Generic query API ")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -182,6 +194,8 @@ class SqlApi:
 
         **Note**: this endpoint is available in Alfresco 6.0 and newer versions. This will require Insight Engine and will not work with Alfresco Search Services.  **You specify all the parameters in this API in a JSON body**, A basic query looks like this:  ```JSON {   \"stmt\": \"select * from alfresco\",   \"locales\": [\"en_UK\"],   \"timezone\": \"Europe/London\",   \"includeMetadata\":true } ```  **Note:** the minimum possible query parameter required. ```JSON {   \"stmt\": } ``` The expected reponse will appear in the Alfresco format as seen below. ```JSON {   \"list\": {     \"pagination\": {       \"count\": 1,       \"hasMoreItems\": false,       \"totalItems\": 1,       \"skipCount\": 0,       \"maxItems\": 100   },   \"entries\": [{     \"entry\": [       {         \"label\": \"aliases\",         \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"       },       {         \"label\": \"isMetadata\",         \"value\": \"true\"       },       {         \"label\": \"fields\",         \"value\": \"[\\\"SITE\\\"]\"       }     ]   }]}}   ```   To override the default format set the format to solr.   ```JSON   {     \"stmt\": \"select * from alfresco\",     \"format\": \"solr\"   } ``` This will return Solr's output response. ```JSON {   \"result-set\": {   \"docs\": [     {       \"aliases\": {       \"SITE\": \"site\"     },       \"isMetadata\": true,       \"fields\": [ \"SITE\"]     },     {         \"RESPONSE_TIME\": 23,         \"EOF\": true     }   ]} } ```   You can use the **locales parameter** to filter results based on locale. ```JSON \"locales\": [\"en_UK\", \"en_US\"] ```  To include timezone in the query add the **timezone parameter**. ```JSON \"timezone\": \"Japan\" ```  To include custom filter queries add the **filterQueries parameter**. ```JSON \"filterQueries\": [\"-SITE:swsdp\"] ```  You can use the **includeMetadata parameter** to include addtional  information, this is by default set to false.  ```JSON \"includeMetadata\": \"false\" ``` Please note that if its set to true the first entry will represent the metdata requested   ```JSON  {    \"stmt\": \"select site from alfresco limit 2\",    \"includeMetadata\":true  } ``` The expected response: ```JSON \"entries\": [   {     #First entry holds the Metadata infromation as set by {includeMetadata:true}     \"entry\": [       {         \"label\": \"aliases\",         \"value\": \"{\\\"SITE\\\":\\\"site\\\"}\"        },       {         \"label\": \"isMetadata\",         \"value\": \"true\"       },       {         \"label\": \"fields\",         \"value\": \"[\\\"SITE\\\"]\"       }     ]     #end of Metadata   },   {     #Query result entry value.     \"entry\": [       {         \"label\": \"site\",         \"value\": \"[\\\"test\\\"]\"       }     ]   },   {     \"entry\": [     {       \"label\": \"site\",       \"value\": \"[\\\"test\\\"]\"     }     ]   } ] ``` 
 
+        :param sql_search_request: Generic query API  (required)
+        :type sql_search_request: SQLSearchRequest
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -205,6 +219,7 @@ class SqlApi:
         """ # noqa: E501
 
         _param = self._search_serialize(
+            sql_search_request=sql_search_request,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -223,6 +238,7 @@ class SqlApi:
 
     def _search_serialize(
         self,
+        sql_search_request,
         _request_auth,
         _content_type,
         _headers,
@@ -248,6 +264,8 @@ class SqlApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
+        if sql_search_request is not None:
+            _body_params = sql_search_request
 
 
         # set the HTTP header `Accept`
@@ -258,6 +276,19 @@ class SqlApi:
                 ]
             )
 
+        # set the HTTP header `Content-Type`
+        if _content_type:
+            _header_params['Content-Type'] = _content_type
+        else:
+            _default_content_type = (
+                self.api_client.select_header_content_type(
+                    [
+                        'application/json'
+                    ]
+                )
+            )
+            if _default_content_type is not None:
+                _header_params['Content-Type'] = _default_content_type
 
         # authentication setting
         _auth_settings: List[str] = [

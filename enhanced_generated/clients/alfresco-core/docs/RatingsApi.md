@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 
 # **create_rating**
-> RatingEntry create_rating(node_id, rating_body_create, fields=fields)
+> RatingEntry create_rating(node_id, rating_body, fields=fields)
 
 Create a rating
 
@@ -50,12 +50,12 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_core_client.RatingsApi(api_client)
     node_id = 'node_id_example' # str | The identifier of a node.
-    rating_body_create = alfresco_core_client.RatingBody() # RatingBody | For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ``` 
+    rating_body = alfresco_core_client.RatingBody() # RatingBody | For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ``` 
     fields = ['fields_example'] # List[str] | A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  (optional)
 
     try:
         # Create a rating
-        api_response = api_instance.create_rating(node_id, rating_body_create, fields=fields)
+        api_response = api_instance.create_rating(node_id, rating_body, fields=fields)
         print("The response of RatingsApi->create_rating:\n")
         pprint(api_response)
     except Exception as e:
@@ -70,7 +70,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **node_id** | **str**| The identifier of a node. | 
- **rating_body_create** | [**RatingBody**](RatingBody.md)| For \&quot;myRating\&quot; the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \&quot;like\&quot; a file the following body would be used:  &#x60;&#x60;&#x60;JSON   {     \&quot;id\&quot;: \&quot;likes\&quot;,     \&quot;myRating\&quot;: true   } &#x60;&#x60;&#x60;  | 
+ **rating_body** | [**RatingBody**](RatingBody.md)| For \&quot;myRating\&quot; the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \&quot;like\&quot; a file the following body would be used:  &#x60;&#x60;&#x60;JSON   {     \&quot;id\&quot;: \&quot;likes\&quot;,     \&quot;myRating\&quot;: true   } &#x60;&#x60;&#x60;  | 
  **fields** | [**List[str]**](str.md)| A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  | [optional] 
 
 ### Return type

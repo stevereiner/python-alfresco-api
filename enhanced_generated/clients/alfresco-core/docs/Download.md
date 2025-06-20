@@ -5,12 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**bytes_added** | **int** | number of bytes added so far in the zip | [optional] 
-**files_added** | **int** | number of files added so far in the zip | [optional] 
+**bytes_added** | **int** | number of bytes added so far in the zip | [optional] [default to 0]
+**files_added** | **int** | number of files added so far in the zip | [optional] [default to 0]
 **id** | **str** | the id of the download node | [optional] 
 **status** | **str** | the current status of the download node creation | [optional] [default to 'PENDING']
-**total_bytes** | **int** | the total number of bytes to be added in the zip | [optional] 
-**total_files** | **int** | the total number of files to be added in the zip | [optional] 
+**total_bytes** | **int** | the total number of bytes to be added in the zip | [optional] [default to 0]
+**total_files** | **int** | the total number of files to be added in the zip | [optional] [default to 0]
 
 ## Example
 

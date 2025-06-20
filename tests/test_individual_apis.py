@@ -432,7 +432,6 @@ class TestWorkflowAPI:
             assert 'tasks' in enhanced_client.workflow, "Missing tasks API"
             
             print("✓ Workflow APIs available: deployments, process_definitions, processes, tasks")
-            return True
         else:
             pytest.fail("Workflow API not available")
 
@@ -495,6 +494,5 @@ class TestModelAPI:
             assert 'types' in enhanced_client.model, "Missing types API"
             
             print("✓ Model APIs available: aspects, types")
-            return True
         else:
             pytest.fail("Model API not available") 

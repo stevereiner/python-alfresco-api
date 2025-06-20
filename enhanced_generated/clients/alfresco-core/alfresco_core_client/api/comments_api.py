@@ -45,7 +45,7 @@ class CommentsApi:
     def create_comment(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        comment_body_create: Annotated[CommentBody, Field(description="The comment text. Note that you can also provide a list of comments.")],
+        comment_body: Annotated[CommentBody, Field(description="The comment text. Note that you can also provide a list of comments.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -66,8 +66,8 @@ class CommentsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param comment_body_create: The comment text. Note that you can also provide a list of comments. (required)
-        :type comment_body_create: CommentBody
+        :param comment_body: The comment text. Note that you can also provide a list of comments. (required)
+        :type comment_body: CommentBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -94,7 +94,7 @@ class CommentsApi:
 
         _param = self._create_comment_serialize(
             node_id=node_id,
-            comment_body_create=comment_body_create,
+            comment_body=comment_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -126,7 +126,7 @@ class CommentsApi:
     def create_comment_with_http_info(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        comment_body_create: Annotated[CommentBody, Field(description="The comment text. Note that you can also provide a list of comments.")],
+        comment_body: Annotated[CommentBody, Field(description="The comment text. Note that you can also provide a list of comments.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -147,8 +147,8 @@ class CommentsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param comment_body_create: The comment text. Note that you can also provide a list of comments. (required)
-        :type comment_body_create: CommentBody
+        :param comment_body: The comment text. Note that you can also provide a list of comments. (required)
+        :type comment_body: CommentBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -175,7 +175,7 @@ class CommentsApi:
 
         _param = self._create_comment_serialize(
             node_id=node_id,
-            comment_body_create=comment_body_create,
+            comment_body=comment_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -207,7 +207,7 @@ class CommentsApi:
     def create_comment_without_preload_content(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        comment_body_create: Annotated[CommentBody, Field(description="The comment text. Note that you can also provide a list of comments.")],
+        comment_body: Annotated[CommentBody, Field(description="The comment text. Note that you can also provide a list of comments.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -228,8 +228,8 @@ class CommentsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param comment_body_create: The comment text. Note that you can also provide a list of comments. (required)
-        :type comment_body_create: CommentBody
+        :param comment_body: The comment text. Note that you can also provide a list of comments. (required)
+        :type comment_body: CommentBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -256,7 +256,7 @@ class CommentsApi:
 
         _param = self._create_comment_serialize(
             node_id=node_id,
-            comment_body_create=comment_body_create,
+            comment_body=comment_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -283,7 +283,7 @@ class CommentsApi:
     def _create_comment_serialize(
         self,
         node_id,
-        comment_body_create,
+        comment_body,
         fields,
         _request_auth,
         _content_type,
@@ -317,8 +317,8 @@ class CommentsApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if comment_body_create is not None:
-            _body_params = comment_body_create
+        if comment_body is not None:
+            _body_params = comment_body
 
 
         # set the HTTP header `Accept`
@@ -984,7 +984,7 @@ class CommentsApi:
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
         comment_id: Annotated[StrictStr, Field(description="The identifier of a comment.")],
-        comment_body_update: Annotated[CommentBody, Field(description="The JSON representing the comment to be updated.")],
+        comment_body: Annotated[CommentBody, Field(description="The JSON representing the comment to be updated.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1007,8 +1007,8 @@ class CommentsApi:
         :type node_id: str
         :param comment_id: The identifier of a comment. (required)
         :type comment_id: str
-        :param comment_body_update: The JSON representing the comment to be updated. (required)
-        :type comment_body_update: CommentBody
+        :param comment_body: The JSON representing the comment to be updated. (required)
+        :type comment_body: CommentBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1036,7 +1036,7 @@ class CommentsApi:
         _param = self._update_comment_serialize(
             node_id=node_id,
             comment_id=comment_id,
-            comment_body_update=comment_body_update,
+            comment_body=comment_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1068,7 +1068,7 @@ class CommentsApi:
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
         comment_id: Annotated[StrictStr, Field(description="The identifier of a comment.")],
-        comment_body_update: Annotated[CommentBody, Field(description="The JSON representing the comment to be updated.")],
+        comment_body: Annotated[CommentBody, Field(description="The JSON representing the comment to be updated.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1091,8 +1091,8 @@ class CommentsApi:
         :type node_id: str
         :param comment_id: The identifier of a comment. (required)
         :type comment_id: str
-        :param comment_body_update: The JSON representing the comment to be updated. (required)
-        :type comment_body_update: CommentBody
+        :param comment_body: The JSON representing the comment to be updated. (required)
+        :type comment_body: CommentBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1120,7 +1120,7 @@ class CommentsApi:
         _param = self._update_comment_serialize(
             node_id=node_id,
             comment_id=comment_id,
-            comment_body_update=comment_body_update,
+            comment_body=comment_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1152,7 +1152,7 @@ class CommentsApi:
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
         comment_id: Annotated[StrictStr, Field(description="The identifier of a comment.")],
-        comment_body_update: Annotated[CommentBody, Field(description="The JSON representing the comment to be updated.")],
+        comment_body: Annotated[CommentBody, Field(description="The JSON representing the comment to be updated.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -1175,8 +1175,8 @@ class CommentsApi:
         :type node_id: str
         :param comment_id: The identifier of a comment. (required)
         :type comment_id: str
-        :param comment_body_update: The JSON representing the comment to be updated. (required)
-        :type comment_body_update: CommentBody
+        :param comment_body: The JSON representing the comment to be updated. (required)
+        :type comment_body: CommentBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -1204,7 +1204,7 @@ class CommentsApi:
         _param = self._update_comment_serialize(
             node_id=node_id,
             comment_id=comment_id,
-            comment_body_update=comment_body_update,
+            comment_body=comment_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -1231,7 +1231,7 @@ class CommentsApi:
         self,
         node_id,
         comment_id,
-        comment_body_update,
+        comment_body,
         fields,
         _request_auth,
         _content_type,
@@ -1267,8 +1267,8 @@ class CommentsApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if comment_body_update is not None:
-            _body_params = comment_body_update
+        if comment_body is not None:
+            _body_params = comment_body
 
 
         # set the HTTP header `Accept`

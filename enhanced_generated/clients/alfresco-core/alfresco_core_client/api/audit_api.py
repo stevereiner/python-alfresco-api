@@ -2341,7 +2341,7 @@ class AuditApi:
     def update_audit_app(
         self,
         audit_application_id: Annotated[StrictStr, Field(description="The identifier of an audit application.")],
-        audit_app_body_update: Annotated[AuditBodyUpdate, Field(description="The audit application to update.")],
+        audit_body_update: Annotated[AuditBodyUpdate, Field(description="The audit application to update.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -2362,8 +2362,8 @@ class AuditApi:
 
         :param audit_application_id: The identifier of an audit application. (required)
         :type audit_application_id: str
-        :param audit_app_body_update: The audit application to update. (required)
-        :type audit_app_body_update: AuditBodyUpdate
+        :param audit_body_update: The audit application to update. (required)
+        :type audit_body_update: AuditBodyUpdate
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -2390,7 +2390,7 @@ class AuditApi:
 
         _param = self._update_audit_app_serialize(
             audit_application_id=audit_application_id,
-            audit_app_body_update=audit_app_body_update,
+            audit_body_update=audit_body_update,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -2421,7 +2421,7 @@ class AuditApi:
     def update_audit_app_with_http_info(
         self,
         audit_application_id: Annotated[StrictStr, Field(description="The identifier of an audit application.")],
-        audit_app_body_update: Annotated[AuditBodyUpdate, Field(description="The audit application to update.")],
+        audit_body_update: Annotated[AuditBodyUpdate, Field(description="The audit application to update.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -2442,8 +2442,8 @@ class AuditApi:
 
         :param audit_application_id: The identifier of an audit application. (required)
         :type audit_application_id: str
-        :param audit_app_body_update: The audit application to update. (required)
-        :type audit_app_body_update: AuditBodyUpdate
+        :param audit_body_update: The audit application to update. (required)
+        :type audit_body_update: AuditBodyUpdate
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -2470,7 +2470,7 @@ class AuditApi:
 
         _param = self._update_audit_app_serialize(
             audit_application_id=audit_application_id,
-            audit_app_body_update=audit_app_body_update,
+            audit_body_update=audit_body_update,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -2501,7 +2501,7 @@ class AuditApi:
     def update_audit_app_without_preload_content(
         self,
         audit_application_id: Annotated[StrictStr, Field(description="The identifier of an audit application.")],
-        audit_app_body_update: Annotated[AuditBodyUpdate, Field(description="The audit application to update.")],
+        audit_body_update: Annotated[AuditBodyUpdate, Field(description="The audit application to update.")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -2522,8 +2522,8 @@ class AuditApi:
 
         :param audit_application_id: The identifier of an audit application. (required)
         :type audit_application_id: str
-        :param audit_app_body_update: The audit application to update. (required)
-        :type audit_app_body_update: AuditBodyUpdate
+        :param audit_body_update: The audit application to update. (required)
+        :type audit_body_update: AuditBodyUpdate
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -2550,7 +2550,7 @@ class AuditApi:
 
         _param = self._update_audit_app_serialize(
             audit_application_id=audit_application_id,
-            audit_app_body_update=audit_app_body_update,
+            audit_body_update=audit_body_update,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -2576,7 +2576,7 @@ class AuditApi:
     def _update_audit_app_serialize(
         self,
         audit_application_id,
-        audit_app_body_update,
+        audit_body_update,
         fields,
         _request_auth,
         _content_type,
@@ -2610,8 +2610,8 @@ class AuditApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if audit_app_body_update is not None:
-            _body_params = audit_app_body_update
+        if audit_body_update is not None:
+            _body_params = audit_body_update
 
 
         # set the HTTP header `Accept`

@@ -128,7 +128,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **create_association**
-> AssociationEntry create_association(node_id, association_body_create, fields=fields)
+> AssociationEntry create_association(node_id, association_body, fields=fields)
 
 Create node association
 
@@ -213,12 +213,12 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_core_client.NodesApi(api_client)
     node_id = 'node_id_example' # str | The identifier of a source node.
-    association_body_create = alfresco_core_client.AssociationBody() # AssociationBody | The target node id and assoc type.
+    association_body = alfresco_core_client.AssociationBody() # AssociationBody | The target node id and assoc type.
     fields = ['fields_example'] # List[str] | A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  (optional)
 
     try:
         # Create node association
-        api_response = api_instance.create_association(node_id, association_body_create, fields=fields)
+        api_response = api_instance.create_association(node_id, association_body, fields=fields)
         print("The response of NodesApi->create_association:\n")
         pprint(api_response)
     except Exception as e:
@@ -233,7 +233,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **node_id** | **str**| The identifier of a source node. | 
- **association_body_create** | [**AssociationBody**](AssociationBody.md)| The target node id and assoc type. | 
+ **association_body** | [**AssociationBody**](AssociationBody.md)| The target node id and assoc type. | 
  **fields** | [**List[str]**](str.md)| A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  | [optional] 
 
 ### Return type
@@ -599,7 +599,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **create_secondary_child_association**
-> ChildAssociationEntry create_secondary_child_association(node_id, secondary_child_association_body_create, fields=fields)
+> ChildAssociationEntry create_secondary_child_association(node_id, child_association_body, fields=fields)
 
 Create secondary child
 
@@ -684,12 +684,12 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_core_client.NodesApi(api_client)
     node_id = 'node_id_example' # str | The identifier of a parent node.
-    secondary_child_association_body_create = alfresco_core_client.ChildAssociationBody() # ChildAssociationBody | The child node id and assoc type.
+    child_association_body = alfresco_core_client.ChildAssociationBody() # ChildAssociationBody | The child node id and assoc type.
     fields = ['fields_example'] # List[str] | A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  (optional)
 
     try:
         # Create secondary child
-        api_response = api_instance.create_secondary_child_association(node_id, secondary_child_association_body_create, fields=fields)
+        api_response = api_instance.create_secondary_child_association(node_id, child_association_body, fields=fields)
         print("The response of NodesApi->create_secondary_child_association:\n")
         pprint(api_response)
     except Exception as e:
@@ -704,7 +704,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **node_id** | **str**| The identifier of a parent node. | 
- **secondary_child_association_body_create** | [**ChildAssociationBody**](ChildAssociationBody.md)| The child node id and assoc type. | 
+ **child_association_body** | [**ChildAssociationBody**](ChildAssociationBody.md)| The child node id and assoc type. | 
  **fields** | [**List[str]**](str.md)| A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.  | [optional] 
 
 ### Return type
@@ -2194,7 +2194,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **update_node_content**
-> NodeEntry update_node_content(node_id, content_body_update, major_version=major_version, comment=comment, name=name, include=include, fields=fields)
+> NodeEntry update_node_content(node_id, body, major_version=major_version, comment=comment, name=name, include=include, fields=fields)
 
 Update node content
 
@@ -2247,7 +2247,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_core_client.NodesApi(api_client)
     node_id = 'node_id_example' # str | The identifier of a node.
-    content_body_update = None # bytearray | The binary content
+    body = None # bytearray | The binary content
     major_version = False # bool | If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned.  (optional) (default to False)
     comment = 'comment_example' # str | Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned.  (optional)
     name = 'name_example' # str | Optional new name. This should include the file extension. The name must not contain spaces or the following special characters: * \" < > \\ / ? : and |. The character `.` must not be used at the end of the name.  (optional)
@@ -2256,7 +2256,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
 
     try:
         # Update node content
-        api_response = api_instance.update_node_content(node_id, content_body_update, major_version=major_version, comment=comment, name=name, include=include, fields=fields)
+        api_response = api_instance.update_node_content(node_id, body, major_version=major_version, comment=comment, name=name, include=include, fields=fields)
         print("The response of NodesApi->update_node_content:\n")
         pprint(api_response)
     except Exception as e:
@@ -2271,7 +2271,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **node_id** | **str**| The identifier of a node. | 
- **content_body_update** | **bytearray**| The binary content | 
+ **body** | **bytearray**| The binary content | 
  **major_version** | **bool**| If **true**, create a major version. Setting this parameter also enables versioning of this node, if it is not already versioned.  | [optional] [default to False]
  **comment** | **str**| Add a version comment which will appear in version history. Setting this parameter also enables versioning of this node, if it is not already versioned.  | [optional] 
  **name** | **str**| Optional new name. This should include the file extension. The name must not contain spaces or the following special characters: * \&quot; &lt; &gt; \\ / ? : and |. The character &#x60;.&#x60; must not be used at the end of the name.  | [optional] 

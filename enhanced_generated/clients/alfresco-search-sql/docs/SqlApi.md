@@ -8,7 +8,7 @@ Method | HTTP request | Description
 
 
 # **search**
-> SQLResultSetPaging search()
+> SQLResultSetPaging search(sql_search_request)
 
 Alfresco Insight Engine SQL Passthrough
 
@@ -167,6 +167,7 @@ The expected response:
 ```python
 import alfresco_search_sql_client
 from alfresco_search_sql_client.models.sql_result_set_paging import SQLResultSetPaging
+from alfresco_search_sql_client.models.sql_search_request import SQLSearchRequest
 from alfresco_search_sql_client.rest import ApiException
 from pprint import pprint
 
@@ -191,10 +192,11 @@ configuration = alfresco_search_sql_client.Configuration(
 with alfresco_search_sql_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_search_sql_client.SqlApi(api_client)
+    sql_search_request = alfresco_search_sql_client.SQLSearchRequest() # SQLSearchRequest | Generic query API 
 
     try:
         # Alfresco Insight Engine SQL Passthrough
-        api_response = api_instance.search()
+        api_response = api_instance.search(sql_search_request)
         print("The response of SqlApi->search:\n")
         pprint(api_response)
     except Exception as e:
@@ -205,7 +207,10 @@ with alfresco_search_sql_client.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **sql_search_request** | [**SQLSearchRequest**](SQLSearchRequest.md)| Generic query API  | 
 
 ### Return type
 
@@ -217,7 +222,7 @@ This endpoint does not need any parameter.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 ### HTTP response details

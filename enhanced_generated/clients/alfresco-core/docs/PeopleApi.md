@@ -691,7 +691,7 @@ void (empty response body)
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **update_avatar_image**
-> update_avatar_image(person_id, content_body_update)
+> update_avatar_image(person_id, body)
 
 Update avatar image
 
@@ -738,11 +738,11 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = alfresco_core_client.PeopleApi(api_client)
     person_id = 'person_id_example' # str | The identifier of a person.
-    content_body_update = None # bytearray | The binary content
+    body = None # bytearray | The binary content
 
     try:
         # Update avatar image
-        api_instance.update_avatar_image(person_id, content_body_update)
+        api_instance.update_avatar_image(person_id, body)
     except Exception as e:
         print("Exception when calling PeopleApi->update_avatar_image: %s\n" % e)
 ```
@@ -755,7 +755,7 @@ with alfresco_core_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **person_id** | **str**| The identifier of a person. | 
- **content_body_update** | **bytearray**| The binary content | 
+ **body** | **bytearray**| The binary content | 
 
 ### Return type
 

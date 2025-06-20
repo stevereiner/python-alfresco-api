@@ -3791,7 +3791,7 @@ class TasksApi:
         self,
         task_id: Annotated[StrictStr, Field(description="The identifier of a task.")],
         variable_name: Annotated[StrictStr, Field(description="The name of a variable.")],
-        variable_body: Annotated[Variable, Field(description="A variable")],
+        variable: Annotated[Variable, Field(description="A variable")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -3813,8 +3813,8 @@ class TasksApi:
         :type task_id: str
         :param variable_name: The name of a variable. (required)
         :type variable_name: str
-        :param variable_body: A variable (required)
-        :type variable_body: Variable
+        :param variable: A variable (required)
+        :type variable: Variable
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -3840,7 +3840,7 @@ class TasksApi:
         _param = self._update_task_variable_serialize(
             task_id=task_id,
             variable_name=variable_name,
-            variable_body=variable_body,
+            variable=variable,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -3869,7 +3869,7 @@ class TasksApi:
         self,
         task_id: Annotated[StrictStr, Field(description="The identifier of a task.")],
         variable_name: Annotated[StrictStr, Field(description="The name of a variable.")],
-        variable_body: Annotated[Variable, Field(description="A variable")],
+        variable: Annotated[Variable, Field(description="A variable")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -3891,8 +3891,8 @@ class TasksApi:
         :type task_id: str
         :param variable_name: The name of a variable. (required)
         :type variable_name: str
-        :param variable_body: A variable (required)
-        :type variable_body: Variable
+        :param variable: A variable (required)
+        :type variable: Variable
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -3918,7 +3918,7 @@ class TasksApi:
         _param = self._update_task_variable_serialize(
             task_id=task_id,
             variable_name=variable_name,
-            variable_body=variable_body,
+            variable=variable,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -3947,7 +3947,7 @@ class TasksApi:
         self,
         task_id: Annotated[StrictStr, Field(description="The identifier of a task.")],
         variable_name: Annotated[StrictStr, Field(description="The name of a variable.")],
-        variable_body: Annotated[Variable, Field(description="A variable")],
+        variable: Annotated[Variable, Field(description="A variable")],
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -3969,8 +3969,8 @@ class TasksApi:
         :type task_id: str
         :param variable_name: The name of a variable. (required)
         :type variable_name: str
-        :param variable_body: A variable (required)
-        :type variable_body: Variable
+        :param variable: A variable (required)
+        :type variable: Variable
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -3996,7 +3996,7 @@ class TasksApi:
         _param = self._update_task_variable_serialize(
             task_id=task_id,
             variable_name=variable_name,
-            variable_body=variable_body,
+            variable=variable,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -4020,7 +4020,7 @@ class TasksApi:
         self,
         task_id,
         variable_name,
-        variable_body,
+        variable,
         _request_auth,
         _content_type,
         _headers,
@@ -4050,8 +4050,8 @@ class TasksApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if variable_body is not None:
-            _body_params = variable_body
+        if variable is not None:
+            _body_params = variable
 
 
         # set the HTTP header `Accept`

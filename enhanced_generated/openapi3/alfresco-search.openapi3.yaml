@@ -1,22 +1,466 @@
 openapi: 3.0.0
 info:
-  description: '**Search API**
-  
-  
+  description: |
+    **Search API**
+
     Provides access to the search features of Alfresco Content Services.
-  
-    '
   title: Alfresco Content Services REST API
-  version: '1'
-servers:
-  - url: /alfresco/api/-default-/public/search/versions/1
+  version: "1"
+paths:
+  /search:
+    post:
+      description: >
+        **Note**: this endpoint is available in Alfresco 5.2 and newer versions.
+
+
+        **You specify all the parameters in this API in a JSON body**, URL parameters are not supported.
+
+        A basic query looks like this:
+
+
+        ```JSON
+
+        {
+          "query": {
+            "query": "foo"
+          }
+        }
+
+        ```
+
+
+        **Note:** These are the minimum possible query parameters.
+
+
+        The default search language is **afts** ([Alfresco Full Text Search](http://docs.alfresco.com/5.1/concepts/rm-searchsyntax-intro.html)), but you can also specify **cmis**, and **lucene**.
+
+
+        A basic CMIS query looks like this:
+
+
+        ```JSON
+
+        {
+          "query": {
+            "query": "select * from cmis:folder",
+            "language": "cmis"
+          }
+        }
+
+        ```
+
+
+        By default, **results are limited to the first 100.**
+
+        Results can be restricted using "paging". For example:
+
+        ```JSON
+
+        "paging": {
+          "maxItems": "50",
+          "skipCount": "28"
+        }
+
+        ```
+
+        This example would ensure that results are **limited by Final Size**, skipping the first 28 results and returning the next 50.
+
+
+        Alternatively, you can limit the results by using the **limits JSON body parameter**. For example,
+
+        ```JSON
+
+        "limits": {
+          "permissionEvaluationTime": 20000,
+          "permissionEvaluationCount": 2000
+        }
+
+        ```
+
+
+        You can use the **include JSON body parameter** to return additional information.
+
+        This works in the same way as in the /nodes/{nodeId}/children method in the core API. For example:
+
+        ```JSON
+
+        "include": ["aspectNames", "properties", "isLink"]
+
+        ```
+
+
+        You can use the **fields JSON body parameter** to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.
+
+        This works in the same way as in the /nodes/{nodeId}/children method in the core API. For example:
+
+        ```JSON
+
+        "fields": ["id", "name", "search"]
+
+        ```
+
+
+        You can sort the results using the **sort JSON body parameter**, for example:
+
+        ```JSON
+
+        "sort": [{"type":"FIELD", "field":"cm:description", "ascending":"true"}]
+
+        ```
+
+        **Note:** the **sort** parameter is not supported for CMIS queries.
+
+
+        By default, search uses the **"nodes" location**, which is the **content store known as workspace://SpacesStore**.
+
+        To change the scope to another location you can use the **locations JSON body parameter**.
+
+        You can specify either **nodes** (the default), **versions** or **deleted-nodes**. For example:
+
+        ```JSON
+
+        "scope": {
+            "locations": ["deleted-nodes"]
+        }
+
+        ```
+
+        You can specify templates using the **templates JSON body parameter**, for example:
+
+        ```JSON
+
+        "templates": [{"name": "_PERSON","template": "|%firstName OR |%lastName OR |%userName"},
+                      {"name": "mytemplate","template": "%cm:content"}]
+        ```
+
+
+        **Note: Spell checking only works on Search Services (Solr 6) if you have already enabled suggestions.**
+
+
+        For **spell checking** you can use a query like this:
+
+        ```JSON
+
+        {
+          "query": {
+            "query": "cm:title:alfrezco"
+          },
+          "spellcheck": {"query": "alfrezco"}
+        }
+
+        ```
+
+
+        If you are already specifying "userQuery" then the following may be easier and produces the same result :
+
+        ```JSON
+
+        {
+          "query": {
+            "query": "cm:title:alfrezco",
+            "userQuery": "alfrezco"
+          },
+          "spellcheck": {}
+        }
+
+        ```
+
+
+        The spellcheck response includes a spellCheck context like this:
+
+        ```JSON
+
+        "context": {
+          "spellCheck": {
+            "type": "searchInsteadFor",
+            "suggestions": ["alfresco"]
+          }
+        },
+
+        ```
+
+
+        To specify defaults, you  use a **defaults JSON body parameter**, for example:
+
+        ```JSON
+
+        "defaults": {
+          "textAttributes": [
+            "cm:content", "cm:name"
+          ],
+          "defaultFTSOperator": "AND",
+          "defaultFTSFieldOperator": "OR",
+          "namespace": "cm",
+          "defaultFieldName": "PATH"
+        }
+
+        ```
+
+
+        You can specify several filter queries using the **filterQueries JSON body parameter**, for example:
+
+        ```JSON
+
+        "filterQueries": [{"query": "TYPE:'cm:folder'"},{"query": "cm:creator:mjackson"}]
+
+        ```
+
+
+        You can specify several facet queries using the **facetQueries JSON body parameter**, for example:
+
+        ```JSON
+
+        "facetQueries": [{"query": "created:2016","label": "CreatedThisYear"}]
+
+        ```
+
+        The response will contain a matching "context" section, the "label" will match the facet query.
+
+        ```JSON
+
+        "context": {
+          "facetQueries": [
+            {"label": "CreatedThisYear","count": 3}
+          ]
+        },
+
+        ```
+
+
+        A complete query for facetting via the content.size field looks this:
+
+        ```JSON
+
+        {
+          "query": {
+            "query": "presentation",
+            "language": "afts"
+          },
+            "facetQueries": [
+                {"query": "content.size:[0 TO 10240]", "label": "xtra small"},
+                {"query": "content.size:[10240 TO 102400]", "label": "small"},
+                {"query": "content.size:[102400 TO 1048576]", "label": "medium"},
+                {"query": "content.size:[1048576 TO 16777216]", "label": "large"},
+                {"query": "content.size:[16777216 TO 134217728]", "label": "xtra large"},
+                {"query": "content.size:[134217728 TO MAX]", "label": "XX large"}
+          ],
+            "facetFields": {"facets": [{"field": "'content.size'"}]}
+        }
+
+        ```
+
+
+        The response will contain a matching "context" section, the "label" will match the facet query.
+
+        ```JSON
+
+        "context": {
+          "facetQueries": [
+            { "label": "small","count": 2 },
+            { "label": "large","count": 0 },
+            { "label": "xtra small","count": 5 },
+            { "label": "xtra large","count": 56},
+            { "label": "medium","count": 4 },
+            { "label": "XX large", "count": 1 }
+          ]
+        },
+
+        ```
+
+
+        You can specify several facet fields using the **facetFields JSON body parameter**, for example:
+
+        ```JSON
+
+        "facetFields": {"facets": [{"field": "creator", "mincount": 1}, {"field": "modifier", "mincount": 1}]}
+
+        ```
+
+        The response will contain a matching "context" section, the "label" will match the facet field.
+
+        ```JSON
+
+        "context": {
+           "facetsFields": [
+             {  "label": "creator",
+                "buckets": [
+                  { "label": "System", "count": 75 },
+                  { "label": "mjackson", "count": 5 }
+                ]},
+             {  "label": "modifier",
+                "buckets": [
+                  { "label": "System", "count": 72 },
+                  { "label": "mjackson", "count": 5 },
+                  { "label": "admin", "count": 3 }
+                ]}
+           ]
+        },
+
+        ```
+
+
+        Grouping facet queries that go together can be done by specifying the group label in the fact queries as follow:
+
+        ```JSON
+            {
+                "query": {
+                    "query": "presentation"
+                },
+                "facetQueries": [
+                    {"query": "content.size:[0 TO 102400]", "label": "small", "group":"foo"},
+                    {"query": "content.size:[102400 TO 1048576]", "label": "medium","group":"foo"},
+                    {"query": "content.size:[1048576 TO 16777216]", "label": "large","group":"foo"}
+                ]
+            }
+        ```
+
+        The above query returns the results a faceted field grouped under the label foo:
+
+        ```JSON
+
+        {
+            "context": {"facetsFields": [{
+                "label": "foo",
+                "buckets": [
+                    {
+                        "count": 109,
+                        "label": "small",
+                        "filterQuery": "content.size:[0 TO 102400]"
+                    },
+                    {
+                        "count": 0,
+                        "label": "large",
+                        "filterQuery": "content.size:[1048576 TO 16777216]"
+                    },
+                    {
+                        "count": 0,
+                        "label": "medium",
+                        "filterQuery": "content.size:[102400 TO 1048576]"
+                    }
+                ]
+            }]
+        }
+
+        ```
+
+        Range Faceting is supported by the **ranges JSON body parameter**, for example:
+
+        ```JSON
+            {
+                "query": {
+                    "query": "presentation"
+                },
+                "ranges": [
+                {
+                    "field": "content.size",
+                     "start": "0",
+                     "end": "100",
+                     "gap": "20",
+                     "hardend": true
+                },
+                {
+                    "field": "created",
+                    "start": "2015-09-29T10:45:15.729Z",
+                    "end": "2016-09-29T10:45:15.729Z",
+                    "gap": "+100DAY"
+                }]
+            }
+        ```
+
+        An example query for **search highlighting** could look like this:
+
+        ```JSON
+
+        {
+          "query": {
+            "query": "description:workflow",
+            "userQuery":"workflow"
+          },
+          "highlight": {
+            "prefix": "¿",
+            "postfix": "?",
+            "mergeContiguous": true,
+            "fields": [
+              {
+                "field": "cm:title"
+              },
+              {
+                "field": "description",
+                "prefix": "(",
+                "postfix": ")"
+              }
+
+            ]
+          }
+        }
+
+        ```
+
+        The example above changes the highlighting prefix and postfix from the default `<em>` for all fields to ¿? and just for the "description" field to ().
+
+        The hightlight information is added in each node entry response; here is an example partial response:
+
+        ```
+
+        "entry": {
+                "createdAt": "2016-10-12T15:24:31.202+0000",
+                "isFolder": true,
+                "search": {
+                  "score": 1,
+                  "highlight": [
+                    {
+                      "field": "cm:title",
+                      "snippets": [
+                        "Customized ¿Workflow? Process Definitions"
+                      ]
+                    },
+                    {
+                      "field": "description",
+                      "snippets": [
+                        "Customized (Workflow) Process Definitions"
+                      ]
+                    }
+                  ]
+              },
+        ```
+
+        **Note**: after the migration to Swagger UI 3, this API definition was triggering some warnings, more info in [this StackOverflow Q&A](https://stackoverflow.com/q/65584131/1654265).
+      operationId: search
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+        description: |
+          Generic query API
+        required: true
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResultSetPaging"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      summary: Searches Alfresco
+      tags:
+        - search
+      x-alfresco-since: "5.2"
 security:
   - basicAuth: []
-x-original-produces:
-  - application/json
-x-original-consumes:
-  - application/json
+servers:
+  - url: /alfresco/api/-default-/public/search/versions/1
 components:
+  securitySchemes:
+    basicAuth:
+      description: HTTP Basic Authentication
+      type: http
+      scheme: basic
   schemas:
     ContentInfo:
       properties:
@@ -31,9 +475,9 @@ components:
         sizeInBytes:
           type: integer
       required:
-      - mimeType
-      - mimeTypeName
-      - sizeInBytes
+        - mimeType
+        - mimeTypeName
+        - sizeInBytes
       type: object
     Error:
       properties:
@@ -54,7 +498,7 @@ components:
               type: integer
           type: object
       required:
-      - error
+        - error
       type: object
     GenericBucket:
       description: A bucket of facet results
@@ -92,7 +536,7 @@ components:
         metrics:
           description: An array of buckets and values
           items:
-            $ref: '#/components/schemas/GenericMetric'
+            $ref: "#/components/schemas/GenericMetric"
           type: array
       type: object
     GenericFacetResponse:
@@ -100,7 +544,7 @@ components:
         buckets:
           description: An array of buckets and values
           items:
-            $ref: '#/components/schemas/GenericBucket'
+            $ref: "#/components/schemas/GenericBucket"
           type: array
         label:
           description: The field name or its explicit label, if provided on the request
@@ -116,9 +560,8 @@ components:
           description: The type of metric, e.g. count
           type: string
         value:
-          description: 'The metric value, e.g. {"count": 34}
-  
-            '
+          description: |
+            The metric value, e.g. {"count": 34}
           type: object
       type: object
     Node:
@@ -132,12 +575,12 @@ components:
             type: string
           type: array
         content:
-          $ref: '#/components/schemas/ContentInfo'
+          $ref: "#/components/schemas/ContentInfo"
         createdAt:
           format: date-time
           type: string
         createdByUser:
-          $ref: '#/components/schemas/UserInfo'
+          $ref: "#/components/schemas/UserInfo"
         id:
           type: string
         isFile:
@@ -153,14 +596,13 @@ components:
           format: date-time
           type: string
         modifiedByUser:
-          $ref: '#/components/schemas/UserInfo'
+          $ref: "#/components/schemas/UserInfo"
         name:
-          description: 'The name must not contain spaces or the following special characters:
-            * " < > \ / ? : and |.
-  
+          description: >
+            The name must not contain spaces or the following special
+            characters: * " < > \ / ? : and |.
+
             The character . must not be used at the end of the name.
-  
-            '
           pattern: ^(?!(.*[\"\*\\\>\<\?\/\:\|]+.*)|(.*[\.]?.*[\.]+$)|(.*[ ]+$))
           type: string
         nodeType:
@@ -168,72 +610,65 @@ components:
         parentId:
           type: string
         path:
-          $ref: '#/components/schemas/PathInfo'
+          $ref: "#/components/schemas/PathInfo"
         properties:
           type: object
       required:
-      - id
-      - name
-      - nodeType
-      - isFolder
-      - isFile
-      - createdAt
-      - createdByUser
-      - modifiedAt
-      - modifiedByUser
+        - id
+        - name
+        - nodeType
+        - isFolder
+        - isFile
+        - createdAt
+        - createdByUser
+        - modifiedAt
+        - modifiedByUser
       type: object
     Pagination:
       properties:
         count:
-          description: 'The number of objects in the entries array.
-  
-            '
+          description: |
+            The number of objects in the entries array.
           format: int64
           type: integer
         hasMoreItems:
-          description: 'A boolean value which is **true** if there are more entities
-            in the collection
-  
-            beyond those in this response. A true value means a request with a larger
-            value
-  
+          description: >
+            A boolean value which is **true** if there are more entities in the
+            collection
+
+            beyond those in this response. A true value means a request with a larger value
+
             for the **skipCount** or the **maxItems** parameter will return more entities.
-  
-            '
           type: boolean
         maxItems:
-          description: 'The value of the **maxItems** parameter used to generate this
-            list,
-  
+          description: |
+            The value of the **maxItems** parameter used to generate this list,
             or if there was no **maxItems** parameter the default value is 100
-  
-            '
           format: int64
           type: integer
         skipCount:
-          description: 'An integer describing how many entities exist in the collection
+          description: >
+            An integer describing how many entities exist in the collection
             before
-  
+
             those included in this list.
-  
-            '
           format: int64
           type: integer
         totalItems:
-          description: 'An integer describing the total number of entities in the collection.
-  
+          description: >
+            An integer describing the total number of entities in the
+            collection.
+
             The API might not be able to determine this value,
-  
+
             in which case this property will not be present.
-  
-            '
           format: int64
           type: integer
       required:
-      - count
-      - hasMoreItems
-      - skipCount
-      - maxItems
+        - count
+        - hasMoreItems
+        - skipCount
+        - maxItems
       type: object
     PathElement:
       properties:
@@ -246,7 +681,7 @@ components:
       properties:
         elements:
           items:
-            $ref: '#/components/schemas/PathElement'
+            $ref: "#/components/schemas/PathElement"
           type: array
         isComplete:
           type: boolean
@@ -258,29 +693,27 @@ components:
       properties:
         defaultFTSFieldOperator:
           default: AND
-          description: 'The default way to combine query parts in field query groups
-            when AND or OR is not explicitly stated - includes ! - +
-  
+          description: >
+            The default way to combine query parts in field query groups when
+            AND or OR is not explicitly stated - includes ! - +
+
             FIELD:(one two three)
-  
-            '
           enum:
-          - AND
-          - OR
+            - AND
+            - OR
           type: string
         defaultFTSOperator:
           default: AND
-          description: 'The default way to combine query parts when AND or OR is not
+          description: >
+            The default way to combine query parts when AND or OR is not
             explicitly stated - includes ! - +
-  
+
             one two three
-  
+
             (one two three)
-  
-            '
           enum:
-          - AND
-          - OR
+            - AND
+            - OR
           type: string
         defaultFieldName:
           default: TEXT
@@ -290,17 +723,14 @@ components:
           description: The default name space to use if one is not provided
           type: string
         textAttributes:
-          description: 'A list of query fields/properties used to expand TEXT: queries.
-  
+          description: >
+            A list of query fields/properties used to expand TEXT: queries.
+
             The default is cm:content.
-  
-            You could include all content properties using d:content or list all individual
-            content properties or types.
-  
-            As more terms are included the query size, complexity, memory impact and
-            query time will increase.
-  
-            '
+
+            You could include all content properties using d:content or list all individual content properties or types.
+
+            As more terms are included the query size, complexity, memory impact and query time will increase.
           items:
             default: cm:content
             type: string
@@ -310,12 +740,11 @@ components:
       description: A simple facet field
       properties:
         excludeFilters:
-          description: 'Filter Queries with tags listed here will not be included in
-            facet counts.
-  
+          description: >
+            Filter Queries with tags listed here will not be included in facet
+            counts.
+
             This is used for multi-select facetting.
-  
-            '
           items:
             type: string
           type: array
@@ -331,47 +760,46 @@ components:
           type: integer
         method:
           enum:
-          - ENUM
-          - FC
+            - ENUM
+            - FC
           type: string
         mincount:
           default: 1
-          description: The minimum count required for a facet field to be included in
-            the response.
+          description: The minimum count required for a facet field to be included in the
+            response.
           type: integer
         missing:
           default: false
-          description: When true, count results that match the query but which have
-            no facet value for the field (in addition to the Term-based constraints).
+          description: When true, count results that match the query but which have no
+            facet value for the field (in addition to the Term-based
+            constraints).
           type: boolean
         offset:
           type: integer
         prefix:
-          description: Restricts the possible constraints to only indexed values with
-            a specified prefix.
+          description: Restricts the possible constraints to only indexed values with a
+            specified prefix.
           type: string
         sort:
           enum:
-          - COUNT
-          - INDEX
+            - COUNT
+            - INDEX
           type: string
       type: object
     RequestFacetFields:
-      description: 'Simple facet fields to include
-  
+      description: >
+        Simple facet fields to include
+
         The Properties reflect the global properties related to field facts in SOLR.
-  
+
         They are descripbed in detail by the SOLR documentation
-  
-        '
       properties:
         facets:
-          description: 'Define specifc fields on which to facet (adds SOLR facet.field
-            and f.<field>.facet.* options)
-  
-            '
+          description: >
+            Define specifc fields on which to facet (adds SOLR facet.field and
+            f.<field>.facet.* options)
           items:
-            $ref: '#/components/schemas/RequestFacetField'
+            $ref: "#/components/schemas/RequestFacetField"
           type: array
       type: object
     RequestFacetIntervals:
@@ -390,14 +818,14 @@ components:
               sets:
                 description: Sets the intervals for all fields.
                 items:
-                  $ref: '#/components/schemas/RequestFacetSet'
+                  $ref: "#/components/schemas/RequestFacetSet"
                 type: array
             type: object
           type: array
         sets:
           description: Sets the intervals for all fields.
           items:
-            $ref: '#/components/schemas/RequestFacetSet'
+            $ref: "#/components/schemas/RequestFacetSet"
           type: array
       type: object
     RequestFacetQueries:
@@ -420,8 +848,7 @@ components:
           type: string
         endInclusive:
           default: true
-          description: When true, the set will include values less than or equal to
-            "end"
+          description: When true, the set will include values less than or equal to "end"
           type: boolean
         label:
           description: A label to use to identify the set
@@ -435,16 +862,14 @@ components:
           type: boolean
       type: object
     RequestFields:
-      description: 'A list of field names.
-  
-        You can use this parameter to restrict the fields returned within a response
-        if, for example, you want to save on overall bandwidth.
-  
+      description: >-
+        A list of field names.
+
+        You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.
+
         The list applies to a returned individual entity or entries within a collection.
-  
-        If the **include** parameter is used aswell then the fields specified in the
-        **include** parameter are returned in addition to those specified in the **fields**
-        parameter.'
+
+        If the **include** parameter is used aswell then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter.
       items:
         type: string
       type: array
@@ -454,26 +879,22 @@ components:
       items:
         properties:
           query:
-            description: 'The filter query expression.
-  
+            description: |
+              The filter query expression.
               For multi-select facets selected facets must be order together
-  
-              '
             type: string
           tags:
-            description: Tags used exclude the filters from facet evaluation for multi-select
-              facet support
+            description: Tags used exclude the filters from facet evaluation for
+              multi-select facet support
             items:
               type: string
             type: array
         type: object
       type: array
     RequestHighlight:
-      description: 'Request that highlight fragments to be added to result set rows
-  
+      description: |
+        Request that highlight fragments to be added to result set rows
         The properties reflect SOLR highlighting parameters.
-  
-        '
       properties:
         fields:
           description: The fields to highlight and field specific configuration properties
@@ -520,17 +941,23 @@ components:
           type: boolean
       type: object
     RequestInclude:
-      description: "Returns additional information about the node. The following optional\
-        \ fields can be requested:\n * properties\n * aspectNames\n * path\n * isLink\n\
-        \ * allowableOperations\n * association\n"
+      description: >
+        Returns additional information about the node. The following optional
+        fields can be requested:
+         * properties
+         * aspectNames
+         * path
+         * isLink
+         * allowableOperations
+         * association
       items:
         enum:
-        - allowableOperations
-        - aspectNames
-        - isLink
-        - isLocked
-        - path
-        - properties
+          - allowableOperations
+          - aspectNames
+          - isLink
+          - isLocked
+          - path
+          - properties
         type: string
       type: array
     RequestLimits:
@@ -549,9 +976,9 @@ components:
       description: Localization settings
       properties:
         locales:
-          description: A list of Locales definied by IETF BCP 47.  The ordering is significant.  The
-            first locale (leftmost) is used for sort and query localization, whereas
-            the remaining locales are used for query only.
+          description: A list of Locales definied by IETF BCP 47.  The ordering is
+            significant.  The first locale (leftmost) is used for sort and query
+            localization, whereas the remaining locales are used for query only.
           items:
             type: string
           type: array
@@ -577,15 +1004,15 @@ components:
       example:
         key: MyKey
         pivots:
-        - key: AnotherKey
-          pivots: []
+          - key: AnotherKey
+            pivots: []
       properties:
         key:
           description: A key corresponding to a matching field facet label or stats.
           type: string
         pivots:
           items:
-            $ref: '#/components/schemas/RequestPivot'
+            $ref: "#/components/schemas/RequestPivot"
           type: array
       type: object
     RequestQuery:
@@ -595,9 +1022,9 @@ components:
           default: afts
           description: The query language in which the query is written.
           enum:
-          - afts
-          - lucene
-          - cmis
+            - afts
+            - lucene
+            - cmis
           type: string
         query:
           description: The query which may have been generated in some way from the
@@ -607,7 +1034,7 @@ components:
           description: The exact search request typed in by the user
           type: string
       required:
-      - query
+        - query
       type: object
     RequestRange:
       description: Facet range
@@ -627,8 +1054,8 @@ components:
           description: Bucket size
           type: string
         hardend:
-          description: "If true means that the last bucket will end at \u201Cend\u201D\
-            \ even if it is less than \u201Cgap\u201D wide."
+          description: If true means that the last bucket will end at “end” even if it is
+            less than “gap” wide.
           type: boolean
         include:
           description: lower, upper, edge, outer, all
@@ -651,13 +1078,12 @@ components:
       description: Scope
       properties:
         locations:
-          description: 'The locations to include in the query
-  
-            '
+          description: |
+            The locations to include in the query
           enum:
-          - nodes
-          - versions
-          - deleted-nodes
+            - nodes
+            - versions
+            - deleted-nodes
           type: string
       type: object
     RequestSortDefinition:
@@ -667,29 +1093,27 @@ components:
         properties:
           ascending:
             default: false
-            description: The sort order. (The ordering of nulls is determined by the
-              SOLR configuration)
+            description: The sort order. (The ordering of nulls is determined by the SOLR
+              configuration)
             type: boolean
           field:
             description: The name of the field
             type: string
           type:
             default: FIELD
-            description: How to order - using a field, when position of the document
-              in the index, score/relevence.
+            description: How to order - using a field, when position of the document in the
+              index, score/relevence.
             enum:
-            - FIELD
-            - DOCUMENT
-            - SCORE
+              - FIELD
+              - DOCUMENT
+              - SCORE
             type: string
         type: object
       type: array
     RequestSpellcheck:
-      description: 'Request that spellcheck fragments to be added to result set rows
-  
+      description: |
+        Request that spellcheck fragments to be added to result set rows
         The properties reflect SOLR spellcheck parameters.
-  
-        '
       properties:
         query:
           type: string
@@ -703,8 +1127,9 @@ components:
           type: boolean
         cardinalityAccuracy:
           default: 0.3
-          description: Number between 0.0 and 1.0 indicating how aggressively the algorithm
-            should try to be accurate. Used with boolean cardinality flag.
+          description: Number between 0.0 and 1.0 indicating how aggressively the
+            algorithm should try to be accurate. Used with boolean cardinality
+            flag.
           format: float
           type: number
         countDistinct:
@@ -768,17 +1193,12 @@ components:
           type: boolean
       type: object
     RequestTemplates:
-      description: 'Templates usewd for query expansion.
-  
+      description: |
+        Templates usewd for query expansion.
         A template called "WOOF" defined as "%(cm:name cm:title)" allows
-  
         WOOF:example
-  
         to generate
-  
         cm:name:example cm:name:example
-  
-        '
       items:
         properties:
           name:
@@ -822,25 +1242,25 @@ components:
       type: object
     ResultNode:
       allOf:
-      - $ref: '#/components/schemas/Node'
-      - properties:
-          archivedAt:
-            format: date-time
-            type: string
-          archivedByUser:
-            $ref: '#/components/schemas/UserInfo'
-          search:
-            $ref: '#/components/schemas/SearchEntry'
-          versionComment:
-            type: string
-          versionLabel:
-            type: string
-        type: object
+        - $ref: "#/components/schemas/Node"
+        - properties:
+            archivedAt:
+              format: date-time
+              type: string
+            archivedByUser:
+              $ref: "#/components/schemas/UserInfo"
+            search:
+              $ref: "#/components/schemas/SearchEntry"
+            versionComment:
+              type: string
+            versionLabel:
+              type: string
+          type: object
     ResultSetContext:
       description: Context that applies to the whole result set
       properties:
         consistency:
-          $ref: '#/components/schemas/ResponseConsistency'
+          $ref: "#/components/schemas/ResponseConsistency"
         facetQueries:
           description: The counts from facet queries
           items:
@@ -857,28 +1277,25 @@ components:
         facets:
           description: The faceted response
           items:
-            $ref: '#/components/schemas/GenericFacetResponse'
+            $ref: "#/components/schemas/GenericFacetResponse"
           type: array
         facetsFields:
           description: The counts from field facets
           items:
-            $ref: '#/components/schemas/ResultBuckets'
+            $ref: "#/components/schemas/ResultBuckets"
           type: array
         request:
-          $ref: '#/components/schemas/SearchRequest'
+          $ref: "#/components/schemas/SearchRequest"
         spellcheck:
-          description: 'Suggested corrections
-  
-  
-            If zero results were found for the original query then a single entry of
-            type "searchInsteadFor" will be returned.
-  
-            If alternatives were found that return more results than the original query
-            they are returned as "didYouMean" options.
-  
+          description: >
+            Suggested corrections
+
+
+            If zero results were found for the original query then a single entry of type "searchInsteadFor" will be returned.
+
+            If alternatives were found that return more results than the original query they are returned as "didYouMean" options.
+
             The highest quality suggestion is first.
-  
-            '
           items:
             properties:
               suggestion:
@@ -888,8 +1305,8 @@ components:
                 type: array
               type:
                 enum:
-                - searchInsteadFor
-                - didYouMean
+                  - searchInsteadFor
+                  - didYouMean
                 type: string
             type: object
           type: array
@@ -900,39 +1317,38 @@ components:
         list:
           properties:
             context:
-              $ref: '#/components/schemas/ResultSetContext'
+              $ref: "#/components/schemas/ResultSetContext"
             entries:
               items:
-                $ref: '#/components/schemas/ResultSetRowEntry'
+                $ref: "#/components/schemas/ResultSetRowEntry"
               type: array
             pagination:
-              $ref: '#/components/schemas/Pagination'
+              $ref: "#/components/schemas/Pagination"
           type: object
       type: object
     ResultSetRowEntry:
       description: A row in the result set
       properties:
         entry:
-          $ref: '#/components/schemas/ResultNode'
+          $ref: "#/components/schemas/ResultNode"
       required:
-      - entry
+        - entry
       type: object
     SearchEntry:
       properties:
         highlight:
-          description: 'Highlight fragments if requested and available. A match can
-            happen in any of the requested field.
-  
-            '
+          description: >
+            Highlight fragments if requested and available. A match can happen
+            in any of the requested field.
           items:
             properties:
               field:
-                description: The field where a match occured (one of the fields defined
-                  on the request)
+                description: The field where a match occured (one of the fields defined on the
+                  request)
                 type: string
               snippets:
-                description: Any number of snippets for the specified field highlighting
-                  the matching text
+                description: Any number of snippets for the specified field highlighting the
+                  matching text
                 items:
                   description: The highlighted fragment for the field.
                   type: string
@@ -947,55 +1363,55 @@ components:
     SearchRequest:
       properties:
         defaults:
-          $ref: '#/components/schemas/RequestDefaults'
+          $ref: "#/components/schemas/RequestDefaults"
         facetFields:
-          $ref: '#/components/schemas/RequestFacetFields'
+          $ref: "#/components/schemas/RequestFacetFields"
         facetIntervals:
-          $ref: '#/components/schemas/RequestFacetIntervals'
+          $ref: "#/components/schemas/RequestFacetIntervals"
         facetQueries:
-          $ref: '#/components/schemas/RequestFacetQueries'
+          $ref: "#/components/schemas/RequestFacetQueries"
         fields:
-          $ref: '#/components/schemas/RequestFields'
+          $ref: "#/components/schemas/RequestFields"
         filterQueries:
-          $ref: '#/components/schemas/RequestFilterQueries'
+          $ref: "#/components/schemas/RequestFilterQueries"
         highlight:
-          $ref: '#/components/schemas/RequestHighlight'
+          $ref: "#/components/schemas/RequestHighlight"
         include:
-          $ref: '#/components/schemas/RequestInclude'
+          $ref: "#/components/schemas/RequestInclude"
         includeRequest:
           default: false
           description: When true, include the original request in the response
           type: boolean
         limits:
-          $ref: '#/components/schemas/RequestLimits'
+          $ref: "#/components/schemas/RequestLimits"
         localization:
-          $ref: '#/components/schemas/RequestLocalization'
+          $ref: "#/components/schemas/RequestLocalization"
         paging:
-          $ref: '#/components/schemas/RequestPagination'
+          $ref: "#/components/schemas/RequestPagination"
         pivots:
           items:
-            $ref: '#/components/schemas/RequestPivot'
+            $ref: "#/components/schemas/RequestPivot"
           type: array
         query:
-          $ref: '#/components/schemas/RequestQuery'
+          $ref: "#/components/schemas/RequestQuery"
         ranges:
           items:
-            $ref: '#/components/schemas/RequestRange'
+            $ref: "#/components/schemas/RequestRange"
           type: array
         scope:
-          $ref: '#/components/schemas/RequestScope'
+          $ref: "#/components/schemas/RequestScope"
         sort:
-          $ref: '#/components/schemas/RequestSortDefinition'
+          $ref: "#/components/schemas/RequestSortDefinition"
         spellcheck:
-          $ref: '#/components/schemas/RequestSpellcheck'
+          $ref: "#/components/schemas/RequestSpellcheck"
         stats:
           items:
-            $ref: '#/components/schemas/RequestStats'
+            $ref: "#/components/schemas/RequestStats"
           type: array
         templates:
-          $ref: '#/components/schemas/RequestTemplates'
+          $ref: "#/components/schemas/RequestTemplates"
       required:
-      - query
+        - query
       type: object
     UserInfo:
       properties:
@@ -1004,165 +1420,6 @@ components:
         id:
           type: string
       required:
-      - displayName
-      - id
+        - displayName
+        - id
       type: object
-  securitySchemes:
-    basicAuth:
-      scheme: basic
-      type: http
-paths:
-  /search:
-    post:
-      description: "**Note**: this endpoint is available in Alfresco 5.2 and newer versions.\n\
-        \n**You specify all the parameters in this API in a JSON body**, URL parameters\
-        \ are not supported.\nA basic query looks like this:\n\n```JSON\n{\n  \"query\"\
-        : {\n    \"query\": \"foo\"\n  }\n}\n```\n\n**Note:** These are the minimum\
-        \ possible query parameters.\n\nThe default search language is **afts** ([Alfresco\
-        \ Full Text Search](http://docs.alfresco.com/5.1/concepts/rm-searchsyntax-intro.html)),\
-        \ but you can also specify **cmis**, and **lucene**.\n\nA basic CMIS query looks\
-        \ like this:\n\n```JSON\n{\n  \"query\": {\n    \"query\": \"select * from cmis:folder\"\
-        ,\n    \"language\": \"cmis\"\n  }\n}\n```\n\nBy default, **results are limited\
-        \ to the first 100.**\nResults can be restricted using \"paging\". For example:\n\
-        ```JSON\n\"paging\": {\n  \"maxItems\": \"50\",\n  \"skipCount\": \"28\"\n}\n\
-        ```\nThis example would ensure that results are **limited by Final Size**, skipping\
-        \ the first 28 results and returning the next 50.\n\nAlternatively, you can\
-        \ limit the results by using the **limits JSON body parameter**. For example,\n\
-        ```JSON\n\"limits\": {\n  \"permissionEvaluationTime\": 20000,\n  \"permissionEvaluationCount\"\
-        : 2000\n}\n```\n\nYou can use the **include JSON body parameter** to return\
-        \ additional information.\nThis works in the same way as in the /nodes/{nodeId}/children\
-        \ method in the core API. For example:\n```JSON\n\"include\": [\"aspectNames\"\
-        , \"properties\", \"isLink\"]\n```\n\nYou can use the **fields JSON body parameter**\
-        \ to restrict the fields returned within a response if, for example, you want\
-        \ to save on overall bandwidth.\nThis works in the same way as in the /nodes/{nodeId}/children\
-        \ method in the core API. For example:\n```JSON\n\"fields\": [\"id\", \"name\"\
-        , \"search\"]\n```\n\nYou can sort the results using the **sort JSON body parameter**,\
-        \ for example:\n```JSON\n\"sort\": [{\"type\":\"FIELD\", \"field\":\"cm:description\"\
-        , \"ascending\":\"true\"}]\n```\n**Note:** the **sort** parameter is not supported\
-        \ for CMIS queries.\n\nBy default, search uses the **\"nodes\" location**, which\
-        \ is the **content store known as workspace://SpacesStore**.\nTo change the\
-        \ scope to another location you can use the **locations JSON body parameter**.\n\
-        You can specify either **nodes** (the default), **versions** or **deleted-nodes**.\
-        \ For example:\n```JSON\n\"scope\": {\n    \"locations\": [\"deleted-nodes\"\
-        ]\n}\n```\nYou can specify templates using the **templates JSON body parameter**,\
-        \ for example:\n```JSON\n\"templates\": [{\"name\": \"_PERSON\",\"template\"\
-        : \"|%firstName OR |%lastName OR |%userName\"},\n              {\"name\": \"\
-        mytemplate\",\"template\": \"%cm:content\"}]\n```\n\n**Note: Spell checking\
-        \ only works on Search Services (Solr 6) if you have already enabled suggestions.**\n\
-        \nFor **spell checking** you can use a query like this:\n```JSON\n{\n  \"query\"\
-        : {\n    \"query\": \"cm:title:alfrezco\"\n  },\n  \"spellcheck\": {\"query\"\
-        : \"alfrezco\"}\n}\n```\n\nIf you are already specifying \"userQuery\" then\
-        \ the following may be easier and produces the same result :\n```JSON\n{\n \
-        \ \"query\": {\n    \"query\": \"cm:title:alfrezco\",\n    \"userQuery\": \"\
-        alfrezco\"\n  },\n  \"spellcheck\": {}\n}\n```\n\nThe spellcheck response includes\
-        \ a spellCheck context like this:\n```JSON\n\"context\": {\n  \"spellCheck\"\
-        : {\n    \"type\": \"searchInsteadFor\",\n    \"suggestions\": [\"alfresco\"\
-        ]\n  }\n},\n```\n\nTo specify defaults, you  use a **defaults JSON body parameter**,\
-        \ for example:\n```JSON\n\"defaults\": {\n  \"textAttributes\": [\n    \"cm:content\"\
-        , \"cm:name\"\n  ],\n  \"defaultFTSOperator\": \"AND\",\n  \"defaultFTSFieldOperator\"\
-        : \"OR\",\n  \"namespace\": \"cm\",\n  \"defaultFieldName\": \"PATH\"\n}\n```\n\
-        \nYou can specify several filter queries using the **filterQueries JSON body\
-        \ parameter**, for example:\n```JSON\n\"filterQueries\": [{\"query\": \"TYPE:'cm:folder'\"\
-        },{\"query\": \"cm:creator:mjackson\"}]\n```\n\nYou can specify several facet\
-        \ queries using the **facetQueries JSON body parameter**, for example:\n```JSON\n\
-        \"facetQueries\": [{\"query\": \"created:2016\",\"label\": \"CreatedThisYear\"\
-        }]\n```\nThe response will contain a matching \"context\" section, the \"label\"\
-        \ will match the facet query.\n```JSON\n\"context\": {\n  \"facetQueries\":\
-        \ [\n    {\"label\": \"CreatedThisYear\",\"count\": 3}\n  ]\n},\n```\n\nA complete\
-        \ query for facetting via the content.size field looks this:\n```JSON\n{\n \
-        \ \"query\": {\n    \"query\": \"presentation\",\n    \"language\": \"afts\"\
-        \n  },\n    \"facetQueries\": [\n        {\"query\": \"content.size:[0 TO 10240]\"\
-        , \"label\": \"xtra small\"},\n        {\"query\": \"content.size:[10240 TO\
-        \ 102400]\", \"label\": \"small\"},\n        {\"query\": \"content.size:[102400\
-        \ TO 1048576]\", \"label\": \"medium\"},\n        {\"query\": \"content.size:[1048576\
-        \ TO 16777216]\", \"label\": \"large\"},\n        {\"query\": \"content.size:[16777216\
-        \ TO 134217728]\", \"label\": \"xtra large\"},\n        {\"query\": \"content.size:[134217728\
-        \ TO MAX]\", \"label\": \"XX large\"}\n  ],\n    \"facetFields\": {\"facets\"\
-        : [{\"field\": \"'content.size'\"}]}\n}\n```\n\nThe response will contain a\
-        \ matching \"context\" section, the \"label\" will match the facet query.\n\
-        ```JSON\n\"context\": {\n  \"facetQueries\": [\n    { \"label\": \"small\",\"\
-        count\": 2 },\n    { \"label\": \"large\",\"count\": 0 },\n    { \"label\":\
-        \ \"xtra small\",\"count\": 5 },\n    { \"label\": \"xtra large\",\"count\"\
-        : 56},\n    { \"label\": \"medium\",\"count\": 4 },\n    { \"label\": \"XX large\"\
-        , \"count\": 1 }\n  ]\n},\n```\n\nYou can specify several facet fields using\
-        \ the **facetFields JSON body parameter**, for example:\n```JSON\n\"facetFields\"\
-        : {\"facets\": [{\"field\": \"creator\", \"mincount\": 1}, {\"field\": \"modifier\"\
-        , \"mincount\": 1}]}\n```\nThe response will contain a matching \"context\"\
-        \ section, the \"label\" will match the facet field.\n```JSON\n\"context\":\
-        \ {\n   \"facetsFields\": [\n     {  \"label\": \"creator\",\n        \"buckets\"\
-        : [\n          { \"label\": \"System\", \"count\": 75 },\n          { \"label\"\
-        : \"mjackson\", \"count\": 5 }\n        ]},\n     {  \"label\": \"modifier\"\
-        ,\n        \"buckets\": [\n          { \"label\": \"System\", \"count\": 72\
-        \ },\n          { \"label\": \"mjackson\", \"count\": 5 },\n          { \"label\"\
-        : \"admin\", \"count\": 3 }\n        ]}\n   ]\n},\n```\n\nGrouping facet queries\
-        \ that go together can be done by specifying the group label in the fact queries\
-        \ as follow:\n```JSON\n    {\n        \"query\": {\n            \"query\": \"\
-        presentation\"\n        },\n        \"facetQueries\": [\n            {\"query\"\
-        : \"content.size:[0 TO 102400]\", \"label\": \"small\", \"group\":\"foo\"},\n\
-        \            {\"query\": \"content.size:[102400 TO 1048576]\", \"label\": \"\
-        medium\",\"group\":\"foo\"},\n            {\"query\": \"content.size:[1048576\
-        \ TO 16777216]\", \"label\": \"large\",\"group\":\"foo\"}\n        ]\n    }\n\
-        ```\nThe above query returns the results a faceted field grouped under the label\
-        \ foo:\n```JSON\n{\n    \"context\": {\"facetsFields\": [{\n        \"label\"\
-        : \"foo\",\n        \"buckets\": [\n            {\n                \"count\"\
-        : 109,\n                \"label\": \"small\",\n                \"filterQuery\"\
-        : \"content.size:[0 TO 102400]\"\n            },\n            {\n          \
-        \      \"count\": 0,\n                \"label\": \"large\",\n              \
-        \  \"filterQuery\": \"content.size:[1048576 TO 16777216]\"\n            },\n\
-        \            {\n                \"count\": 0,\n                \"label\": \"\
-        medium\",\n                \"filterQuery\": \"content.size:[102400 TO 1048576]\"\
-        \n            }\n        ]\n    }]\n}\n```\nRange Faceting is supported by the\
-        \ **ranges JSON body parameter**, for example:\n```JSON\n    {\n        \"query\"\
-        : {\n            \"query\": \"presentation\"\n        },\n        \"ranges\"\
-        : [\n        {\n            \"field\": \"content.size\",\n             \"start\"\
-        : \"0\",\n             \"end\": \"100\",\n             \"gap\": \"20\",\n  \
-        \           \"hardend\": true\n        },\n        {\n            \"field\"\
-        : \"created\",\n            \"start\": \"2015-09-29T10:45:15.729Z\",\n     \
-        \       \"end\": \"2016-09-29T10:45:15.729Z\",\n            \"gap\": \"+100DAY\"\
-        \n        }]\n    }\n```\nAn example query for **search highlighting** could\
-        \ look like this:\n```JSON\n{\n  \"query\": {\n    \"query\": \"description:workflow\"\
-        ,\n    \"userQuery\":\"workflow\"\n  },\n  \"highlight\": {\n    \"prefix\"\
-        : \"\xBF\",\n    \"postfix\": \"?\",\n    \"mergeContiguous\": true,\n    \"\
-        fields\": [\n      {\n        \"field\": \"cm:title\"\n      },\n      {\n \
-        \       \"field\": \"description\",\n        \"prefix\": \"(\",\n        \"\
-        postfix\": \")\"\n      }\n\n    ]\n  }\n}\n```\nThe example above changes the\
-        \ highlighting prefix and postfix from the default `<em>` for all fields to\
-        \ \xBF? and just for the \"description\" field to ().\nThe hightlight information\
-        \ is added in each node entry response; here is an example partial response:\n\
-        ```\n\"entry\": {\n        \"createdAt\": \"2016-10-12T15:24:31.202+0000\",\n\
-        \        \"isFolder\": true,\n        \"search\": {\n          \"score\": 1,\n\
-        \          \"highlight\": [\n            {\n              \"field\": \"cm:title\"\
-        ,\n              \"snippets\": [\n                \"Customized \xBFWorkflow?\
-        \ Process Definitions\"\n              ]\n            },\n            {\n  \
-        \            \"field\": \"description\",\n              \"snippets\": [\n  \
-        \              \"Customized (Workflow) Process Definitions\"\n             \
-        \ ]\n            }\n          ]\n      },\n```\n**Note**: after the migration\
-        \ to Swagger UI 3, this API definition was triggering some warnings, more info\
-        \ in [this StackOverflow Q&A](https://stackoverflow.com/q/65584131/1654265).\n"
-      operationId: search
-      parameters:
-      - description: 'Generic query API
-  
-          '
-        in: body
-        name: queryBody
-        required: true
-        schema:
-          $ref: '#/components/schemas/SearchRequest'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResultSetPaging'
-          description: Successful response
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error
-      summary: Searches Alfresco
-      tags:
-      - search
-      x-alfresco-since: '5.2'

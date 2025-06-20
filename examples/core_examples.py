@@ -7,7 +7,7 @@ The Core API provides access to nodes, sites, people, groups, and actions.
 
 Current Status:
 - Actions API: ✅ Working
-- Nodes API: ✅ Working (see enhanced_generated/examples/alfresco_client_usage.py)
+- Nodes API: ✅ Working (see examples/alfresco_client_usage.py)
 - Sites API: ✅ Available
 - People API: ✅ Available
 - Groups API: ✅ Available
@@ -16,7 +16,7 @@ Requirements:
 - Alfresco server running on localhost:8080
 - Admin credentials (admin/admin)
 
-Note: For the latest working examples, see enhanced_generated/examples/alfresco_client_usage.py
+Note: For the latest working examples, see examples/alfresco_client_usage.py
 which demonstrates all APIs including the improved Core API functionality.
 """
 

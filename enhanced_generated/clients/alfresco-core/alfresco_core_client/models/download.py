@@ -26,12 +26,12 @@ class Download(BaseModel):
     """
     Download
     """ # noqa: E501
-    bytes_added: Optional[StrictInt] = Field(default=None, description="number of bytes added so far in the zip", alias="bytesAdded")
-    files_added: Optional[StrictInt] = Field(default=None, description="number of files added so far in the zip", alias="filesAdded")
+    bytes_added: Optional[StrictInt] = Field(default=0, description="number of bytes added so far in the zip", alias="bytesAdded")
+    files_added: Optional[StrictInt] = Field(default=0, description="number of files added so far in the zip", alias="filesAdded")
     id: Optional[StrictStr] = Field(default=None, description="the id of the download node")
     status: Optional[StrictStr] = Field(default='PENDING', description="the current status of the download node creation")
-    total_bytes: Optional[StrictInt] = Field(default=None, description="the total number of bytes to be added in the zip", alias="totalBytes")
-    total_files: Optional[StrictInt] = Field(default=None, description="the total number of files to be added in the zip", alias="totalFiles")
+    total_bytes: Optional[StrictInt] = Field(default=0, description="the total number of bytes to be added in the zip", alias="totalBytes")
+    total_files: Optional[StrictInt] = Field(default=0, description="the total number of files to be added in the zip", alias="totalFiles")
     __properties: ClassVar[List[str]] = ["bytesAdded", "filesAdded", "id", "status", "totalBytes", "totalFiles"]
 
     @field_validator('status')
@@ -95,12 +95,12 @@ class Download(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "bytesAdded": obj.get("bytesAdded"),
-            "filesAdded": obj.get("filesAdded"),
+            "bytesAdded": obj.get("bytesAdded") if obj.get("bytesAdded") is not None else 0,
+            "filesAdded": obj.get("filesAdded") if obj.get("filesAdded") is not None else 0,
             "id": obj.get("id"),
             "status": obj.get("status") if obj.get("status") is not None else 'PENDING',
-            "totalBytes": obj.get("totalBytes"),
-            "totalFiles": obj.get("totalFiles")
+            "totalBytes": obj.get("totalBytes") if obj.get("totalBytes") is not None else 0,
+            "totalFiles": obj.get("totalFiles") if obj.get("totalFiles") is not None else 0
         })
         return _obj
 

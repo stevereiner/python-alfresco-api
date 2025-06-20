@@ -21,8 +21,8 @@ a local Alfresco Community Edition server running.
 import sys
 from pathlib import Path
 
-# Add the parent directory to the path to import our client
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add the enhanced_generated directory to the path to import our client
+sys.path.insert(0, str(Path(__file__).parent.parent / "enhanced_generated"))
 
 from AlfrescoClient import AlfrescoClient
 

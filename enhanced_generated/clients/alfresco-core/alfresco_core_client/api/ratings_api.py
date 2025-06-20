@@ -45,7 +45,7 @@ class RatingsApi:
     def create_rating(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        rating_body_create: Annotated[RatingBody, Field(description="For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ``` ")],
+        rating_body: Annotated[RatingBody, Field(description="For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ``` ")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -66,8 +66,8 @@ class RatingsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param rating_body_create: For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ```  (required)
-        :type rating_body_create: RatingBody
+        :param rating_body: For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ```  (required)
+        :type rating_body: RatingBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -94,7 +94,7 @@ class RatingsApi:
 
         _param = self._create_rating_serialize(
             node_id=node_id,
-            rating_body_create=rating_body_create,
+            rating_body=rating_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -124,7 +124,7 @@ class RatingsApi:
     def create_rating_with_http_info(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        rating_body_create: Annotated[RatingBody, Field(description="For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ``` ")],
+        rating_body: Annotated[RatingBody, Field(description="For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ``` ")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -145,8 +145,8 @@ class RatingsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param rating_body_create: For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ```  (required)
-        :type rating_body_create: RatingBody
+        :param rating_body: For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ```  (required)
+        :type rating_body: RatingBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -173,7 +173,7 @@ class RatingsApi:
 
         _param = self._create_rating_serialize(
             node_id=node_id,
-            rating_body_create=rating_body_create,
+            rating_body=rating_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -203,7 +203,7 @@ class RatingsApi:
     def create_rating_without_preload_content(
         self,
         node_id: Annotated[StrictStr, Field(description="The identifier of a node.")],
-        rating_body_create: Annotated[RatingBody, Field(description="For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ``` ")],
+        rating_body: Annotated[RatingBody, Field(description="For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ``` ")],
         fields: Annotated[Optional[List[StrictStr]], Field(description="A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. ")] = None,
         _request_timeout: Union[
             None,
@@ -224,8 +224,8 @@ class RatingsApi:
 
         :param node_id: The identifier of a node. (required)
         :type node_id: str
-        :param rating_body_create: For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ```  (required)
-        :type rating_body_create: RatingBody
+        :param rating_body: For \"myRating\" the type is specific to the rating scheme, boolean for the likes and an integer for the fiveStar.  For example, to \"like\" a file the following body would be used:  ```JSON   {     \"id\": \"likes\",     \"myRating\": true   } ```  (required)
+        :type rating_body: RatingBody
         :param fields: A list of field names.  You can use this parameter to restrict the fields returned within a response if, for example, you want to save on overall bandwidth.  The list applies to a returned individual entity or entries within a collection.  If the API method also supports the **include** parameter, then the fields specified in the **include** parameter are returned in addition to those specified in the **fields** parameter. 
         :type fields: List[str]
         :param _request_timeout: timeout setting for this request. If one
@@ -252,7 +252,7 @@ class RatingsApi:
 
         _param = self._create_rating_serialize(
             node_id=node_id,
-            rating_body_create=rating_body_create,
+            rating_body=rating_body,
             fields=fields,
             _request_auth=_request_auth,
             _content_type=_content_type,
@@ -277,7 +277,7 @@ class RatingsApi:
     def _create_rating_serialize(
         self,
         node_id,
-        rating_body_create,
+        rating_body,
         fields,
         _request_auth,
         _content_type,
@@ -311,8 +311,8 @@ class RatingsApi:
         # process the header parameters
         # process the form parameters
         # process the body parameter
-        if rating_body_create is not None:
-            _body_params = rating_body_create
+        if rating_body is not None:
+            _body_params = rating_body
 
 
         # set the HTTP header `Accept`
