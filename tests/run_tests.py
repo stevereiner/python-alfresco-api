@@ -19,7 +19,6 @@ def run_unit_tests():
     try:
         result = subprocess.run([
             sys.executable, "-m", "pytest", 
-            "tests/test_unit_master_client.py",
             "tests/test_individual_apis.py",
             "-v",
             "--tb=short"

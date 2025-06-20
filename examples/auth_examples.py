@@ -20,11 +20,108 @@ Requirements:
 
 import sys
 import os
+import base64
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
 
 from AlfrescoClient import AlfrescoClient
 
+def create_auth_ticket(client, username='admin', password='admin'):
+    """
+    Helper function to create authentication tickets and share them across all API clients.
+    
+    Args:
+        client: The Alfresco client instance
+        username: Username for authentication
+        password: Password for authentication
+        
+    Returns:
+        Authentication ticket response
+    """
+    # Fix the auth configuration if needed
+    expected_url = client.get_api_url('auth')
+    if client.auth_client.configuration.host != expected_url:
+        print(f"🔧 Fixing auth config host from {client.auth_client.configuration.host} to {expected_url}")
+        client.auth_client.configuration.host = expected_url
+        client.auth_client.configuration.ignore_operation_servers = True
+    
+    # Use dict format that we know works
+    auth_result = client.auth.create_ticket(
+        ticket_body={'userId': username, 'password': password}
+    )
+    
+    # After successful authentication, share credentials with all API clients
+    share_authentication_across_clients(client)
+    
+    return auth_result
+
+def share_authentication_across_clients(client):
+    """
+    Share authentication state from auth client to all other API clients.
+    
+    Args:
+        client: The Alfresco client instance with authenticated auth client
+    """
+    if not client.auth_client:
+        return
+    
+    # Get the auth client's configuration and headers
+    auth_config = client.auth_client.configuration
+    auth_headers = getattr(client.auth_client, 'default_headers', {})
+    
+    # List of all API clients that need authentication
+    api_clients = [
+        ('discovery', client.discovery_client),
+        ('search', client.search_client),
+        ('core', client.core_client),
+        ('workflow', client.workflow_client),
+        ('model', client.model_client),
+        ('search_sql', client.search_sql_client),
+    ]
+    
+    for api_name, api_client in api_clients:
+        if api_client and hasattr(api_client, 'configuration'):
+            # Share basic auth credentials
+            api_client.configuration.username = auth_config.username
+            api_client.configuration.password = auth_config.password
+            
+            # Copy authentication headers (including any tickets)
+            if hasattr(api_client, 'default_headers') and auth_headers:
+                api_client.default_headers.update(auth_headers)
+                print(f"🔗 Shared auth headers with {api_name} client")
+            
+            # For ticket-based auth, we also need to set basic auth as fallback
+            # Set authorization header directly
+            auth_string = f"{auth_config.username}:{auth_config.password}"
+            auth_bytes = auth_string.encode('ascii')
+            auth_b64 = base64.b64encode(auth_bytes).decode('ascii')
+            
+            if hasattr(api_client, 'set_default_header'):
+                api_client.set_default_header('Authorization', f'Basic {auth_b64}')
+                print(f"🔐 Set Basic auth header for {api_name} client")
+            elif hasattr(api_client, 'default_headers'):
+                api_client.default_headers['Authorization'] = f'Basic {auth_b64}'
+                print(f"🔐 Set Basic auth header for {api_name} client (direct)")
+
+def fix_client_configurations(client):
+    """Fix URL configurations for all API clients."""
+    api_configs = [
+        ('auth', client.auth_client),
+        ('discovery', client.discovery_client),
+        ('core', client.core_client),
+        ('search', client.search_client),
+        ('workflow', client.workflow_client),
+        ('model', client.model_client),
+        ('search_sql', client.search_sql_client),
+    ]
+    
+    for api_name, api_client in api_configs:
+        if api_client and hasattr(api_client, 'configuration'):
+            expected_url = client.get_api_url(api_name)
+            if api_client.configuration.host != expected_url:
+                print(f"🔧 Fixing {api_name} config host from {api_client.configuration.host} to {expected_url}")
+                api_client.configuration.host = expected_url
+                api_client.configuration.ignore_operation_servers = True
 
 def print_section(title):
     """Print a formatted section header."""
@@ -61,6 +158,10 @@ def main():
     
     print("✅ Authentication API initialized successfully")
     
+    # Fix client configurations
+    print("\n🔧 Fixing client configurations...")
+    fix_client_configurations(client)
+    
     # Basic authentication flow
     print_section("Basic Authentication Flow")
     basic_authentication_flow(client)
@@ -84,10 +185,7 @@ def basic_authentication_flow(client):
     
     # Step 1: Create authentication ticket (login)
     print("\n1. Creating authentication ticket (login)...")
-    ticket_result = safe_api_call(
-        client.auth.create_ticket,
-        ticket_body={'userId': 'admin', 'password': 'admin'}
-    )
+    ticket_result = safe_api_call(create_auth_ticket, client, 'admin', 'admin')
     
     if ticket_result['success']:
         print("✅ Authentication ticket created successfully")
@@ -151,6 +249,11 @@ def ticket_management_examples(client):
         
         if result['success']:
             print("   ✅ Authentication successful")
+            # Clean up successful tickets
+            try:
+                client.auth.delete_ticket()
+            except:
+                pass
         else:
             print(f"   ❌ Authentication failed: {result['error']}")
     
@@ -159,10 +262,7 @@ def ticket_management_examples(client):
     
     # Create ticket
     print("   Creating new ticket...")
-    create_result = safe_api_call(
-        client.auth.create_ticket,
-        ticket_body={'userId': 'admin', 'password': 'admin'}
-    )
+    create_result = safe_api_call(create_auth_ticket, client, 'admin', 'admin')
     
     if create_result['success']:
         print("   ✅ Ticket created")

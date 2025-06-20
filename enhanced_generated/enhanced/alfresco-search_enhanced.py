@@ -9,79 +9,74 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 # Add generated client to path
-client_dir = Path(__file__).parent.parent / "enhanced_generated" / "clients" / "alfresco-search"
+client_dir = Path(__file__).parent.parent / "clients" / "alfresco-search"
 if str(client_dir) not in sys.path:
     sys.path.insert(0, str(client_dir))
 
 # Add Pydantic models to path  
-models_dir = Path(__file__).parent.parent / "enhanced_generated" / "models"
+models_dir = Path(__file__).parent.parent / "models"
 if str(models_dir) not in sys.path:
     sys.path.insert(0, str(models_dir))
 
 try:
     from alfresco_search_client.api_client import ApiClient
     from alfresco_search_client.configuration import Configuration
-    print(f"✅ Successfully imported {api_name} API client")
+    from alfresco_search_client.api.search_api import SearchApi
+    print("✅ Successfully imported Alfresco Search API client")
 except ImportError as e:
-    print(f"❌ Failed to import {api_name} API client: {e}")
+    print(f"❌ Failed to import Alfresco Search API client: {e}")
     ApiClient = None
     Configuration = None
+    SearchApi = None
 
 try:
     from alfresco_search_models import *
-    print(f"✅ Successfully imported {api_name} Pydantic models")
+    print("✅ Successfully imported Alfresco Search Pydantic models")
 except ImportError as e:
-    print(f"❌ Failed to import {api_name} Pydantic models: {e}")
+    print(f"❌ Failed to import Alfresco Search Pydantic models: {e}")
 
-class EnhancedAlfrescosearchClient:
-    """Enhanced client with convenience methods"""
+class SearchClient:
+    """Alfresco Search API client that provides access to all Alfresco Search API endpoints."""
     
-    def __init__(self, host: str = "http://localhost:8080", username: str = "admin", password: str = "admin"):
-        if not ApiClient or not Configuration:
-            raise ImportError("API client not available")
+    def __init__(self, base_url: str, username: str, password: str, verify_ssl: bool = True):
+        if not ApiClient or not Configuration or not SearchApi:
+            raise ImportError("Alfresco Search API client not available")
             
-        # Configure the API client
-        self.configuration = Configuration()
-        self.configuration.host = host + "/alfresco/api/-default-/public/alfresco/versions/1"
-        self.configuration.username = username
-        self.configuration.password = password
+        self.base_url = base_url
+        self.username = username
+        self.password = password
+        self.verify_ssl = verify_ssl
+        
+        # Create configuration
+        config = Configuration()
+        config.host = f"{base_url}/alfresco/api/-default-/public/search/versions/1"
+        config.username = username
+        config.password = password
+        config.verify_ssl = verify_ssl
         
         # Create API client
-        self.api_client = ApiClient(self.configuration)
+        self.api_client = ApiClient(configuration=config)
         
-        # Import specific APIs as needed
-        self._import_apis()
+        # Initialize API endpoints
+        self.search = SearchApi(self.api_client)
     
-    def _import_apis(self):
-        """Import specific API classes"""
-        try:
-            # Import common APIs - adjust based on actual generated APIs
-            from alfresco_search_client.api import DefaultApi
-            self.default_api = DefaultApi(self.api_client)
-        except ImportError:
-            print(f"Warning: Could not import APIs for {api_name}")
-    
-    def test_connection(self) -> bool:
-        """Test if the connection to Alfresco is working"""
-        try:
-            # This would need to be customized based on available endpoints
-            # For now, just test if we can create the client
-            return self.api_client is not None
-        except Exception as e:
-            print(f"Connection test failed: {e}")
-            return False
+    def get_api_info(self) -> dict:
+        """Get information about the Alfresco Search API."""
+        return {
+            'name': 'Alfresco Search API',
+            'version': '1.0',
+            'description': 'Alfresco Search API endpoints',
+            'endpoints': ['search']
+        }
 
-def create_client(host: str = "http://localhost:8080", username: str = "admin", password: str = "admin") -> EnhancedAlfrescosearchClient:
-    """Convenience function to create an enhanced client"""
-    return EnhancedAlfrescosearchClient(host, username, password)
+def create_client(host: str = "http://localhost:8080", username: str = "admin", password: str = "admin") -> SearchClient:
+    """Convenience function to create a search client"""
+    return SearchClient(host, username, password)
 
 if __name__ == "__main__":
     # Test the enhanced client
     try:
         client = create_client()
-        if client.test_connection():
-            print(f"✅ Enhanced {api_name} client is working!")
-        else:
-            print(f"❌ Enhanced {api_name} client connection failed")
+        print("✅ Enhanced Alfresco Search client is working!")
     except Exception as e:
-        print(f"❌ Enhanced {api_name} client test failed: {e}")
+        print(f"❌ Enhanced Alfresco Search client test failed: {e}")

@@ -8,6 +8,9 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, Optional
 
+# Define API name for this module
+api_name = "Alfresco-Workflow"
+
 # Add generated client to path
 client_dir = Path(__file__).parent.parent / "enhanced_generated" / "clients" / "alfresco-workflow"
 if str(client_dir) not in sys.path:
@@ -36,15 +39,16 @@ except ImportError as e:
 class EnhancedAlfrescoworkflowClient:
     """Enhanced client with convenience methods"""
     
-    def __init__(self, host: str = "http://localhost:8080", username: str = "admin", password: str = "admin"):
+    def __init__(self, base_url: str = "http://localhost:8080", username: str = "admin", password: str = "admin", verify_ssl: bool = True):
         if not ApiClient or not Configuration:
             raise ImportError("API client not available")
             
         # Configure the API client
         self.configuration = Configuration()
-        self.configuration.host = host + "/alfresco/api/-default-/public/alfresco/versions/1"
+        self.configuration.host = base_url + "/alfresco/api/-default-/public/alfresco/versions/1"
         self.configuration.username = username
         self.configuration.password = password
+        self.configuration.verify_ssl = verify_ssl
         
         # Create API client
         self.api_client = ApiClient(self.configuration)

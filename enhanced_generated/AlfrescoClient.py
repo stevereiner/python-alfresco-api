@@ -70,32 +70,32 @@ class AlfrescoClient(AlfrescoBaseClient):
         # Apply enhanced fixes for generated code issues
         self._apply_enhanced_fixes()
         
-        # Authentication API (restored structure)
-        self.auth_client = self.create_api_client('alfresco_auth')
+        # Authentication API (using hyphenated names)
+        self.auth_client = self.create_api_client('alfresco-auth')
         self.auth = self._create_auth_api()
         if self.auth:
             print("   ✅ Authentication API ready")
         else:
             print("   ❌ Authentication API failed")
         
-        # Core API (restored structure)
-        self.core_client = self.create_api_client('alfresco_core')
+        # Core API (using hyphenated names)
+        self.core_client = self.create_api_client('alfresco-core')
         self.core = self._create_core_apis()
         if self.core:
             print("   ✅ Core API ready")
         else:
             print("   ❌ Core API failed")
         
-        # Discovery API (restored structure)
-        self.discovery_client = self.create_api_client('alfresco_discovery')
+        # Discovery API (using hyphenated names)
+        self.discovery_client = self.create_api_client('alfresco-discovery')
         self.discovery = self._create_discovery_api()
         if self.discovery:
             print("   ✅ Discovery API ready")
         else:
             print("   ❌ Discovery API failed")
         
-        # Search API (restored structure)
-        self.search_client = self.create_api_client('alfresco_search')
+        # Search API (using hyphenated names)
+        self.search_client = self.create_api_client('alfresco-search')
         self.search = self._create_search_api()
         if self.search:
             print("   ✅ Search API ready")
@@ -118,8 +118,8 @@ class AlfrescoClient(AlfrescoBaseClient):
         else:
             print("   ❌ Model API failed")
         
-        # Search SQL API (restored structure)
-        self.search_sql_client = self.create_api_client('alfresco_search-sql')
+        # Search SQL API (using hyphenated names)
+        self.search_sql_client = self.create_api_client('alfresco-search-sql')
         self.search_sql = self._create_search_sql_api()
         if self.search_sql:
             print("   ✅ Search SQL API ready")

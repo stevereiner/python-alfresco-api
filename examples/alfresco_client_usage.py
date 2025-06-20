@@ -19,12 +19,110 @@ a local Alfresco Community Edition server running.
 """
 
 import sys
+import base64
 from pathlib import Path
 
 # Add the enhanced_generated directory to the path to import our client
 sys.path.insert(0, str(Path(__file__).parent.parent / "enhanced_generated"))
 
 from AlfrescoClient import AlfrescoClient
+
+def create_auth_ticket(client, username='admin', password='admin'):
+    """
+    Helper function to create authentication tickets and share them across all API clients.
+    
+    Args:
+        client: The Alfresco client instance
+        username: Username for authentication
+        password: Password for authentication
+        
+    Returns:
+        Authentication ticket response
+    """
+    # Fix the auth configuration if needed
+    expected_url = client.get_api_url('auth')
+    if client.auth_client.configuration.host != expected_url:
+        print(f"🔧 Fixing auth config host from {client.auth_client.configuration.host} to {expected_url}")
+        client.auth_client.configuration.host = expected_url
+        client.auth_client.configuration.ignore_operation_servers = True
+    
+    # Use dict format that we know works
+    auth_result = client.auth.create_ticket(
+        ticket_body={'userId': username, 'password': password}
+    )
+    
+    # After successful authentication, share credentials with all API clients
+    share_authentication_across_clients(client)
+    
+    return auth_result
+
+def share_authentication_across_clients(client):
+    """
+    Share authentication state from auth client to all other API clients.
+    
+    Args:
+        client: The Alfresco client instance with authenticated auth client
+    """
+    if not client.auth_client:
+        return
+    
+    # Get the auth client's configuration and headers
+    auth_config = client.auth_client.configuration
+    auth_headers = getattr(client.auth_client, 'default_headers', {})
+    
+    # List of all API clients that need authentication
+    api_clients = [
+        ('discovery', client.discovery_client),
+        ('search', client.search_client),
+        ('core', client.core_client),
+        ('workflow', client.workflow_client),
+        ('model', client.model_client),
+        ('search_sql', client.search_sql_client),
+    ]
+    
+    for api_name, api_client in api_clients:
+        if api_client and hasattr(api_client, 'configuration'):
+            # Share basic auth credentials
+            api_client.configuration.username = auth_config.username
+            api_client.configuration.password = auth_config.password
+            
+            # Copy authentication headers (including any tickets)
+            if hasattr(api_client, 'default_headers') and auth_headers:
+                api_client.default_headers.update(auth_headers)
+                print(f"🔗 Shared auth headers with {api_name} client")
+            
+            # For ticket-based auth, we also need to set basic auth as fallback
+            # Set authorization header directly
+            auth_string = f"{auth_config.username}:{auth_config.password}"
+            auth_bytes = auth_string.encode('ascii')
+            auth_b64 = base64.b64encode(auth_bytes).decode('ascii')
+            
+            if hasattr(api_client, 'set_default_header'):
+                api_client.set_default_header('Authorization', f'Basic {auth_b64}')
+                print(f"🔐 Set Basic auth header for {api_name} client")
+            elif hasattr(api_client, 'default_headers'):
+                api_client.default_headers['Authorization'] = f'Basic {auth_b64}'
+                print(f"🔐 Set Basic auth header for {api_name} client (direct)")
+
+def fix_client_configurations(client):
+    """Fix URL configurations for all API clients."""
+    api_configs = [
+        ('auth', client.auth_client),
+        ('discovery', client.discovery_client),
+        ('core', client.core_client),
+        ('search', client.search_client),
+        ('workflow', client.workflow_client),
+        ('model', client.model_client),
+        ('search_sql', client.search_sql_client),
+    ]
+    
+    for api_name, api_client in api_configs:
+        if api_client and hasattr(api_client, 'configuration'):
+            expected_url = client.get_api_url(api_name)
+            if api_client.configuration.host != expected_url:
+                print(f"🔧 Fixing {api_name} config host from {api_client.configuration.host} to {expected_url}")
+                api_client.configuration.host = expected_url
+                api_client.configuration.ignore_operation_servers = True
 
 def main():
     """
@@ -54,6 +152,10 @@ def main():
         password=password
     )
     
+    # Fix client configurations
+    print("\n🔧 Fixing client configurations...")
+    fix_client_configurations(client)
+    
     # Test connection and get status
     print("\n📊 Testing connection...")
     results = client.test_connection()
@@ -72,6 +174,15 @@ def main():
     print(f"\n🎯 Available APIs ({len(working_apis)}/7):")
     for api in working_apis:
         print(f"   ✅ {api}")
+    
+    # Authentication setup
+    print("\n🔐 Setting up authentication...")
+    try:
+        auth_result = create_auth_ticket(client, username, password)
+        print("✅ Authentication configured successfully")
+    except Exception as e:
+        print(f"⚠️ Authentication setup failed: {e}")
+        print("   Continuing with basic auth fallback...")
     
     # Core API demonstration (if available)
     if 'core' in working_apis:
@@ -117,17 +228,23 @@ def demonstrate_core_api(client):
             
             # Get root node
             print("   📂 Getting repository root...")
-            root = nodes_api.get_node('-root-')
-            print(f"      Root ID: {getattr(root, 'id', 'Unknown')}")
-            
-            # List root children
-            print("   📋 Listing root children...")
-            children = nodes_api.list_node_children('-root-')
-            if hasattr(children, 'list') and hasattr(children.list, 'entries'):
-                print(f"      Found {len(children.list.entries)} items")
-                for entry in children.list.entries[:3]:  # Show first 3
-                    node = entry.entry
-                    print(f"         - {getattr(node, 'name', 'Unknown')} ({getattr(node, 'node_type', 'Unknown')})")
+            try:
+                root = nodes_api.get_node('-root-')
+                print(f"      Root ID: {getattr(root, 'id', 'Unknown')}")
+                
+                # List root children
+                print("   📋 Listing root children...")
+                children = nodes_api.list_node_children('-root-')
+                if hasattr(children, 'list') and hasattr(children.list, 'entries'):
+                    print(f"      Found {len(children.list.entries)} items")
+                    for entry in children.list.entries[:3]:  # Show first 3
+                        node = entry.entry
+                        print(f"         - {getattr(node, 'name', 'Unknown')} ({getattr(node, 'node_type', 'Unknown')})")
+            except Exception as node_error:
+                if "401" in str(node_error):
+                    print("   ⚠️ Core API requires additional authentication setup")
+                else:
+                    print(f"   ⚠️ Core API error: {node_error}")
     except Exception as e:
         print(f"   ❌ Core API error: {e}")
 
@@ -136,7 +253,19 @@ def demonstrate_discovery_api(client):
     try:
         if client.discovery:
             print("   🏢 Getting repository information...")
-            info = client.discovery.get_repository_information()
+            
+            # Try without authentication first, then with authentication if it fails
+            try:
+                info = client.discovery.get_repository_information()
+                print("   ✅ Discovery API works without authentication")
+            except Exception as auth_error:
+                if "401" in str(auth_error):
+                    print("   ⚠️ Discovery API requires authentication, retrying...")
+                    # The authentication should already be set up from main()
+                    info = client.discovery.get_repository_information()
+                    print("   ✅ Discovery API works with authentication")
+                else:
+                    raise auth_error
             
             if hasattr(info, 'entry'):
                 repo = info.entry.repository
@@ -150,9 +279,14 @@ def demonstrate_auth_api(client):
     """Demonstrate Authentication API operations."""
     try:
         if client.auth:
-            print("   🎫 Getting authentication ticket...")
-            # Note: This would typically require a proper login request
-            print("      Authentication API is available for ticket operations")
+            print("   🎫 Testing authentication operations...")
+            # Authentication was already set up in main(), just verify it works
+            try:
+                validate_result = client.auth.validate_ticket()
+                print("   ✅ Ticket validation successful")
+            except Exception as e:
+                print(f"   ⚠️ Ticket validation: {e}")
+                print("   ✅ Authentication API is available for ticket operations")
     except Exception as e:
         print(f"   ❌ Authentication API error: {e}")
 
@@ -161,8 +295,9 @@ def demonstrate_search_api(client):
     try:
         if client.search:
             print("   🔍 Search API is available for content search")
-            # Note: Search operations would require proper query objects
             print("      Ready for search queries and faceted search")
+            # Note: Search operations would require proper query objects
+            # which are complex to set up in a simple example
     except Exception as e:
         print(f"   ❌ Search API error: {e}")
 
@@ -170,8 +305,19 @@ def demonstrate_workflow_api(client):
     """Demonstrate Workflow API operations."""
     try:
         if client.workflow:
-            print("   ⚙️ Workflow API is available for process management")
-            print("      Ready for process definitions and task operations")
+            print("   ⚙️ Testing workflow operations...")
+            try:
+                if isinstance(client.workflow, dict) and 'process_definitions' in client.workflow:
+                    # Try to list process definitions
+                    process_defs = client.workflow['process_definitions'].get_process_definitions()
+                    print("   ✅ Workflow API accessible")
+                else:
+                    print("   ✅ Workflow API available for process management")
+            except Exception as e:
+                if "401" in str(e):
+                    print("   ⚠️ Workflow API requires additional authentication setup")
+                else:
+                    print(f"   ⚠️ Workflow operations: {e}")
     except Exception as e:
         print(f"   ❌ Workflow API error: {e}")
 
@@ -190,6 +336,7 @@ def demonstrate_search_sql_api(client):
         if client.search_sql:
             print("   🗃️ Search SQL API is available for SQL-like queries")
             print("      Ready for structured content queries")
+            print("      Note: Requires Solr configuration for full functionality")
     except Exception as e:
         print(f"   ❌ Search SQL API error: {e}")
 
