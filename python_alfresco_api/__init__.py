@@ -21,7 +21,7 @@ from .clients.discovery_client import AlfrescoDiscoveryClient
 from .clients.search_client import AlfrescoSearchClient
 from .clients.workflow_client import AlfrescoWorkflowClient
 from .clients.model_client import AlfrescoModelClient
-from .clients.search_sql_client import AlfrescoSearchSQLClient
+from .clients.search_sql_client import AlfrescoSearchSqlClient
 
 # Pydantic models for LLM integration
 from .models import *
@@ -39,5 +39,5 @@ __all__ = [
     "AlfrescoSearchClient",
     "AlfrescoWorkflowClient", 
     "AlfrescoModelClient",
-    "AlfrescoSearchSQLClient"
+    "AlfrescoSearchSqlClient"
 ]

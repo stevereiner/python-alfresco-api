@@ -13,7 +13,7 @@ from .clients.discovery_client import AlfrescoDiscoveryClient
 from .clients.search_client import AlfrescoSearchClient
 from .clients.workflow_client import AlfrescoWorkflowClient
 from .clients.model_client import AlfrescoModelClient
-from .clients.search_sql_client import AlfrescoSearchSQLClient
+from .clients.search_sql_client import AlfrescoSearchSqlClient
 
 class ClientFactory:
     """
@@ -73,9 +73,9 @@ class ClientFactory:
         """Create Model API client"""
         return AlfrescoModelClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
     
-    def create_search_sql_client(self) -> AlfrescoSearchSQLClient:
+    def create_search_sql_client(self) -> AlfrescoSearchSqlClient:
         """Create Search SQL API client"""
-        return AlfrescoSearchSQLClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        return AlfrescoSearchSqlClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
     
     def create_all_clients(self) -> Dict[str, Any]:
         """Create all available clients"""
