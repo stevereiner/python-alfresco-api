@@ -1,0 +1,1167 @@
+basePath: /alfresco/api/-default-/public/search/versions/1
+consumes:
+- application/json
+definitions:
+  ContentInfo:
+    properties:
+      encoding:
+        type: string
+      mimeType:
+        type: string
+      mimeTypeGroup:
+        type: string
+      mimeTypeName:
+        type: string
+      sizeInBytes:
+        type: integer
+    required:
+    - mimeType
+    - mimeTypeName
+    - sizeInBytes
+    type: object
+  Error:
+    properties:
+      error:
+        properties:
+          briefSummary:
+            type: string
+          descriptionURL:
+            type: string
+          errorKey:
+            type: string
+          logId:
+            type: string
+          stackTrace:
+            type: string
+          statusCode:
+            format: int32
+            type: integer
+        type: object
+    required:
+    - error
+    type: object
+  GenericBucket:
+    description: A bucket of facet results
+    properties:
+      bucketInfo:
+        description: Additional information of nested facet
+        properties:
+          end:
+            description: The end of range
+            type: string
+          endInclusive:
+            description: Includes values less than or equal to "end"
+            type: boolean
+          start:
+            description: The start of range
+            type: string
+          startInclusive:
+            description: Includes values greater or equal to "start"
+            type: boolean
+        type: object
+      display:
+        description: An optional field for additional display information
+        type: object
+      facets:
+        description: Additional list of nested facets
+        items:
+          type: object
+        type: array
+      filterQuery:
+        description: The filter query you can use to apply this facet
+        type: string
+      label:
+        description: The bucket label
+        type: string
+      metrics:
+        description: An array of buckets and values
+        items:
+          $ref: '#/definitions/GenericMetric'
+        type: array
+    type: object
+  GenericFacetResponse:
+    properties:
+      buckets:
+        description: An array of buckets and values
+        items:
+          $ref: '#/definitions/GenericBucket'
+        type: array
+      label:
+        description: The field name or its explicit label, if provided on the request
+        type: string
+      type:
+        description: The facet type, eg. interval, range, pivot, stats
+        type: string
+    type: object
+  GenericMetric:
+    description: A metric used in faceting
+    properties:
+      type:
+        description: The type of metric, e.g. count
+        type: string
+      value:
+        description: 'The metric value, e.g. {"count": 34}
+
+          '
+        type: object
+    type: object
+  Node:
+    properties:
+      allowableOperations:
+        items:
+          type: string
+        type: array
+      aspectNames:
+        items:
+          type: string
+        type: array
+      content:
+        $ref: '#/definitions/ContentInfo'
+      createdAt:
+        format: date-time
+        type: string
+      createdByUser:
+        $ref: '#/definitions/UserInfo'
+      id:
+        type: string
+      isFile:
+        type: boolean
+      isFolder:
+        type: boolean
+      isLink:
+        type: boolean
+      isLocked:
+        default: false
+        type: boolean
+      modifiedAt:
+        format: date-time
+        type: string
+      modifiedByUser:
+        $ref: '#/definitions/UserInfo'
+      name:
+        description: 'The name must not contain spaces or the following special characters:
+          * " < > \ / ? : and |.
+
+          The character . must not be used at the end of the name.
+
+          '
+        pattern: ^(?!(.*[\"\*\\\>\<\?\/\:\|]+.*)|(.*[\.]?.*[\.]+$)|(.*[ ]+$))
+        type: string
+      nodeType:
+        type: string
+      parentId:
+        type: string
+      path:
+        $ref: '#/definitions/PathInfo'
+      properties:
+        type: object
+    required:
+    - id
+    - name
+    - nodeType
+    - isFolder
+    - isFile
+    - createdAt
+    - createdByUser
+    - modifiedAt
+    - modifiedByUser
+    type: object
+  Pagination:
+    properties:
+      count:
+        description: 'The number of objects in the entries array.
+
+          '
+        format: int64
+        type: integer
+      hasMoreItems:
+        description: 'A boolean value which is **true** if there are more entities
+          in the collection
+
+          beyond those in this response. A true value means a request with a larger
+          value
+
+          for the **skipCount** or the **maxItems** parameter will return more entities.
+
+          '
+        type: boolean
+      maxItems:
+        description: 'The value of the **maxItems** parameter used to generate this
+          list,
+
+          or if there was no **maxItems** parameter the default value is 100
+
+          '
+        format: int64
+        type: integer
+      skipCount:
+        description: 'An integer describing how many entities exist in the collection
+          before
+
+          those included in this list.
+
+          '
+        format: int64
+        type: integer
+      totalItems:
+        description: 'An integer describing the total number of entities in the collection.
+
+          The API might not be able to determine this value,
+
+          in which case this property will not be present.
+
+          '
+        format: int64
+        type: integer
+    required:
+    - count
+    - hasMoreItems
+    - skipCount
+    - maxItems
+    type: object
+  PathElement:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  PathInfo:
+    properties:
+      elements:
+        items:
+          $ref: '#/definitions/PathElement'
+        type: array
+      isComplete:
+        type: boolean
+      name:
+        type: string
+    type: object
+  RequestDefaults:
+    description: Common query defaults
+    properties:
+      defaultFTSFieldOperator:
+        default: AND
+        description: 'The default way to combine query parts in field query groups
+          when AND or OR is not explicitly stated - includes ! - +
+
+          FIELD:(one two three)
+
+          '
+        enum:
+        - AND
+        - OR
+        type: string
+      defaultFTSOperator:
+        default: AND
+        description: 'The default way to combine query parts when AND or OR is not
+          explicitly stated - includes ! - +
+
+          one two three
+
+          (one two three)
+
+          '
+        enum:
+        - AND
+        - OR
+        type: string
+      defaultFieldName:
+        default: TEXT
+        type: string
+      namespace:
+        default: cm
+        description: The default name space to use if one is not provided
+        type: string
+      textAttributes:
+        description: 'A list of query fields/properties used to expand TEXT: queries.
+
+          The default is cm:content.
+
+          You could include all content properties using d:content or list all individual
+          content properties or types.
+
+          As more terms are included the query size, complexity, memory impact and
+          query time will increase.
+
+          '
+        items:
+          default: cm:content
+          type: string
+        type: array
+    type: object
+  RequestFacetField:
+    description: A simple facet field
+    properties:
+      excludeFilters:
+        description: 'Filter Queries with tags listed here will not be included in
+          facet counts.
+
+          This is used for multi-select facetting.
+
+          '
+        items:
+          type: string
+        type: array
+      facetEnumCacheMinDf:
+        type: integer
+      field:
+        description: The facet field
+        type: string
+      label:
+        description: A label to include in place of the facet field
+        type: string
+      limit:
+        type: integer
+      method:
+        enum:
+        - ENUM
+        - FC
+        type: string
+      mincount:
+        default: 1
+        description: The minimum count required for a facet field to be included in
+          the response.
+        type: integer
+      missing:
+        default: false
+        description: When true, count results that match the query but which have
+          no facet value for the field (in addition to the Term-based constraints).
+        type: boolean
+      offset:
+        type: integer
+      prefix:
+        description: Restricts the possible constraints to only indexed values with
+          a specified prefix.
+        type: string
+      sort:
+        enum:
+        - COUNT
+        - INDEX
+        type: string
+    type: object
+  RequestFacetFields:
+    description: 'Simple facet fields to include
+
+      The Properties reflect the global properties related to field facts in SOLR.
+
+      They are descripbed in detail by the SOLR documentation
+
+      '
+    properties:
+      facets:
+        description: 'Define specifc fields on which to facet (adds SOLR facet.field
+          and f.<field>.facet.* options)
+
+          '
+        items:
+          $ref: '#/definitions/RequestFacetField'
+        type: array
+    type: object
+  RequestFacetIntervals:
+    description: Facet Intervals
+    properties:
+      intervals:
+        description: Specifies the fields to facet by interval.
+        items:
+          properties:
+            field:
+              description: The field to facet on
+              type: string
+            label:
+              description: A label to use to identify the field facet
+              type: string
+            sets:
+              description: Sets the intervals for all fields.
+              items:
+                $ref: '#/definitions/RequestFacetSet'
+              type: array
+          type: object
+        type: array
+      sets:
+        description: Sets the intervals for all fields.
+        items:
+          $ref: '#/definitions/RequestFacetSet'
+        type: array
+    type: object
+  RequestFacetQueries:
+    description: Facet queries to include
+    items:
+      properties:
+        label:
+          description: A label to include in place of the facet query
+          type: string
+        query:
+          description: A facet query
+          type: string
+      type: object
+    type: array
+  RequestFacetSet:
+    description: The interval to Set
+    properties:
+      end:
+        description: The end of the range
+        type: string
+      endInclusive:
+        default: true
+        description: When true, the set will include values less than or equal to
+          "end"
+        type: boolean
+      label:
+        description: A label to use to identify the set
+        type: string
+      start:
+        description: The start of the range
+        type: string
+      startInclusive:
+        default: true
+        description: When true, the set will include values greater or equal to "start"
+        type: boolean
+    type: object
+  RequestFields:
+    description: 'A list of field names.
+
+      You can use this parameter to restrict the fields returned within a response
+      if, for example, you want to save on overall bandwidth.
+
+      The list applies to a returned individual entity or entries within a collection.
+
+      If the **include** parameter is used aswell then the fields specified in the
+      **include** parameter are returned in addition to those specified in the **fields**
+      parameter.'
+    items:
+      type: string
+    type: array
+  RequestFilterQueries:
+    description: Filter Queries. Constraints that apply to the results set but do
+      not affect the score of each entry.
+    items:
+      properties:
+        query:
+          description: 'The filter query expression.
+
+            For multi-select facets selected facets must be order together
+
+            '
+          type: string
+        tags:
+          description: Tags used exclude the filters from facet evaluation for multi-select
+            facet support
+          items:
+            type: string
+          type: array
+      type: object
+    type: array
+  RequestHighlight:
+    description: 'Request that highlight fragments to be added to result set rows
+
+      The properties reflect SOLR highlighting parameters.
+
+      '
+    properties:
+      fields:
+        description: The fields to highlight and field specific configuration properties
+          for each field
+        items:
+          properties:
+            field:
+              description: The name of the field to highlight.
+              type: string
+            fragmentSize:
+              type: integer
+            mergeContiguous:
+              type: boolean
+            postfix:
+              type: string
+            prefix:
+              type: string
+            snippetCount:
+              type: integer
+          type: object
+        type: array
+      fragmentSize:
+        description: The character length of each snippet.
+        type: integer
+      maxAnalyzedChars:
+        description: The number of characters to be considered for highlighting. Matches
+          after this count will not be shown.
+        type: integer
+      mergeContiguous:
+        description: If fragments over lap they can be  merged into one larger fragment
+        type: boolean
+      postfix:
+        description: The string used to mark the end of a highlight in a fragment.
+        type: string
+      prefix:
+        description: The string used to mark the start of a highlight in a fragment.
+        type: string
+      snippetCount:
+        description: The maximum number of distinct highlight snippets to return for
+          each highlight field.
+        type: integer
+      usePhraseHighlighter:
+        description: Should phrases be identified.
+        type: boolean
+    type: object
+  RequestInclude:
+    description: "Returns additional information about the node. The following optional\
+      \ fields can be requested:\n * properties\n * aspectNames\n * path\n * isLink\n\
+      \ * allowableOperations\n * association\n"
+    items:
+      enum:
+      - allowableOperations
+      - aspectNames
+      - isLink
+      - isLocked
+      - path
+      - properties
+      type: string
+    type: array
+  RequestLimits:
+    description: Limit the time and resources used for query execution
+    properties:
+      permissionEvaluationCount:
+        default: 2000
+        description: Maximum count of post query permission evaluations
+        type: integer
+      permissionEvaluationTime:
+        default: 20000
+        description: Maximum time for post query permission evaluation
+        type: integer
+    type: object
+  RequestLocalization:
+    description: Localization settings
+    properties:
+      locales:
+        description: A list of Locales definied by IETF BCP 47.  The ordering is significant.  The
+          first locale (leftmost) is used for sort and query localization, whereas
+          the remaining locales are used for query only.
+        items:
+          type: string
+        type: array
+      timezone:
+        description: A valid timezone id supported by @see java.time.ZoneId
+        type: string
+    type: object
+  RequestPagination:
+    properties:
+      maxItems:
+        default: 100
+        description: The maximum number of items to return in the query results
+        minimum: 1
+        type: integer
+      skipCount:
+        default: 0
+        description: The number of items to skip from the start of the query set
+        minimum: 0
+        type: integer
+    type: object
+  RequestPivot:
+    description: A list of pivots.
+    example:
+      key: MyKey
+      pivots:
+      - key: AnotherKey
+        pivots: []
+    properties:
+      key:
+        description: A key corresponding to a matching field facet label or stats.
+        type: string
+      pivots:
+        items:
+          $ref: '#/definitions/RequestPivot'
+        type: array
+    type: object
+  RequestQuery:
+    description: Query.
+    properties:
+      language:
+        default: afts
+        description: The query language in which the query is written.
+        enum:
+        - afts
+        - lucene
+        - cmis
+        type: string
+      query:
+        description: The query which may have been generated in some way from the
+          userQuery
+        type: string
+      userQuery:
+        description: The exact search request typed in by the user
+        type: string
+    required:
+    - query
+    type: object
+  RequestRange:
+    description: Facet range
+    properties:
+      end:
+        description: The end of the range
+        type: string
+      excludeFilters:
+        description: Filter queries to exclude when calculating statistics
+        items:
+          type: string
+        type: array
+      field:
+        description: The name of the field to perform range
+        type: string
+      gap:
+        description: Bucket size
+        type: string
+      hardend:
+        description: "If true means that the last bucket will end at \u201Cend\u201D\
+          \ even if it is less than \u201Cgap\u201D wide."
+        type: boolean
+      include:
+        description: lower, upper, edge, outer, all
+        items:
+          type: string
+        type: array
+      label:
+        description: A label to include as a pivot reference
+        type: string
+      other:
+        description: before, after, between, non, all
+        items:
+          type: string
+        type: array
+      start:
+        description: The start of the range
+        type: string
+    type: object
+  RequestScope:
+    description: Scope
+    properties:
+      locations:
+        description: 'The locations to include in the query
+
+          '
+        enum:
+        - nodes
+        - versions
+        - deleted-nodes
+        type: string
+    type: object
+  RequestSortDefinition:
+    description: How to sort the rows? An array of sort specifications. The array
+      order defines the ordering precedence.
+    items:
+      properties:
+        ascending:
+          default: false
+          description: The sort order. (The ordering of nulls is determined by the
+            SOLR configuration)
+          type: boolean
+        field:
+          description: The name of the field
+          type: string
+        type:
+          default: FIELD
+          description: How to order - using a field, when position of the document
+            in the index, score/relevence.
+          enum:
+          - FIELD
+          - DOCUMENT
+          - SCORE
+          type: string
+      type: object
+    type: array
+  RequestSpellcheck:
+    description: 'Request that spellcheck fragments to be added to result set rows
+
+      The properties reflect SOLR spellcheck parameters.
+
+      '
+    properties:
+      query:
+        type: string
+    type: object
+  RequestStats:
+    description: A list of stats request.
+    properties:
+      cardinality:
+        default: false
+        description: A statistical approximation of the number of distinct values
+        type: boolean
+      cardinalityAccuracy:
+        default: 0.3
+        description: Number between 0.0 and 1.0 indicating how aggressively the algorithm
+          should try to be accurate. Used with boolean cardinality flag.
+        format: float
+        type: number
+      countDistinct:
+        default: false
+        description: The number of distinct values  (This can be very expensive to
+          calculate)
+        type: boolean
+      countValues:
+        default: true
+        description: The number which have a value for this field
+        type: boolean
+      distinctValues:
+        default: false
+        description: The set of all distinct values for the field (This can be very
+          expensive to calculate)
+        type: boolean
+      excludeFilters:
+        description: A list of filters to exclude
+        items:
+          type: string
+        type: array
+      field:
+        description: The stats field
+        type: string
+      label:
+        description: A label to include for reference the stats field
+        type: string
+      max:
+        default: true
+        description: The maximum value of the field
+        type: boolean
+      mean:
+        default: true
+        description: The average
+        type: boolean
+      min:
+        default: true
+        description: The minimum value of the field
+        type: boolean
+      missing:
+        default: true
+        description: The number which do not have a value for this field
+        type: boolean
+      percentiles:
+        description: A list of percentile values, e.g. "1,99,99.9"
+        items:
+          format: float
+          type: number
+        type: array
+      stddev:
+        default: true
+        description: Standard deviation
+        type: boolean
+      sum:
+        default: true
+        description: The sum of all values of the field
+        type: boolean
+      sumOfSquares:
+        default: true
+        description: Sum of all values squared
+        type: boolean
+    type: object
+  RequestTemplates:
+    description: 'Templates usewd for query expansion.
+
+      A template called "WOOF" defined as "%(cm:name cm:title)" allows
+
+      WOOF:example
+
+      to generate
+
+      cm:name:example cm:name:example
+
+      '
+    items:
+      properties:
+        name:
+          description: The template name
+          type: string
+        template:
+          description: The template
+          type: string
+      type: object
+    type: array
+  ResponseConsistency:
+    description: The consistency state of the index used to execute the query
+    properties:
+      lastTxId:
+        description: The id of the last indexed transaction
+        type: integer
+    type: object
+  ResultBuckets:
+    properties:
+      buckets:
+        description: An array of buckets and values
+        items:
+          properties:
+            count:
+              description: The count for the bucket
+              type: integer
+            display:
+              description: An optional field for additional display information
+              type: object
+            filterQuery:
+              description: The filter query you can use to apply this facet
+              type: string
+            label:
+              description: The bucket label
+              type: string
+          type: object
+        type: array
+      label:
+        description: The field name or its explicit label, if provided on the request
+        type: string
+    type: object
+  ResultNode:
+    allOf:
+    - $ref: '#/definitions/Node'
+    - properties:
+        archivedAt:
+          format: date-time
+          type: string
+        archivedByUser:
+          $ref: '#/definitions/UserInfo'
+        search:
+          $ref: '#/definitions/SearchEntry'
+        versionComment:
+          type: string
+        versionLabel:
+          type: string
+      type: object
+  ResultSetContext:
+    description: Context that applies to the whole result set
+    properties:
+      consistency:
+        $ref: '#/definitions/ResponseConsistency'
+      facetQueries:
+        description: The counts from facet queries
+        items:
+          properties:
+            count:
+              type: integer
+            filterQuery:
+              description: The filter query you can use to apply this facet
+              type: string
+            label:
+              type: string
+          type: object
+        type: array
+      facets:
+        description: The faceted response
+        items:
+          $ref: '#/definitions/GenericFacetResponse'
+        type: array
+      facetsFields:
+        description: The counts from field facets
+        items:
+          $ref: '#/definitions/ResultBuckets'
+        type: array
+      request:
+        $ref: '#/definitions/SearchRequest'
+      spellcheck:
+        description: 'Suggested corrections
+
+
+          If zero results were found for the original query then a single entry of
+          type "searchInsteadFor" will be returned.
+
+          If alternatives were found that return more results than the original query
+          they are returned as "didYouMean" options.
+
+          The highest quality suggestion is first.
+
+          '
+        items:
+          properties:
+            suggestion:
+              description: A suggested alternative query
+              items:
+                type: string
+              type: array
+            type:
+              enum:
+              - searchInsteadFor
+              - didYouMean
+              type: string
+          type: object
+        type: array
+    type: object
+  ResultSetPaging:
+    description: Query results
+    properties:
+      list:
+        properties:
+          context:
+            $ref: '#/definitions/ResultSetContext'
+          entries:
+            items:
+              $ref: '#/definitions/ResultSetRowEntry'
+            type: array
+          pagination:
+            $ref: '#/definitions/Pagination'
+        type: object
+    type: object
+  ResultSetRowEntry:
+    description: A row in the result set
+    properties:
+      entry:
+        $ref: '#/definitions/ResultNode'
+    required:
+    - entry
+    type: object
+  SearchEntry:
+    properties:
+      highlight:
+        description: 'Highlight fragments if requested and available. A match can
+          happen in any of the requested field.
+
+          '
+        items:
+          properties:
+            field:
+              description: The field where a match occured (one of the fields defined
+                on the request)
+              type: string
+            snippets:
+              description: Any number of snippets for the specified field highlighting
+                the matching text
+              items:
+                description: The highlighted fragment for the field.
+                type: string
+              type: array
+          type: object
+        type: array
+      score:
+        description: The score for this row
+        format: float
+        type: number
+    type: object
+  SearchRequest:
+    properties:
+      defaults:
+        $ref: '#/definitions/RequestDefaults'
+      facetFields:
+        $ref: '#/definitions/RequestFacetFields'
+      facetIntervals:
+        $ref: '#/definitions/RequestFacetIntervals'
+      facetQueries:
+        $ref: '#/definitions/RequestFacetQueries'
+      fields:
+        $ref: '#/definitions/RequestFields'
+      filterQueries:
+        $ref: '#/definitions/RequestFilterQueries'
+      highlight:
+        $ref: '#/definitions/RequestHighlight'
+      include:
+        $ref: '#/definitions/RequestInclude'
+      includeRequest:
+        default: false
+        description: When true, include the original request in the response
+        type: boolean
+      limits:
+        $ref: '#/definitions/RequestLimits'
+      localization:
+        $ref: '#/definitions/RequestLocalization'
+      paging:
+        $ref: '#/definitions/RequestPagination'
+      pivots:
+        items:
+          $ref: '#/definitions/RequestPivot'
+        type: array
+      query:
+        $ref: '#/definitions/RequestQuery'
+      ranges:
+        items:
+          $ref: '#/definitions/RequestRange'
+        type: array
+      scope:
+        $ref: '#/definitions/RequestScope'
+      sort:
+        $ref: '#/definitions/RequestSortDefinition'
+      spellcheck:
+        $ref: '#/definitions/RequestSpellcheck'
+      stats:
+        items:
+          $ref: '#/definitions/RequestStats'
+        type: array
+      templates:
+        $ref: '#/definitions/RequestTemplates'
+    required:
+    - query
+    type: object
+  UserInfo:
+    properties:
+      displayName:
+        type: string
+      id:
+        type: string
+    required:
+    - displayName
+    - id
+    type: object
+info:
+  description: '**Search API**
+
+
+    Provides access to the search features of Alfresco Content Services.
+
+    '
+  title: Alfresco Content Services REST API
+  version: '1'
+paths:
+  /search:
+    post:
+      description: "**Note**: this endpoint is available in Alfresco 5.2 and newer\
+        \ versions.\n\n**You specify all the parameters in this API in a JSON body**,\
+        \ URL parameters are not supported.\nA basic query looks like this:\n\n```JSON\n\
+        {\n  \"query\": {\n    \"query\": \"foo\"\n  }\n}\n```\n\n**Note:** These\
+        \ are the minimum possible query parameters.\n\nThe default search language\
+        \ is **afts** ([Alfresco Full Text Search](http://docs.alfresco.com/5.1/concepts/rm-searchsyntax-intro.html)),\
+        \ but you can also specify **cmis**, and **lucene**.\n\nA basic CMIS query\
+        \ looks like this:\n\n```JSON\n{\n  \"query\": {\n    \"query\": \"select\
+        \ * from cmis:folder\",\n    \"language\": \"cmis\"\n  }\n}\n```\n\nBy default,\
+        \ **results are limited to the first 100.**\nResults can be restricted using\
+        \ \"paging\". For example:\n```JSON\n\"paging\": {\n  \"maxItems\": \"50\"\
+        ,\n  \"skipCount\": \"28\"\n}\n```\nThis example would ensure that results\
+        \ are **limited by Final Size**, skipping the first 28 results and returning\
+        \ the next 50.\n\nAlternatively, you can limit the results by using the **limits\
+        \ JSON body parameter**. For example,\n```JSON\n\"limits\": {\n  \"permissionEvaluationTime\"\
+        : 20000,\n  \"permissionEvaluationCount\": 2000\n}\n```\n\nYou can use the\
+        \ **include JSON body parameter** to return additional information.\nThis\
+        \ works in the same way as in the /nodes/{nodeId}/children method in the core\
+        \ API. For example:\n```JSON\n\"include\": [\"aspectNames\", \"properties\"\
+        , \"isLink\"]\n```\n\nYou can use the **fields JSON body parameter** to restrict\
+        \ the fields returned within a response if, for example, you want to save\
+        \ on overall bandwidth.\nThis works in the same way as in the /nodes/{nodeId}/children\
+        \ method in the core API. For example:\n```JSON\n\"fields\": [\"id\", \"name\"\
+        , \"search\"]\n```\n\nYou can sort the results using the **sort JSON body\
+        \ parameter**, for example:\n```JSON\n\"sort\": [{\"type\":\"FIELD\", \"field\"\
+        :\"cm:description\", \"ascending\":\"true\"}]\n```\n**Note:** the **sort**\
+        \ parameter is not supported for CMIS queries.\n\nBy default, search uses\
+        \ the **\"nodes\" location**, which is the **content store known as workspace://SpacesStore**.\n\
+        To change the scope to another location you can use the **locations JSON body\
+        \ parameter**.\nYou can specify either **nodes** (the default), **versions**\
+        \ or **deleted-nodes**. For example:\n```JSON\n\"scope\": {\n    \"locations\"\
+        : [\"deleted-nodes\"]\n}\n```\nYou can specify templates using the **templates\
+        \ JSON body parameter**, for example:\n```JSON\n\"templates\": [{\"name\"\
+        : \"_PERSON\",\"template\": \"|%firstName OR |%lastName OR |%userName\"},\n\
+        \              {\"name\": \"mytemplate\",\"template\": \"%cm:content\"}]\n\
+        ```\n\n**Note: Spell checking only works on Search Services (Solr 6) if you\
+        \ have already enabled suggestions.**\n\nFor **spell checking** you can use\
+        \ a query like this:\n```JSON\n{\n  \"query\": {\n    \"query\": \"cm:title:alfrezco\"\
+        \n  },\n  \"spellcheck\": {\"query\": \"alfrezco\"}\n}\n```\n\nIf you are\
+        \ already specifying \"userQuery\" then the following may be easier and produces\
+        \ the same result :\n```JSON\n{\n  \"query\": {\n    \"query\": \"cm:title:alfrezco\"\
+        ,\n    \"userQuery\": \"alfrezco\"\n  },\n  \"spellcheck\": {}\n}\n```\n\n\
+        The spellcheck response includes a spellCheck context like this:\n```JSON\n\
+        \"context\": {\n  \"spellCheck\": {\n    \"type\": \"searchInsteadFor\",\n\
+        \    \"suggestions\": [\"alfresco\"]\n  }\n},\n```\n\nTo specify defaults,\
+        \ you  use a **defaults JSON body parameter**, for example:\n```JSON\n\"defaults\"\
+        : {\n  \"textAttributes\": [\n    \"cm:content\", \"cm:name\"\n  ],\n  \"\
+        defaultFTSOperator\": \"AND\",\n  \"defaultFTSFieldOperator\": \"OR\",\n \
+        \ \"namespace\": \"cm\",\n  \"defaultFieldName\": \"PATH\"\n}\n```\n\nYou\
+        \ can specify several filter queries using the **filterQueries JSON body parameter**,\
+        \ for example:\n```JSON\n\"filterQueries\": [{\"query\": \"TYPE:'cm:folder'\"\
+        },{\"query\": \"cm:creator:mjackson\"}]\n```\n\nYou can specify several facet\
+        \ queries using the **facetQueries JSON body parameter**, for example:\n```JSON\n\
+        \"facetQueries\": [{\"query\": \"created:2016\",\"label\": \"CreatedThisYear\"\
+        }]\n```\nThe response will contain a matching \"context\" section, the \"\
+        label\" will match the facet query.\n```JSON\n\"context\": {\n  \"facetQueries\"\
+        : [\n    {\"label\": \"CreatedThisYear\",\"count\": 3}\n  ]\n},\n```\n\nA\
+        \ complete query for facetting via the content.size field looks this:\n```JSON\n\
+        {\n  \"query\": {\n    \"query\": \"presentation\",\n    \"language\": \"\
+        afts\"\n  },\n    \"facetQueries\": [\n        {\"query\": \"content.size:[0\
+        \ TO 10240]\", \"label\": \"xtra small\"},\n        {\"query\": \"content.size:[10240\
+        \ TO 102400]\", \"label\": \"small\"},\n        {\"query\": \"content.size:[102400\
+        \ TO 1048576]\", \"label\": \"medium\"},\n        {\"query\": \"content.size:[1048576\
+        \ TO 16777216]\", \"label\": \"large\"},\n        {\"query\": \"content.size:[16777216\
+        \ TO 134217728]\", \"label\": \"xtra large\"},\n        {\"query\": \"content.size:[134217728\
+        \ TO MAX]\", \"label\": \"XX large\"}\n  ],\n    \"facetFields\": {\"facets\"\
+        : [{\"field\": \"'content.size'\"}]}\n}\n```\n\nThe response will contain\
+        \ a matching \"context\" section, the \"label\" will match the facet query.\n\
+        ```JSON\n\"context\": {\n  \"facetQueries\": [\n    { \"label\": \"small\"\
+        ,\"count\": 2 },\n    { \"label\": \"large\",\"count\": 0 },\n    { \"label\"\
+        : \"xtra small\",\"count\": 5 },\n    { \"label\": \"xtra large\",\"count\"\
+        : 56},\n    { \"label\": \"medium\",\"count\": 4 },\n    { \"label\": \"XX\
+        \ large\", \"count\": 1 }\n  ]\n},\n```\n\nYou can specify several facet fields\
+        \ using the **facetFields JSON body parameter**, for example:\n```JSON\n\"\
+        facetFields\": {\"facets\": [{\"field\": \"creator\", \"mincount\": 1}, {\"\
+        field\": \"modifier\", \"mincount\": 1}]}\n```\nThe response will contain\
+        \ a matching \"context\" section, the \"label\" will match the facet field.\n\
+        ```JSON\n\"context\": {\n   \"facetsFields\": [\n     {  \"label\": \"creator\"\
+        ,\n        \"buckets\": [\n          { \"label\": \"System\", \"count\": 75\
+        \ },\n          { \"label\": \"mjackson\", \"count\": 5 }\n        ]},\n \
+        \    {  \"label\": \"modifier\",\n        \"buckets\": [\n          { \"label\"\
+        : \"System\", \"count\": 72 },\n          { \"label\": \"mjackson\", \"count\"\
+        : 5 },\n          { \"label\": \"admin\", \"count\": 3 }\n        ]}\n   ]\n\
+        },\n```\n\nGrouping facet queries that go together can be done by specifying\
+        \ the group label in the fact queries as follow:\n```JSON\n    {\n       \
+        \ \"query\": {\n            \"query\": \"presentation\"\n        },\n    \
+        \    \"facetQueries\": [\n            {\"query\": \"content.size:[0 TO 102400]\"\
+        , \"label\": \"small\", \"group\":\"foo\"},\n            {\"query\": \"content.size:[102400\
+        \ TO 1048576]\", \"label\": \"medium\",\"group\":\"foo\"},\n            {\"\
+        query\": \"content.size:[1048576 TO 16777216]\", \"label\": \"large\",\"group\"\
+        :\"foo\"}\n        ]\n    }\n```\nThe above query returns the results a faceted\
+        \ field grouped under the label foo:\n```JSON\n{\n    \"context\": {\"facetsFields\"\
+        : [{\n        \"label\": \"foo\",\n        \"buckets\": [\n            {\n\
+        \                \"count\": 109,\n                \"label\": \"small\",\n\
+        \                \"filterQuery\": \"content.size:[0 TO 102400]\"\n       \
+        \     },\n            {\n                \"count\": 0,\n                \"\
+        label\": \"large\",\n                \"filterQuery\": \"content.size:[1048576\
+        \ TO 16777216]\"\n            },\n            {\n                \"count\"\
+        : 0,\n                \"label\": \"medium\",\n                \"filterQuery\"\
+        : \"content.size:[102400 TO 1048576]\"\n            }\n        ]\n    }]\n\
+        }\n```\nRange Faceting is supported by the **ranges JSON body parameter**,\
+        \ for example:\n```JSON\n    {\n        \"query\": {\n            \"query\"\
+        : \"presentation\"\n        },\n        \"ranges\": [\n        {\n       \
+        \     \"field\": \"content.size\",\n             \"start\": \"0\",\n     \
+        \        \"end\": \"100\",\n             \"gap\": \"20\",\n             \"\
+        hardend\": true\n        },\n        {\n            \"field\": \"created\"\
+        ,\n            \"start\": \"2015-09-29T10:45:15.729Z\",\n            \"end\"\
+        : \"2016-09-29T10:45:15.729Z\",\n            \"gap\": \"+100DAY\"\n      \
+        \  }]\n    }\n```\nAn example query for **search highlighting** could look\
+        \ like this:\n```JSON\n{\n  \"query\": {\n    \"query\": \"description:workflow\"\
+        ,\n    \"userQuery\":\"workflow\"\n  },\n  \"highlight\": {\n    \"prefix\"\
+        : \"\xBF\",\n    \"postfix\": \"?\",\n    \"mergeContiguous\": true,\n   \
+        \ \"fields\": [\n      {\n        \"field\": \"cm:title\"\n      },\n    \
+        \  {\n        \"field\": \"description\",\n        \"prefix\": \"(\",\n  \
+        \      \"postfix\": \")\"\n      }\n\n    ]\n  }\n}\n```\nThe example above\
+        \ changes the highlighting prefix and postfix from the default `<em>` for\
+        \ all fields to \xBF? and just for the \"description\" field to ().\nThe hightlight\
+        \ information is added in each node entry response; here is an example partial\
+        \ response:\n```\n\"entry\": {\n        \"createdAt\": \"2016-10-12T15:24:31.202+0000\"\
+        ,\n        \"isFolder\": true,\n        \"search\": {\n          \"score\"\
+        : 1,\n          \"highlight\": [\n            {\n              \"field\":\
+        \ \"cm:title\",\n              \"snippets\": [\n                \"Customized\
+        \ \xBFWorkflow? Process Definitions\"\n              ]\n            },\n \
+        \           {\n              \"field\": \"description\",\n              \"\
+        snippets\": [\n                \"Customized (Workflow) Process Definitions\"\
+        \n              ]\n            }\n          ]\n      },\n```\n**Note**: after\
+        \ the migration to Swagger UI 3, this API definition was triggering some warnings,\
+        \ more info in [this StackOverflow Q&A](https://stackoverflow.com/q/65584131/1654265).\n"
+      operationId: search
+      parameters:
+      - description: 'Generic query API
+
+          '
+        in: body
+        name: queryBody
+        required: true
+        schema:
+          $ref: '#/definitions/SearchRequest'
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/ResultSetPaging'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Searches Alfresco
+      tags:
+      - search
+      x-alfresco-since: '5.2'
+produces:
+- application/json
+security:
+- basicAuth: []
+securityDefinitions:
+  basicAuth:
+    description: HTTP Basic Authentication
+    type: basic
+swagger: '2.0'

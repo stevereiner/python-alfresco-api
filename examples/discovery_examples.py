@@ -10,10 +10,7 @@ import sys
 import os
 import json
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
-
 
 def main():
     """Discovery API examples."""
@@ -144,7 +141,6 @@ def main():
                 
     except Exception as e:
         print(f"❌ Connectivity testing failed: {e}")
-
 
 if __name__ == "__main__":
     main() 

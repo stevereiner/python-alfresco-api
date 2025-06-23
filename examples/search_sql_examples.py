@@ -20,10 +20,7 @@ Note: This API requires Solr to be properly configured with Alfresco.
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
-
 
 def main():
     """Search SQL API examples."""
@@ -139,7 +136,6 @@ def main():
     print("- Common tables: cmis:document, cmis:folder")
     print("- Use LIMIT to avoid large result sets")
     print("- Check Alfresco logs if queries fail")
-
 
 if __name__ == "__main__":
     main() 

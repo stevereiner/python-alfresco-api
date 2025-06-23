@@ -70,4 +70,3 @@ COPYING text eol=lf
 *.preprocessed.yaml text eol=lf
 
 # Generated code - mark as linguist-generated for GitHub language detection
-enhanced_generated/** linguist-generated=true 

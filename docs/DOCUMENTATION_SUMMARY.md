@@ -61,7 +61,7 @@ This document summarizes the comprehensive documentation and examples structure 
 
 #### **🔍 API-Specific Users Path**:
 1. [API Documentation Index](API_DOCUMENTATION_INDEX.md) - Find your API
-2. Individual enhanced client READMEs (in `enhanced_generated/clients/`)
+2. Individual client READMEs (in `python_alfresco_api/raw_clients/`)
 3. Specific API examples (in `examples/`)
 
 #### **🔐 Authentication Issues Path**:
@@ -77,7 +77,7 @@ This document summarizes the comprehensive documentation and examples structure 
 ## 📋 Generated Client Documentation Status
 
 ### Enhanced Generated Clients (Primary)
-Located in `enhanced_generated/clients/` - All have comprehensive documentation:
+Located in `python_alfresco_api/raw_clients/` - All have comprehensive documentation:
 
 | API | Status | README | Docs Directory | Notes |
 |-----|--------|--------|----------------|-------|
@@ -178,5 +178,5 @@ Use [API Documentation Index](API_DOCUMENTATION_INDEX.md) to find your API → E
 Go to [Authentication Guide](AUTHENTICATION_GUIDE.md) → [401 Solutions](AUTHENTICATION_401_SOLUTION.md) → [Working Tests](../tests/test_integration_live_server.py)
 
 ### For Development
-Check [Test Suite Summary](../TEST_SUITE_SUMMARY.md) → [Integration Tests](../tests/) → [Master Client Code](../enhanced_generated/AlfrescoClient.py)
+Check [Test Suite Summary](../tests/README.md) → [Integration Tests](../tests/) → [Master Client Code](../python_alfresco_api/)
 

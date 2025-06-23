@@ -23,17 +23,13 @@ which demonstrates all APIs including the improved Core API functionality.
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
-
 
 def print_section(title):
     """Print a formatted section header."""
     print(f"\n{'='*50}")
     print(f" {title}")
     print(f"{'='*50}")
-
 
 def safe_api_call(func, *args, **kwargs):
     """Safely execute an API call with error handling."""
@@ -42,7 +38,6 @@ def safe_api_call(func, *args, **kwargs):
         return {'success': True, 'data': result}
     except Exception as e:
         return {'success': False, 'error': str(e)}
-
 
 def main():
     """Core API examples."""
@@ -79,7 +74,6 @@ def main():
     print_section("Advanced Usage")
     advanced_examples(client)
 
-
 def show_api_structure(client):
     """Show the current Core API structure."""
     if isinstance(client.core, dict):
@@ -97,7 +91,6 @@ def show_api_structure(client):
             print(f"   Available methods: {methods[:5]}...")  # Show first 5
         else:
             print("   No public methods found")
-
 
 def test_actions_api(client):
     """Test the Actions API functionality."""
@@ -153,7 +146,6 @@ def test_actions_api(client):
     else:
         print("❌ Actions API not available in expected format")
 
-
 def show_planned_apis(client):
     """Show the planned Core APIs that are in development."""
     planned_apis = {
@@ -189,7 +181,6 @@ def show_planned_apis(client):
                 print(f"   ✅ {api_name}: {description} (Available)")
             else:
                 print(f"   🚧 {api_name}: {description} (Planned)")
-
 
 def advanced_examples(client):
     """Advanced usage examples."""
@@ -231,7 +222,6 @@ def advanced_examples(client):
     print("   # Add user to site")
     print("   client.core['sites'].create_site_membership(site_id='mysite', body={'id': 'user1', 'role': 'SiteConsumer'})")
 
-
 def demonstrate_real_usage():
     """Demonstrate real-world usage patterns."""
     print_section("Real-World Usage Example")
@@ -268,7 +258,6 @@ def demonstrate_real_usage():
     
     print("\n💡 Tip: Always check API availability before use!")
     print("💡 Tip: Use safe_api_call() wrapper for production code!")
-
 
 if __name__ == "__main__":
     main()

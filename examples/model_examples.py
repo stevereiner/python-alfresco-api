@@ -9,10 +9,7 @@ The Model API provides access to content model definitions, types, and aspects.
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
-
 
 def main():
     """Model API examples."""
@@ -118,7 +115,6 @@ def main():
                 print("✅ Model functionality available")
             except Exception as e:
                 print(f"❌ Model failed: {e}")
-
 
 if __name__ == "__main__":
     main() 

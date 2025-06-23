@@ -10,7 +10,6 @@ Author: Alfresco Python Client
 
 import base64
 
-
 def create_auth_ticket(client, username='admin', password='admin'):
     """
     Helper function to create authentication tickets and share them across all API clients.
@@ -39,7 +38,6 @@ def create_auth_ticket(client, username='admin', password='admin'):
     share_authentication_across_clients(client)
     
     return auth_result
-
 
 def share_authentication_across_clients(client):
     """
@@ -89,7 +87,6 @@ def share_authentication_across_clients(client):
                 api_client.default_headers['Authorization'] = f'Basic {auth_b64}'
                 print(f"🔐 Set Basic auth header for {api_name} client (direct)")
 
-
 def fix_client_configurations(client):
     """
     Fix URL configurations for all API clients.
@@ -117,7 +114,6 @@ def fix_client_configurations(client):
                 print(f"🔧 Fixing {api_name} config host from {api_client.configuration.host} to {expected_url}")
                 api_client.configuration.host = expected_url
                 api_client.configuration.ignore_operation_servers = True
-
 
 def setup_authentication(client, username='admin', password='admin', verbose=True):
     """
@@ -169,7 +165,6 @@ def setup_authentication(client, username='admin', password='admin', verbose=Tru
             'message': error_msg
         }
 
-
 def safe_api_call(func, *args, **kwargs):
     """
     Safely execute an API call with error handling.
@@ -187,7 +182,6 @@ def safe_api_call(func, *args, **kwargs):
         return {'success': True, 'data': result}
     except Exception as e:
         return {'success': False, 'error': str(e)}
-
 
 def cleanup_auth_ticket(client):
     """

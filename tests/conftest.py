@@ -10,6 +10,7 @@ Provides:
 import pytest
 from unittest.mock import Mock, patch
 from typing import Dict, Any
+import asyncio
 
 # Test configuration
 TEST_CONFIG = {
@@ -18,6 +19,20 @@ TEST_CONFIG = {
     'password': 'admin',
     'verify_ssl': True
 }
+
+# Configure pytest markers
+def pytest_configure(config):
+    """Configure pytest with custom markers"""
+    config.addinivalue_line("markers", "integration: mark test as integration test requiring live server")
+    config.addinivalue_line("markers", "asyncio: mark test as async test")
+
+# Configure asyncio event loop for tests
+@pytest.fixture(scope="session")
+def event_loop():
+    """Create an instance of the default event loop for the test session."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 @pytest.fixture
 def mock_alfresco_server():
@@ -78,30 +93,37 @@ def mock_api_client():
     return mock_client
 
 @pytest.fixture
-def enhanced_client():
-    """Enhanced Alfresco client for testing."""
+def alfresco_client():
+    """Fixture providing an AlfrescoClient for testing."""
     try:
-        from enhanced_generated import AlfrescoClient
-        return AlfrescoClient(**TEST_CONFIG)
-    except ImportError:
-        pytest.skip("Enhanced client not available")
+        from python_alfresco_api import AlfrescoMasterClient
+        return AlfrescoMasterClient(
+            base_url="http://localhost:8080",
+            verify_ssl=False
+        )
+    except Exception as e:
+        pytest.skip(f"AlfrescoMasterClient not available: {e}")
 
 @pytest.fixture
 def live_client():
     """Live Alfresco client for integration testing."""
     try:
-        from enhanced_generated import AlfrescoClient
-        client = AlfrescoClient(**TEST_CONFIG)
+        from python_alfresco_api import AlfrescoMasterClient
+        # Convert TEST_CONFIG to match AlfrescoMasterClient parameters
+        client = AlfrescoMasterClient(
+            base_url=TEST_CONFIG['host'],
+            verify_ssl=TEST_CONFIG['verify_ssl']
+        )
         
         # Test connection
         try:
-            client.test_connection()
+            result = asyncio.run(client.test_connection())
             return client
         except Exception:
             pytest.skip("Live Alfresco server not available")
             
     except ImportError:
-        pytest.skip("Enhanced client not available")
+        pytest.skip("Master client not available")
 
 @pytest.fixture
 def mock_responses():
@@ -158,4 +180,13 @@ def mock_responses():
                 }
             }
         }
-    } 
+    }
+
+@pytest.fixture  
+def master_client():
+    """Fixture providing master client for integration tests."""
+    try:
+        from python_alfresco_api import AlfrescoMasterClient
+        return AlfrescoMasterClient("http://localhost:8080")
+    except Exception as e:
+        pytest.skip(f"Master client not available: {e}") 

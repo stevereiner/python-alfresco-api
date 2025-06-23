@@ -22,9 +22,6 @@ import sys
 import base64
 from pathlib import Path
 
-# Add the enhanced_generated directory to the path to import our client
-sys.path.insert(0, str(Path(__file__).parent.parent / "enhanced_generated"))
-
 from AlfrescoClient import AlfrescoClient
 
 def create_auth_ticket(client, username='admin', password='admin'):

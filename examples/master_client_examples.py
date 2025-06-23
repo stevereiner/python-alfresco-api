@@ -18,18 +18,13 @@ import os
 import json
 from datetime import datetime
 
-# Add the enhanced_generated directory to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
-
 
 def print_section(title):
     """Print a formatted section header."""
     print(f"\n{'='*60}")
     print(f" {title}")
     print(f"{'='*60}")
-
 
 def safe_api_call(func, *args, **kwargs):
     """Safely execute an API call with error handling."""
@@ -38,7 +33,6 @@ def safe_api_call(func, *args, **kwargs):
         return {'success': True, 'data': result}
     except Exception as e:
         return {'success': False, 'error': str(e)}
-
 
 def main():
     """Main example execution."""
@@ -171,7 +165,6 @@ def main():
     print(f"📈 Success Rate: {(working_count/total_count)*100:.1f}%")
     
     print(f"\n🎉 Examples completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-
 
 if __name__ == "__main__":
     main() 

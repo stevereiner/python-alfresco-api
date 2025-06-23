@@ -1,0 +1,659 @@
+openapi: 3.0.0
+info:
+  description: |
+    **Model API**
+
+    Provides access to the model features of Alfresco Content Services.
+  title: Alfresco Content Services REST API
+  version: "1"
+paths:
+  /aspects:
+    get:
+      description: >
+        **Note:** This is available in Alfresco 7.0.0 and newer versions.
+
+
+        Gets a list of aspects from the data dictionary. The System aspects will be ignored by default.
+
+        ```JSON
+
+        {
+          "list": {
+            "pagination": {
+              "count": 0,
+              "hasMoreItems": true,
+              "totalItems": 0,
+              "skipCount": 0,
+              "maxItems": 0
+            },
+            "entries": [
+              {
+                "entry": {
+                  "associations": [],
+                  "mandatoryAspects": [],
+                  "includedInSupertypeQuery": true,
+                  "description": "Titled",
+                  "isContainer": false,
+                  "model": {
+                      "id": "cm:contentmodel",
+                      "author": "Alfresco",
+                      "description": "Alfresco Content Domain Model",
+                      "namespaceUri": "http://www.alfresco.org/model/content/1.0",
+                      "namespacePrefix": "cm"
+                  },
+                  "id": "cm:titled",
+                  "title": "Titled",
+                  "properties": [
+                    {
+                      "id": "cm:title",
+                      "title": "Title",
+                      "description": "Content Title",
+                      "dataType": "d:mltext",
+                      "isMultiValued": false,
+                      "isMandatory": false,
+                      "isMandatoryEnforced": false,
+                      "isProtected": false
+                    },
+                    {
+                      ...
+                    }
+                  ]
+                }
+              },
+              {
+                "entry": {
+                  ...
+                }
+              },
+              {
+                "entry": {
+                  ...
+                }
+              },
+            ]
+          }
+        }
+
+        ```
+      operationId: listAspects
+      parameters:
+        - description: >
+            Optionally filter the list. Here are some examples:
+
+
+            An aspect should represented in the following format(`prefix:name`). e.g 'cm:title'.
+
+
+            The following where clause will only return aspects from the `namespace1:model` and `namespace2:model`.
+              ```
+              where=(modelId in ('namespace1:model','namespace2:model'))
+              where=(modelId in ('namespace1:model INCLUDESUBASPECTS','namespace2:model'))
+              ```
+
+            The following where clause will only return sub aspects for the given parents.
+              ```
+              where=(parentId in ('namespace1:parent','namespace2:parent'))
+              ```
+
+            The following where clause will only return aspects that match the pattern.
+              ```
+              where=(namespaceUri matches('http://www.alfresco.*'))
+              ```
+
+            The following where clause will only return aspects that don't match the pattern.
+              ```
+              where=(not namespaceUri matches('http://www.alfresco.*'))
+              ```
+          in: query
+          name: where
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/skipCountParam"
+        - $ref: "#/components/parameters/maxItemsParam"
+        - description: >
+            Returns additional information about the aspect. The following
+            optional fields can be requested:
+
+            * properties
+
+            * mandatoryAspects
+
+            * associations
+          in: query
+          name: include
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AspectPaging"
+        "401":
+          description: Authentication failed
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      summary: List aspects
+      tags:
+        - aspects
+      x-alfresco-since: 7.0.0
+  "/aspects/{aspectId}":
+    get:
+      description: |
+        **Note:** This is available in Alfresco 7.0.0 and newer versions.
+        Get information for aspect **aspectId**.
+      operationId: getAspect
+      parameters:
+        - description: The Qname of an aspect(`prefix:name`) e.g 'cm:title'
+          in: path
+          name: aspectId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AspectEntry"
+        "400":
+          description: |
+            Invalid parameter: unknown aspectId scheme specified
+        "401":
+          description: Authentication failed
+        "404":
+          description: |
+            **aspectId** does not exist
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      summary: Get an aspect
+      tags:
+        - aspects
+      x-alfresco-since: 7.0.0
+  /types:
+    get:
+      description: >
+        **Note:** This is available in Alfresco 7.0.0 and newer versions.
+
+
+        Gets a list of types from the data dictionary. The System types will be ignored by default.
+
+        ```JSON
+
+        {
+          "list": {
+            "pagination": {
+              "count": 0,
+              "hasMoreItems": true,
+              "totalItems": 0,
+              "skipCount": 0,
+              "maxItems": 0
+            },
+            "entries": [
+              {
+                "entry": {
+                  "associations": [],
+                  "isArchive": true,
+                  "mandatoryAspects": [
+                      "cm:auditable",
+                      "sys:referenceable",
+                      "sys:localized"
+                  ],
+                  "includedInSupertypeQuery": true,
+                  "description": "Base Content Object",
+                  "isContainer": false,
+                  "model": {
+                      "id": "cm:contentmodel",
+                      "author": "Alfresco",
+                      "description": "Alfresco Content Domain Model",
+                      "namespaceUri": "http://www.alfresco.org/model/content/1.0",
+                      "namespacePrefix": "cm"
+                  },
+                  "id": "cm:content",
+                  "title": "Content",
+                  "parentId": "cm:cmobject"
+                  "properties": [
+                    {
+                      "id": "cm:name",
+                      "title": "Name",
+                      "description": "Name",
+                      "dataType": "d:text",
+                      "isMultiValued": false,
+                      "isMandatory": true,
+                      "isMandatoryEnforced": true
+                      "isProtected": false
+                      ...
+                    },
+                    {
+                      ...
+                    }
+                  ]
+                }
+              },
+              {
+                "entry": {
+                  ...
+                }
+              },
+              {
+                "entry": {
+                  ...
+                }
+              },
+            ]
+          }
+        }
+
+        ```
+      operationId: listTypes
+      parameters:
+        - description: >
+            Optionally filter the list. Here are some examples:
+
+
+            A type should represented in the following format(`prefix:name`). e.g 'cm:content'.
+
+
+            The following where clause will only return types from the `namespace1:model` and `namespace2:model`.
+              ```
+              where=(modelId in ('namespace1:model','namespace2:model'))
+              where=(modelId in ('namespace1:model INCLUDESUBTYPES','namespace2:model'))
+              ```
+
+            The following where clause will only return sub types for the given parents.
+              ```
+              where=(parentId in ('namespace1:parent','namespace2:parent'))
+              ```
+
+            The following where clause will only return types that match the pattern.
+              ```
+              where=(namespaceUri matches('http://www.alfresco.*'))
+              ```
+
+            The following where clause will only return types that don't match the pattern.
+              ```
+              where=(not namespaceUri matches('http://www.alfresco.*'))
+              ```
+          in: query
+          name: where
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/skipCountParam"
+        - $ref: "#/components/parameters/maxItemsParam"
+        - description: >
+            Returns additional information about the type. The following
+            optional fields can be requested:
+
+            * properties
+
+            * mandatoryAspects
+
+            * associations
+          in: query
+          name: include
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TypePaging"
+        "401":
+          description: Authentication failed
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      summary: List types
+      tags:
+        - types
+      x-alfresco-since: 7.0.0
+  "/types/{typeId}":
+    get:
+      description: |
+        **Note:** This is available in Alfresco 7.0.0 and newer versions.
+        Get information for type **typeId**.
+      operationId: getType
+      parameters:
+        - description: The Qname of a type(`prefix:name`) e.g 'cm:content'
+          in: path
+          name: typeId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TypeEntry"
+        "400":
+          description: |
+            Invalid parameter: unknown typeId scheme specified
+        "401":
+          description: Authentication failed
+        "404":
+          description: |
+            **typeId** does not exist
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      summary: Get a type
+      tags:
+        - types
+      x-alfresco-since: 7.0.0
+security:
+  - basicAuth: []
+tags:
+  - description: Retrieve and manage aspects
+    name: aspects
+  - description: Retrieve and manage types
+    name: types
+servers:
+  - url: /alfresco/api/-default-/public/alfresco/versions/1
+components:
+  parameters:
+    maxItemsParam:
+      description: |
+        The maximum number of items to return in the list.
+        If not supplied then the default value is 100.
+      in: query
+      name: maxItems
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 100
+    skipCountParam:
+      description: >
+        The number of entities that exist in the collection before those
+        included in this list.
+
+        If not supplied then the default value is 0.
+      in: query
+      name: skipCount
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+  securitySchemes:
+    basicAuth:
+      description: HTTP Basic Authentication
+      type: http
+      scheme: basic
+  schemas:
+    AbstractClass:
+      properties:
+        associations:
+          items:
+            $ref: "#/components/schemas/AbstractClassAssociation"
+          type: array
+        description:
+          type: string
+        id:
+          type: string
+        includedInSupertypeQuery:
+          type: boolean
+        isArchive:
+          type: boolean
+        isContainer:
+          type: boolean
+        mandatoryAspects:
+          items:
+            type: string
+          type: array
+        model:
+          $ref: "#/components/schemas/Model"
+        parentId:
+          type: string
+        properties:
+          items:
+            $ref: "#/components/schemas/Property"
+          type: array
+        title:
+          type: string
+      required:
+        - id
+        - title
+      type: object
+    AbstractClassAssociation:
+      properties:
+        description:
+          type: string
+        id:
+          type: string
+        isChild:
+          type: boolean
+        isProtected:
+          type: boolean
+        source:
+          $ref: "#/components/schemas/AbstractClassAssociationSource"
+        target:
+          $ref: "#/components/schemas/AbstractClassAssociationSource"
+        title:
+          type: string
+      required:
+        - id
+      type: object
+    AbstractClassAssociationSource:
+      properties:
+        cls:
+          type: string
+        isMandatory:
+          type: boolean
+        isMandatoryEnforced:
+          type: boolean
+        isMany:
+          type: boolean
+        role:
+          type: string
+      type: object
+    Aspect:
+      $ref: "#/components/schemas/AbstractClass"
+    AspectEntry:
+      properties:
+        entry:
+          $ref: "#/components/schemas/Aspect"
+      required:
+        - entry
+      type: object
+    AspectPaging:
+      properties:
+        list:
+          properties:
+            entries:
+              items:
+                $ref: "#/components/schemas/AspectEntry"
+              type: array
+            pagination:
+              $ref: "#/components/schemas/Pagination"
+          type: object
+      type: object
+    Constraint:
+      properties:
+        description:
+          description: the human-readable constraint description
+          type: string
+        id:
+          type: string
+        parameters:
+          additionalProperties:
+            type: object
+          type: object
+        title:
+          description: the human-readable constraint title
+          type: string
+        type:
+          description: the type of the constraint
+          type: string
+      required:
+        - id
+      type: object
+    Error:
+      properties:
+        error:
+          properties:
+            briefSummary:
+              type: string
+            descriptionURL:
+              type: string
+            errorKey:
+              type: string
+            logId:
+              type: string
+            stackTrace:
+              type: string
+            statusCode:
+              format: int32
+              type: integer
+          type: object
+      required:
+        - error
+      type: object
+    Model:
+      properties:
+        author:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        namespacePrefix:
+          type: string
+        namespaceUri:
+          type: string
+      required:
+        - id
+      type: object
+    Pagination:
+      properties:
+        count:
+          description: |
+            The number of objects in the entries array.
+          format: int64
+          type: integer
+        hasMoreItems:
+          description: >
+            A boolean value which is **true** if there are more entities in the
+            collection
+
+            beyond those in this response. A true value means a request with a larger value
+
+            for the **skipCount** or the **maxItems** parameter will return more entities.
+          type: boolean
+        maxItems:
+          description: >
+            The value of the **maxItems** parameter used to generate this list.
+
+            If there was no **maxItems** parameter then the default value is 100.
+          format: int64
+          type: integer
+        skipCount:
+          description: >
+            An integer describing how many entities exist in the collection
+            before
+
+            those included in this list. If there was no **skipCount** parameter then the
+
+            default value is 0.
+          format: int64
+          type: integer
+        totalItems:
+          description: >
+            An integer describing the total number of entities in the
+            collection.
+
+            The API might not be able to determine this value,
+
+            in which case this property will not be present.
+          format: int64
+          type: integer
+      type: object
+    Property:
+      properties:
+        constraints:
+          description: list of constraints defined for the property
+          items:
+            $ref: "#/components/schemas/Constraint"
+          type: array
+        dataType:
+          description: the name of the property type (e.g. d:text)
+          type: string
+        defaultValue:
+          description: the default value
+          type: string
+        description:
+          description: the human-readable description
+          type: string
+        id:
+          type: string
+        isMandatory:
+          description: define if the property is mandatory
+          type: boolean
+        isMandatoryEnforced:
+          description: define if the presence of mandatory properties is enforced
+          type: boolean
+        isMultiValued:
+          description: define if the property is multi-valued
+          type: boolean
+        isProtected:
+          description: define if the property is system maintained
+          type: boolean
+        title:
+          description: the human-readable title
+          type: string
+      required:
+        - id
+      type: object
+    Type:
+      $ref: "#/components/schemas/AbstractClass"
+    TypeEntry:
+      properties:
+        entry:
+          $ref: "#/components/schemas/Type"
+      required:
+        - entry
+      type: object
+    TypePaging:
+      properties:
+        list:
+          properties:
+            entries:
+              items:
+                $ref: "#/components/schemas/TypeEntry"
+              type: array
+            pagination:
+              $ref: "#/components/schemas/Pagination"
+          type: object
+      type: object

@@ -18,9 +18,6 @@ import os
 import base64
 from datetime import datetime
 
-# Add the enhanced_generated directory to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
 
 def create_auth_ticket(client, username='admin', password='admin'):
@@ -120,13 +117,11 @@ def fix_client_configurations(client):
                 api_client.configuration.host = expected_url
                 api_client.configuration.ignore_operation_servers = True
 
-
 def print_section(title):
     """Print a formatted section header."""
     print(f"\n{'='*60}")
     print(f" {title}")
     print(f"{'='*60}")
-
 
 def safe_api_call(func, *args, **kwargs):
     """Safely execute an API call with error handling."""
@@ -135,7 +130,6 @@ def safe_api_call(func, *args, **kwargs):
         return {'success': True, 'data': result}
     except Exception as e:
         return {'success': False, 'error': str(e)}
-
 
 def main():
     """Main example execution with real working APIs."""
@@ -209,7 +203,6 @@ def main():
     
     print(f"\n🎉 Examples completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
-
 def authentication_examples(client):
     """Authentication API examples."""
     print_section("Authentication API Examples")
@@ -231,7 +224,6 @@ def authentication_examples(client):
         
     else:
         print("❌ Authentication API not available")
-
 
 def core_api_examples(client):
     """Core API examples."""
@@ -284,7 +276,6 @@ def core_api_examples(client):
     else:
         print("❌ Core API not available")
 
-
 def discovery_examples(client):
     """Discovery API examples."""
     print_section("Discovery API Examples")
@@ -318,7 +309,6 @@ def discovery_examples(client):
     else:
         print("❌ Discovery API not available")
 
-
 def search_examples(client):
     """Search API examples."""
     print_section("Search API Examples")
@@ -329,7 +319,6 @@ def search_examples(client):
         print("   Note: Search operations require complex query objects")
     else:
         print("❌ Search API not available")
-
 
 def workflow_examples(client):
     """Workflow API examples."""
@@ -353,7 +342,6 @@ def workflow_examples(client):
     else:
         print("❌ Workflow API not available")
 
-
 def model_examples(client):
     """Model API examples."""
     print_section("Model API Examples")
@@ -375,7 +363,6 @@ def model_examples(client):
     else:
         print("❌ Model API not available")
 
-
 def search_sql_examples(client):
     """Search SQL API examples."""
     print_section("Search SQL API Examples")
@@ -396,7 +383,6 @@ def search_sql_examples(client):
             print(f"⚠️ SQL search failed: {sql_result.get('error', 'Expected if Solr not configured')}")
     else:
         print("❌ Search SQL API not available")
-
 
 def error_handling_example():
     """Demonstrate proper error handling."""
@@ -425,7 +411,6 @@ def error_handling_example():
             ticket = client.auth.create_ticket(ticket_body={'userId': 'invalid', 'password': 'invalid'})
     except Exception as e:
         print(f"✅ Authentication error handled: {e}")
-
 
 def advanced_usage_example():
     """Advanced usage patterns."""
@@ -458,7 +443,6 @@ def advanced_usage_example():
                 print("✅ Search completed")
         except Exception as e:
             print(f"❌ Error in combined API usage: {e}")
-
 
 if __name__ == "__main__":
     main()

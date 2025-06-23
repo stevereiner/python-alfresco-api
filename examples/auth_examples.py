@@ -22,8 +22,6 @@ import sys
 import os
 import base64
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
 
 def create_auth_ticket(client, username='admin', password='admin'):
@@ -129,7 +127,6 @@ def print_section(title):
     print(f" {title}")
     print(f"{'='*50}")
 
-
 def safe_api_call(func, *args, **kwargs):
     """Safely execute an API call with error handling."""
     try:
@@ -137,7 +134,6 @@ def safe_api_call(func, *args, **kwargs):
         return {'success': True, 'data': result}
     except Exception as e:
         return {'success': False, 'error': str(e)}
-
 
 def main():
     """Authentication API examples."""
@@ -177,7 +173,6 @@ def main():
     # Advanced usage
     print_section("Advanced Usage")
     advanced_authentication_examples(client)
-
 
 def basic_authentication_flow(client):
     """Demonstrate basic authentication flow."""
@@ -225,7 +220,6 @@ def basic_authentication_flow(client):
             print("⚠️ Ticket data format unexpected")
     else:
         print(f"❌ Authentication failed: {ticket_result['error']}")
-
 
 def ticket_management_examples(client):
     """Demonstrate ticket management operations."""
@@ -296,7 +290,6 @@ def ticket_management_examples(client):
     else:
         print(f"   ❌ Failed to create ticket: {create_result['error']}")
 
-
 def authentication_error_handling(client):
     """Demonstrate proper error handling for authentication."""
     print("🚨 Authentication Error Handling:")
@@ -339,7 +332,6 @@ def authentication_error_handling(client):
             print("✅ Client properly detected unavailable server")
     except Exception as e:
         print(f"✅ Properly caught connection error: {type(e).__name__}")
-
 
 def advanced_authentication_examples(client):
     """Advanced authentication usage patterns."""
@@ -446,7 +438,6 @@ def advanced_authentication_examples(client):
     print("   ✅ Use secure credential storage (environment variables)")
     print("   ✅ Implement retry logic for network issues")
 
-
 def demonstrate_real_world_usage():
     """Show real-world authentication patterns."""
     print_section("Real-World Authentication Patterns")
@@ -513,7 +504,6 @@ def demonstrate_real_world_usage():
                 print("   ✅ Batch operation completed, cleaned up")
         else:
             print("   ❌ Failed to authenticate for batch operation")
-
 
 if __name__ == "__main__":
     main()

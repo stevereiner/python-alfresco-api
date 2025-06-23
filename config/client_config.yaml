@@ -1,0 +1,14 @@
+# OpenAPI Python Client Configuration
+# Shorter, more practical names for Alfresco API clients
+
+class_overrides:
+  "Error": "AlfrescoError"
+  "HTTPValidationError": "AlfrescoValidationError"
+
+# Use shorter project names
+project_name_override: "alfresco_client"
+package_name_override: "alfresco_client"
+
+# Additional configurations
+field_constraints: true
+use_annotated: true 

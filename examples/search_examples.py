@@ -8,10 +8,7 @@ This file demonstrates how to use the Search API with the master client.
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
-
 
 def main():
     """Search API examples."""
@@ -104,7 +101,6 @@ def main():
         print("✅ Sorted search completed")
     except Exception as e:
         print(f"❌ Sorted search failed: {e}")
-
 
 if __name__ == "__main__":
     main() 

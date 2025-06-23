@@ -13,13 +13,10 @@ import os
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
 
 # Import Pydantic for creating example models
 from pydantic import BaseModel, ValidationError, Field
-
 
 # =============================================================================
 # Core API Pydantic Models - The Most Important Ones
@@ -42,22 +39,18 @@ class Node(BaseModel):
     aspectNames: Optional[List[str]] = None
     allowableOperations: Optional[List[str]] = None
 
-
 class NodeEntry(BaseModel):
     """Wrapper for Node responses from API"""
     entry: Node
-
 
 class NodePaging(BaseModel):
     """Paginated list of nodes (for children, search results, etc.)"""
     entries: Optional[List[NodeEntry]] = None
     pagination: Optional[Dict[str, Any]] = None
 
-
 class NodeListResponse(BaseModel):
     """Complete response structure for node listings"""
     list: NodePaging
-
 
 class NodeBodyCreate(BaseModel):
     """Model for creating new nodes (files/folders)"""
@@ -67,7 +60,6 @@ class NodeBodyCreate(BaseModel):
     aspectNames: Optional[List[str]] = None
     relativePath: Optional[str] = None
 
-
 class NodeBodyUpdate(BaseModel):
     """Model for updating existing nodes"""
     name: Optional[str] = None
@@ -75,12 +67,10 @@ class NodeBodyUpdate(BaseModel):
     properties: Optional[Dict[str, str]] = None
     aspectNames: Optional[List[str]] = None
 
-
 # Authentication models for Core API access
 class TicketBody(BaseModel):
     userId: str
     password: str
-
 
 def main():
     """Core API Pydantic data models examples."""
@@ -578,9 +568,8 @@ def main():
     print("   ✅ Consistent patterns across all Core API operations")
     
     print(f"\n🎉 Core API Pydantic examples completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("\n💡 Next steps: Import the real models from enhanced_generated/models/alfresco_core_models.py")
+    print("\n💡 Next steps: Import the real models from python_alfresco_api.models.alfresco_core_models")
     print("   for production use with full Alfresco API compatibility!")
-
 
 if __name__ == "__main__":
     main() 

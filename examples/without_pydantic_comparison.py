@@ -11,11 +11,8 @@ import os
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 # Raw JSON/dict responses vs Pydantic models
 import json
-
 
 def main():
     """Compare Alfresco API usage with and without Pydantic models."""
@@ -362,7 +359,6 @@ def main():
     print("   self-documenting code that catches bugs early!")
     
     print(f"\n✨ Comparison completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-
 
 if __name__ == "__main__":
     main() 

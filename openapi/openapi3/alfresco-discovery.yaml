@@ -1,0 +1,204 @@
+openapi: 3.0.0
+info:
+  description: |
+    **Discovery API**
+
+    Provides access to information about Alfresco Content Services.
+  title: Alfresco Content Services REST API
+  version: "1"
+paths:
+  /discovery:
+    get:
+      description: >
+        **Note:** this endpoint is available in Alfresco 5.2 and newer versions.
+
+
+        Retrieves the capabilities and detailed version information from the repository.
+      operationId: getRepositoryInformation
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryEntry"
+        "501":
+          description: Discovery is disabled for the system
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      summary: Get repository information
+      tags:
+        - discovery
+      x-alfresco-since: "5.2"
+security:
+  - basicAuth: []
+servers:
+  - url: /alfresco/api
+components:
+  securitySchemes:
+    basicAuth:
+      description: HTTP Basic Authentication
+      type: http
+      scheme: basic
+  schemas:
+    DiscoveryEntry:
+      properties:
+        entry:
+          $ref: "#/components/schemas/RepositoryEntry"
+      required:
+        - entry
+      type: object
+    EntitlementsInfo:
+      properties:
+        isClusterEnabled:
+          default: false
+          type: boolean
+        isCryptodocEnabled:
+          default: false
+          type: boolean
+        maxDocs:
+          format: int64
+          type: integer
+        maxUsers:
+          format: int64
+          type: integer
+      type: object
+    Error:
+      properties:
+        error:
+          properties:
+            briefSummary:
+              type: string
+            descriptionURL:
+              type: string
+            errorKey:
+              type: string
+            logId:
+              type: string
+            stackTrace:
+              type: string
+            statusCode:
+              format: int32
+              type: integer
+          type: object
+      required:
+        - error
+      type: object
+    LicenseInfo:
+      properties:
+        entitlements:
+          $ref: "#/components/schemas/EntitlementsInfo"
+        expiresAt:
+          format: date-time
+          type: string
+        holder:
+          type: string
+        issuedAt:
+          format: date-time
+          type: string
+        mode:
+          type: string
+        remainingDays:
+          type: integer
+      required:
+        - issuedAt
+        - expiresAt
+        - remainingDays
+        - holder
+        - mode
+      type: object
+    ModuleInfo:
+      properties:
+        description:
+          type: string
+        id:
+          type: string
+        installDate:
+          format: date-time
+          type: string
+        installState:
+          type: string
+        title:
+          type: string
+        version:
+          type: string
+        versionMax:
+          type: string
+        versionMin:
+          type: string
+      type: object
+    RepositoryEntry:
+      properties:
+        repository:
+          $ref: "#/components/schemas/RepositoryInfo"
+      required:
+        - repository
+      type: object
+    RepositoryInfo:
+      properties:
+        edition:
+          type: string
+        id:
+          type: string
+        license:
+          $ref: "#/components/schemas/LicenseInfo"
+        modules:
+          items:
+            $ref: "#/components/schemas/ModuleInfo"
+          type: array
+        status:
+          $ref: "#/components/schemas/StatusInfo"
+        version:
+          $ref: "#/components/schemas/VersionInfo"
+      required:
+        - id
+        - edition
+        - version
+        - status
+      type: object
+    StatusInfo:
+      properties:
+        isAuditEnabled:
+          type: boolean
+        isQuickShareEnabled:
+          type: boolean
+        isReadOnly:
+          default: false
+          type: boolean
+        isThumbnailGenerationEnabled:
+          type: boolean
+      required:
+        - isReadOnly
+        - isAuditEnabled
+        - isQuickShareEnabled
+        - isThumbnailGenerationEnabled
+      type: object
+    VersionInfo:
+      properties:
+        display:
+          type: string
+        hotfix:
+          type: string
+        label:
+          type: string
+        major:
+          type: string
+        minor:
+          type: string
+        patch:
+          type: string
+        schema:
+          type: integer
+      required:
+        - major
+        - minor
+        - patch
+        - hotfix
+        - schema
+        - label
+        - display
+      type: object

@@ -1,0 +1,71 @@
+# MANIFEST.in for python-alfresco-api v1.0
+# Include additional files in the package distribution
+
+# Include documentation files
+include README.md
+include LICENSE
+include CHANGELOG.md
+
+# Include requirements files
+include requirements.txt
+include requirements-dev.txt
+include tests/requirements-test.txt
+
+# Include configuration files
+include setup.py
+include pyproject.toml
+
+# Include type hint marker
+include python_alfresco_api/py.typed
+
+# Include examples
+recursive-include examples *.py
+recursive-include examples *.md
+
+# Include documentation
+recursive-include docs *.md
+recursive-include docs *.rst
+recursive-include python_alfresco_api/docs *.md
+
+# Include configuration files
+recursive-include config *.yaml
+recursive-include config *.yml
+recursive-include config *.md
+
+# Include test files for source distributions
+recursive-include tests *.py
+recursive-include tests *.yaml
+recursive-include tests *.json
+recursive-include tests *.txt
+
+# Include OpenAPI specifications
+recursive-include openapi *.yaml
+recursive-include openapi *.yml
+
+# Include scripts
+recursive-include scripts *.py
+recursive-include scripts *.sh
+
+# Exclude development and build files
+exclude .gitignore
+exclude .pre-commit-config.yaml
+exclude tox.ini
+exclude .github
+recursive-exclude .github *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * .DS_Store
+recursive-exclude * .pytest_cache
+recursive-exclude * .coverage
+recursive-exclude * htmlcov
+recursive-exclude * .tox
+recursive-exclude * .mypy_cache
+recursive-exclude * *.egg-info
+recursive-exclude * build
+recursive-exclude * dist
+recursive-exclude * venv
+recursive-exclude * .venv
+
+# Include model files
+recursive-include python_alfresco_api/models *.py
+recursive-include python_alfresco_api/raw_clients *.py 

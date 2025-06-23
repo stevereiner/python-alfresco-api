@@ -1,0 +1,541 @@
+basePath: /alfresco/api/-default-/public/alfresco/versions/1
+consumes:
+- application/json
+definitions:
+  AbstractClass:
+    properties:
+      associations:
+        items:
+          $ref: '#/definitions/AbstractClassAssociation'
+        type: array
+      description:
+        type: string
+      id:
+        type: string
+      includedInSupertypeQuery:
+        type: boolean
+      isArchive:
+        type: boolean
+      isContainer:
+        type: boolean
+      mandatoryAspects:
+        items:
+          type: string
+        type: array
+      model:
+        $ref: '#/definitions/Model'
+      parentId:
+        type: string
+      properties:
+        items:
+          $ref: '#/definitions/Property'
+        type: array
+      title:
+        type: string
+    required:
+    - id
+    - title
+    type: object
+  AbstractClassAssociation:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      isChild:
+        type: boolean
+      isProtected:
+        type: boolean
+      source:
+        $ref: '#/definitions/AbstractClassAssociationSource'
+      target:
+        $ref: '#/definitions/AbstractClassAssociationSource'
+      title:
+        type: string
+    required:
+    - id
+    type: object
+  AbstractClassAssociationSource:
+    properties:
+      cls:
+        type: string
+      isMandatory:
+        type: boolean
+      isMandatoryEnforced:
+        type: boolean
+      isMany:
+        type: boolean
+      role:
+        type: string
+    type: object
+  Aspect:
+    $ref: '#/definitions/AbstractClass'
+  AspectEntry:
+    properties:
+      entry:
+        $ref: '#/definitions/Aspect'
+    required:
+    - entry
+    type: object
+  AspectPaging:
+    properties:
+      list:
+        properties:
+          entries:
+            items:
+              $ref: '#/definitions/AspectEntry'
+            type: array
+          pagination:
+            $ref: '#/definitions/Pagination'
+        type: object
+    type: object
+  Constraint:
+    properties:
+      description:
+        description: the human-readable constraint description
+        type: string
+      id:
+        type: string
+      parameters:
+        additionalProperties:
+          type: object
+        type: object
+      title:
+        description: the human-readable constraint title
+        type: string
+      type:
+        description: the type of the constraint
+        type: string
+    required:
+    - id
+    type: object
+  Error:
+    properties:
+      error:
+        properties:
+          briefSummary:
+            type: string
+          descriptionURL:
+            type: string
+          errorKey:
+            type: string
+          logId:
+            type: string
+          stackTrace:
+            type: string
+          statusCode:
+            format: int32
+            type: integer
+        type: object
+    required:
+    - error
+    type: object
+  Model:
+    properties:
+      author:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      namespacePrefix:
+        type: string
+      namespaceUri:
+        type: string
+    required:
+    - id
+    type: object
+  Pagination:
+    properties:
+      count:
+        description: 'The number of objects in the entries array.
+
+          '
+        format: int64
+        type: integer
+      hasMoreItems:
+        description: 'A boolean value which is **true** if there are more entities
+          in the collection
+
+          beyond those in this response. A true value means a request with a larger
+          value
+
+          for the **skipCount** or the **maxItems** parameter will return more entities.
+
+          '
+        type: boolean
+      maxItems:
+        description: 'The value of the **maxItems** parameter used to generate this
+          list.
+
+          If there was no **maxItems** parameter then the default value is 100.
+
+          '
+        format: int64
+        type: integer
+      skipCount:
+        description: 'An integer describing how many entities exist in the collection
+          before
+
+          those included in this list. If there was no **skipCount** parameter then
+          the
+
+          default value is 0.
+
+          '
+        format: int64
+        type: integer
+      totalItems:
+        description: 'An integer describing the total number of entities in the collection.
+
+          The API might not be able to determine this value,
+
+          in which case this property will not be present.
+
+          '
+        format: int64
+        type: integer
+    type: object
+  Property:
+    properties:
+      constraints:
+        description: list of constraints defined for the property
+        items:
+          $ref: '#/definitions/Constraint'
+        type: array
+      dataType:
+        description: the name of the property type (e.g. d:text)
+        type: string
+      defaultValue:
+        description: the default value
+        type: string
+      description:
+        description: the human-readable description
+        type: string
+      id:
+        type: string
+      isMandatory:
+        description: define if the property is mandatory
+        type: boolean
+      isMandatoryEnforced:
+        description: define if the presence of mandatory properties is enforced
+        type: boolean
+      isMultiValued:
+        description: define if the property is multi-valued
+        type: boolean
+      isProtected:
+        description: define if the property is system maintained
+        type: boolean
+      title:
+        description: the human-readable title
+        type: string
+    required:
+    - id
+    type: object
+  Type:
+    $ref: '#/definitions/AbstractClass'
+  TypeEntry:
+    properties:
+      entry:
+        $ref: '#/definitions/Type'
+    required:
+    - entry
+    type: object
+  TypePaging:
+    properties:
+      list:
+        properties:
+          entries:
+            items:
+              $ref: '#/definitions/TypeEntry'
+            type: array
+          pagination:
+            $ref: '#/definitions/Pagination'
+        type: object
+    type: object
+info:
+  description: '**Model API**
+
+
+    Provides access to the model features of Alfresco Content Services.
+
+    '
+  title: Alfresco Content Services REST API
+  version: '1'
+parameters:
+  maxItemsParam:
+    default: 100
+    description: 'The maximum number of items to return in the list.
+
+      If not supplied then the default value is 100.
+
+      '
+    in: query
+    minimum: 1
+    name: maxItems
+    required: false
+    type: integer
+  skipCountParam:
+    default: 0
+    description: 'The number of entities that exist in the collection before those
+      included in this list.
+
+      If not supplied then the default value is 0.
+
+      '
+    in: query
+    minimum: 0
+    name: skipCount
+    required: false
+    type: integer
+paths:
+  /aspects:
+    get:
+      description: "**Note:** This is available in Alfresco 7.0.0 and newer versions.\n\
+        \nGets a list of aspects from the data dictionary. The System aspects will\
+        \ be ignored by default.\n```JSON\n{\n  \"list\": {\n    \"pagination\": {\n\
+        \      \"count\": 0,\n      \"hasMoreItems\": true,\n      \"totalItems\"\
+        : 0,\n      \"skipCount\": 0,\n      \"maxItems\": 0\n    },\n    \"entries\"\
+        : [\n      {\n        \"entry\": {\n          \"associations\": [],\n    \
+        \      \"mandatoryAspects\": [],\n          \"includedInSupertypeQuery\":\
+        \ true,\n          \"description\": \"Titled\",\n          \"isContainer\"\
+        : false,\n          \"model\": {\n              \"id\": \"cm:contentmodel\"\
+        ,\n              \"author\": \"Alfresco\",\n              \"description\"\
+        : \"Alfresco Content Domain Model\",\n              \"namespaceUri\": \"http://www.alfresco.org/model/content/1.0\"\
+        ,\n              \"namespacePrefix\": \"cm\"\n          },\n          \"id\"\
+        : \"cm:titled\",\n          \"title\": \"Titled\",\n          \"properties\"\
+        : [\n            {\n              \"id\": \"cm:title\",\n              \"\
+        title\": \"Title\",\n              \"description\": \"Content Title\",\n \
+        \             \"dataType\": \"d:mltext\",\n              \"isMultiValued\"\
+        : false,\n              \"isMandatory\": false,\n              \"isMandatoryEnforced\"\
+        : false,\n              \"isProtected\": false\n            },\n         \
+        \   {\n              ...\n            }\n          ]\n        }\n      },\n\
+        \      {\n        \"entry\": {\n          ...\n        }\n      },\n     \
+        \ {\n        \"entry\": {\n          ...\n        }\n      },\n    ]\n  }\n\
+        }\n```\n"
+      operationId: listAspects
+      parameters:
+      - description: "Optionally filter the list. Here are some examples:\n\nAn aspect\
+          \ should represented in the following format(`prefix:name`). e.g 'cm:title'.\n\
+          \nThe following where clause will only return aspects from the `namespace1:model`\
+          \ and `namespace2:model`.\n  ```\n  where=(modelId in ('namespace1:model','namespace2:model'))\n\
+          \  where=(modelId in ('namespace1:model INCLUDESUBASPECTS','namespace2:model'))\n\
+          \  ```\n\nThe following where clause will only return sub aspects for the\
+          \ given parents.\n  ```\n  where=(parentId in ('namespace1:parent','namespace2:parent'))\n\
+          \  ```\n\nThe following where clause will only return aspects that match\
+          \ the pattern.\n  ```\n  where=(namespaceUri matches('http://www.alfresco.*'))\n\
+          \  ```\n\nThe following where clause will only return aspects that don't\
+          \ match the pattern.\n  ```\n  where=(not namespaceUri matches('http://www.alfresco.*'))\n\
+          \  ```\n"
+        in: query
+        name: where
+        required: false
+        type: string
+      - $ref: '#/parameters/skipCountParam'
+      - $ref: '#/parameters/maxItemsParam'
+      - collectionFormat: csv
+        description: 'Returns additional information about the aspect. The following
+          optional fields can be requested:
+
+          * properties
+
+          * mandatoryAspects
+
+          * associations
+
+          '
+        in: query
+        items:
+          type: string
+        name: include
+        required: false
+        type: array
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/AspectPaging'
+        '401':
+          description: Authentication failed
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List aspects
+      tags:
+      - aspects
+      x-alfresco-since: 7.0.0
+  /aspects/{aspectId}:
+    get:
+      description: '**Note:** This is available in Alfresco 7.0.0 and newer versions.
+
+        Get information for aspect **aspectId**.
+
+        '
+      operationId: getAspect
+      parameters:
+      - description: The Qname of an aspect(`prefix:name`) e.g 'cm:title'
+        in: path
+        name: aspectId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/AspectEntry'
+        '400':
+          description: 'Invalid parameter: unknown aspectId scheme specified
+
+            '
+        '401':
+          description: Authentication failed
+        '404':
+          description: '**aspectId** does not exist
+
+            '
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get an aspect
+      tags:
+      - aspects
+      x-alfresco-since: 7.0.0
+  /types:
+    get:
+      description: "**Note:** This is available in Alfresco 7.0.0 and newer versions.\n\
+        \nGets a list of types from the data dictionary. The System types will be\
+        \ ignored by default.\n```JSON\n{\n  \"list\": {\n    \"pagination\": {\n\
+        \      \"count\": 0,\n      \"hasMoreItems\": true,\n      \"totalItems\"\
+        : 0,\n      \"skipCount\": 0,\n      \"maxItems\": 0\n    },\n    \"entries\"\
+        : [\n      {\n        \"entry\": {\n          \"associations\": [],\n    \
+        \      \"isArchive\": true,\n          \"mandatoryAspects\": [\n         \
+        \     \"cm:auditable\",\n              \"sys:referenceable\",\n          \
+        \    \"sys:localized\"\n          ],\n          \"includedInSupertypeQuery\"\
+        : true,\n          \"description\": \"Base Content Object\",\n          \"\
+        isContainer\": false,\n          \"model\": {\n              \"id\": \"cm:contentmodel\"\
+        ,\n              \"author\": \"Alfresco\",\n              \"description\"\
+        : \"Alfresco Content Domain Model\",\n              \"namespaceUri\": \"http://www.alfresco.org/model/content/1.0\"\
+        ,\n              \"namespacePrefix\": \"cm\"\n          },\n          \"id\"\
+        : \"cm:content\",\n          \"title\": \"Content\",\n          \"parentId\"\
+        : \"cm:cmobject\"\n          \"properties\": [\n            {\n          \
+        \    \"id\": \"cm:name\",\n              \"title\": \"Name\",\n          \
+        \    \"description\": \"Name\",\n              \"dataType\": \"d:text\",\n\
+        \              \"isMultiValued\": false,\n              \"isMandatory\": true,\n\
+        \              \"isMandatoryEnforced\": true\n              \"isProtected\"\
+        : false\n              ...\n            },\n            {\n              ...\n\
+        \            }\n          ]\n        }\n      },\n      {\n        \"entry\"\
+        : {\n          ...\n        }\n      },\n      {\n        \"entry\": {\n \
+        \         ...\n        }\n      },\n    ]\n  }\n}\n```\n"
+      operationId: listTypes
+      parameters:
+      - description: "Optionally filter the list. Here are some examples:\n\nA type\
+          \ should represented in the following format(`prefix:name`). e.g 'cm:content'.\n\
+          \nThe following where clause will only return types from the `namespace1:model`\
+          \ and `namespace2:model`.\n  ```\n  where=(modelId in ('namespace1:model','namespace2:model'))\n\
+          \  where=(modelId in ('namespace1:model INCLUDESUBTYPES','namespace2:model'))\n\
+          \  ```\n\nThe following where clause will only return sub types for the\
+          \ given parents.\n  ```\n  where=(parentId in ('namespace1:parent','namespace2:parent'))\n\
+          \  ```\n\nThe following where clause will only return types that match the\
+          \ pattern.\n  ```\n  where=(namespaceUri matches('http://www.alfresco.*'))\n\
+          \  ```\n\nThe following where clause will only return types that don't match\
+          \ the pattern.\n  ```\n  where=(not namespaceUri matches('http://www.alfresco.*'))\n\
+          \  ```\n"
+        in: query
+        name: where
+        required: false
+        type: string
+      - $ref: '#/parameters/skipCountParam'
+      - $ref: '#/parameters/maxItemsParam'
+      - collectionFormat: csv
+        description: 'Returns additional information about the type. The following
+          optional fields can be requested:
+
+          * properties
+
+          * mandatoryAspects
+
+          * associations
+
+          '
+        in: query
+        items:
+          type: string
+        name: include
+        required: false
+        type: array
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/TypePaging'
+        '401':
+          description: Authentication failed
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: List types
+      tags:
+      - types
+      x-alfresco-since: 7.0.0
+  /types/{typeId}:
+    get:
+      description: '**Note:** This is available in Alfresco 7.0.0 and newer versions.
+
+        Get information for type **typeId**.
+
+        '
+      operationId: getType
+      parameters:
+      - description: The Qname of a type(`prefix:name`) e.g 'cm:content'
+        in: path
+        name: typeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/TypeEntry'
+        '400':
+          description: 'Invalid parameter: unknown typeId scheme specified
+
+            '
+        '401':
+          description: Authentication failed
+        '404':
+          description: '**typeId** does not exist
+
+            '
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      summary: Get a type
+      tags:
+      - types
+      x-alfresco-since: 7.0.0
+produces:
+- application/json
+security:
+- basicAuth: []
+securityDefinitions:
+  basicAuth:
+    description: HTTP Basic Authentication
+    type: basic
+swagger: '2.0'
+tags:
+- description: Retrieve and manage aspects
+  name: aspects
+- description: Retrieve and manage types
+  name: types

@@ -106,6 +106,8 @@ celerybeat.pid
 .venv
 env/
 venv/
+venv-shared/
+build-env/
 ENV/
 env.bak/
 venv.bak/
@@ -168,7 +170,6 @@ logs/
 
 # Generated API clients (if you want to exclude auto-generated code)
 # Uncomment if you don't want to version control generated clients
-# enhanced_generated/clients/*/
 
 # OpenAPI Generator specific
 .openapi-generator/
@@ -176,4 +177,9 @@ logs/
 
 # Test artifacts
 test-reports/
-coverage-reports/ 
+coverage-reports/
+
+# Development and testing tools
+.benchmarks/
+.flake8
+.pylintrc 

@@ -23,7 +23,6 @@ import json
 from unittest.mock import Mock, patch, MagicMock
 import urllib3
 
-
 class TestAuthenticationStrategies:
     """Test different authentication strategies for Alfresco APIs."""
     
@@ -296,7 +295,6 @@ class TestAuthenticationStrategies:
                 print(f"      Body: {step['body']}")
             print(f"      Expected: {step['expected']}")
             print()
-
 
 if __name__ == "__main__":
     # If run directly, execute some basic authentication tests

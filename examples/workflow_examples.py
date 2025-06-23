@@ -9,10 +9,7 @@ The Workflow API provides access to process definitions, process instances, and 
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'enhanced_generated'))
-
 from AlfrescoClient import AlfrescoClient
-
 
 def main():
     """Workflow API examples."""
@@ -105,7 +102,6 @@ def main():
                 print("✅ Workflow functionality available")
             except Exception as e:
                 print(f"❌ Workflow failed: {e}")
-
 
 if __name__ == "__main__":
     main() 

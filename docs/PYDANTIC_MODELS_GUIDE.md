@@ -1,397 +1,543 @@
-# Pydantic Models Support Guide
+# Pydantic Models Guide - Python Alfresco API v1.0
 
-The Alfresco Python API client provides comprehensive **Pydantic model support** for all API responses and requests, transforming raw JSON dictionaries into type-safe, validated, IDE-friendly Python objects.
+The Python Alfresco API v1.0 provides comprehensive type-safe Pydantic v2 models for all 7 Alfresco APIs. This guide covers model usage, type safety, and integration patterns.
 
-## 🎯 What are Pydantic Models?
+## 📋 Table of Contents
 
-Pydantic models are Python classes that provide:
-- **Type safety** with automatic validation
-- **IDE autocomplete** and IntelliSense support
-- **Automatic data conversion** (strings to dates, etc.)
-- **Self-documenting code** with field descriptions
-- **Early error detection** during development
+- [Model Overview](#model-overview)
+- [Core API Models](#core-api-models)
+- [Search API Models](#search-api-models)
+- [Authentication Models](#authentication-models)
+- [Type Safety Benefits](#type-safety-benefits)
+- [AI/LLM Integration](#aillm-integration)
+- [Advanced Usage](#advanced-usage)
 
-## 🚀 Key Benefits
+## 🎯 Model Overview
 
-### ✅ Type Safety & IDE Support
-- Full autocomplete for all API response fields
-- Type hints show you what each field contains
-- IDE warnings for typos and invalid field access
-- IntelliSense documentation for every field
-
-### ✅ Automatic Validation
-- Invalid data rejected at creation time
-- Automatic type conversion (strings to datetime objects)
-- Field validation (required fields, formats, constraints)
-- Catches errors in development, not production
-
-### ✅ Clean, Maintainable Code
-- No more manual dictionary navigation
-- Strongly typed objects instead of raw dictionaries
-- Self-documenting API interactions
-- Reduced boilerplate and error-handling code
-
-## 📚 Available Models
-
-The client provides Pydantic models for all 7 Alfresco APIs:
+### Available Model Sets
 
 | API | Model Location | Key Models |
 |-----|---------------|------------|
-| **Core API** | `enhanced_generated/models/alfresco_core_models.py` | `Node`, `NodeEntry`, `NodePaging`, `NodeBodyCreate` |
-| **Search API** | `enhanced_generated/models/alfresco_search_models.py` | `SearchRequest`, `ResultSetPaging`, `ResultNode` |
-| **Auth API** | `enhanced_generated/models/alfresco_auth_models.py` | `TicketBody`, `TicketEntry`, `ValidTicket` |
-| **Discovery API** | `enhanced_generated/models/alfresco_discovery_models.py` | `DiscoveryEntry`, `RepositoryInfo` |
-| **Workflow API** | `enhanced_generated/models/alfresco_workflow_models.py` | `ProcessDefinition`, `Task`, `Variable` |
-| **Model API** | `enhanced_generated/models/alfresco_model_models.py` | `CustomModel`, `CustomType`, `CustomAspect` |
-| **Search SQL API** | `enhanced_generated/models/alfresco_search_sql_models.py` | `SqlQuery`, `SqlResultSet` |
+| **Core API** | `python_alfresco_api/models/alfresco_core_models.py` | `Node`, `NodeEntry`, `NodePaging`, `NodeBodyCreate` |
+| **Search API** | `python_alfresco_api/models/alfresco_search_models.py` | `SearchRequest`, `ResultSetPaging`, `ResultNode` |
+| **Auth API** | `python_alfresco_api/models/alfresco_auth_models.py` | `TicketBody`, `TicketEntry`, `ValidTicket` |
+| **Discovery API** | `python_alfresco_api/models/alfresco_discovery_models.py` | `DiscoveryEntry`, `RepositoryInfo` |
+| **Workflow API** | `python_alfresco_api/models/alfresco_workflow_models.py` | `ProcessDefinition`, `Task`, `Variable` |
+| **Model API** | `python_alfresco_api/models/alfresco_model_models.py` | `CustomModel`, `CustomType`, `CustomAspect` |
+| **Search SQL API** | `python_alfresco_api/models/alfresco_search_sql_models.py` | `SqlQuery`, `SqlResultSet` |
 
 ## 🏗️ Core API Models - Most Important
 
-The **Core API models** are the most commonly used, as they handle nodes (files/folders), properties, and folder navigation:
+### Essential Imports
 
 ```python
-from enhanced_generated.models.alfresco_core_models import (
-    Node,           # Files and folders
-    NodeEntry,      # API response wrapper
-    NodePaging,     # Paginated lists
-    NodeBodyCreate, # Creating new nodes
-    NodeBodyUpdate  # Updating existing nodes
+from python_alfresco_api.models.alfresco_core_models import (
+    Node,
+    NodeEntry,
+    NodePaging,
+    NodeBodyCreate,
+    NodeBodyUpdate,
+    ContentInfo,
+    UserInfo,
+    PathInfo,
+    PermissionsInfo
 )
 ```
 
-### Essential Node Model
+### Working with Master Client
+
 ```python
-class Node(BaseModel):
-    id: str                                    # Node ID
-    name: str                                  # File/folder name
-    nodeType: str                             # cm:content, cm:folder, etc.
-    isFile: bool                              # True if file
-    isFolder: bool                            # True if folder
-    createdAt: datetime                       # Creation date (auto-parsed!)
-    modifiedAt: datetime                      # Last modified (auto-parsed!)
-    properties: Optional[Dict[str, Any]]      # Custom properties
-    aspectNames: Optional[List[str]]          # Applied aspects
-    allowableOperations: Optional[List[str]]  # Permitted actions
+from python_alfresco_api import ClientFactory
+from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate
+
+# Initialize client
+factory = ClientFactory(
+    base_url="http://localhost:8080",
+    username="admin",
+    password="admin"
+)
+
+clients = factory.create_all_clients()
+
+# Get nodes with full type safety
+nodes_response = clients['core'].get_nodes()
+print(f"Found {len(nodes_response.list.entries)} root nodes")
+
+# Access individual nodes
+for node_entry in nodes_response.list.entries:
+    node = node_entry.entry
+    print(f"Node: {node.name} (Type: {node.nodeType})")
+    print(f"  ID: {node.id}")
+    print(f"  Created: {node.createdAt}")
+    print(f"  Modified: {node.modifiedAt}")
+    print(f"  Size: {node.content.sizeInBytes if node.content else 'N/A'}")
 ```
 
-## 💻 Usage Examples
+### Creating Content with Type Safety
 
-### Basic Node Operations
 ```python
-from enhanced_generated.AlfrescoClient import AlfrescoClient
+from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate
 
-client = AlfrescoClient(host="http://localhost:8080", username="admin", password="admin")
-
-# Get folder children - returns Pydantic models automatically
-response = client.core['nodes'].list_node_children(node_id='-root-')
-
-# Type-safe access with IDE autocomplete
-for child_entry in response.list.entries:
-    node = child_entry.entry  # This is a Node Pydantic model
-    
-    if node.isFile:
-        print(f"📄 File: {node.name}")
-        print(f"   Size: {node.content.sizeInBytes if node.content else 'Unknown'}")
-        print(f"   Modified: {node.modifiedAt.strftime('%Y-%m-%d')}")
-    
-    elif node.isFolder:
-        print(f"📁 Folder: {node.name}")
-    
-    # Access custom properties safely
-    if node.properties and 'cm:title' in node.properties:
-        print(f"   Title: {node.properties['cm:title']}")
-```
-
-### Creating Nodes with Validation
-```python
-from enhanced_generated.models.alfresco_core_models import NodeBodyCreate
-
-# Create with Pydantic validation
-new_folder = NodeBodyCreate(
-    name="Project Documents",
-    nodeType="cm:folder",
+# Type-safe node creation
+new_node = NodeBodyCreate(
+    name="my-document.txt",
+    nodeType="cm:content",
     properties={
-        "cm:title": "Project Documents Folder",
-        "cm:description": "Contains all project files"
+        "cm:title": "My Document",
+        "cm:description": "Created via Python API with type safety"
     },
-    aspectNames=["cm:titled"]
+    aspectNames=["cm:titled", "cm:author"]
 )
 
-# API call with validated data
-response = client.core['nodes'].create_node(
-    node_id='-root-',
-    node_body_create=new_folder.model_dump()
+# Create the node (when create_node method is available)
+# created_node = clients['core'].create_node(parent_id="-root-", node_body=new_node)
+```
+
+## 🔍 Search API Models
+
+### Search Request Models
+
+```python
+from python_alfresco_api.models.alfresco_search_models import (
+    SearchRequest,
+    RequestQuery,
+    RequestPaging,
+    RequestFilterQuery,
+    RequestSort,
+    RequestHighlight
 )
 
-# Response is also a Pydantic model
-created_node = response.entry
-print(f"Created: {created_node.name} with ID: {created_node.id}")
+# Type-safe search request
+search_request = SearchRequest(
+    query=RequestQuery(
+        query="TYPE:'cm:content' AND ASPECT:'cm:titled'",
+        language="afts"
+    ),
+    paging=RequestPaging(
+        maxItems=25,
+        skipCount=0
+    ),
+    filterQueries=[
+        RequestFilterQuery(
+            query="ASPECT:'cm:author'"
+        )
+    ],
+    sort=[
+        RequestSort(
+            field="cm:modified",
+            ascending=False
+        )
+    ]
+)
+
+# Execute search with full type safety
+search_results = clients['search'].search(search_request)
+
+# Access results with type safety
+for result_entry in search_results.list.entries:
+    result_node = result_entry.entry
+    print(f"Found: {result_node.name}")
+    print(f"  Score: {result_node.search.score}")
+    print(f"  Location: {result_node.location}")
 ```
 
-## 🔍 Detailed Examples
+## 🔐 Authentication Models
 
-### 📚 Core API Examples
-See **[examples/pydantic_models_examples.py](../examples/pydantic_models_examples.py)** for comprehensive examples covering:
-
-- **Node Models** - Files, folders, and properties
-- **Node Children** - Listing folder contents (most common operation)
-- **Node Creation** - Making new files and folders with validation
-- **Node Updates** - Modifying properties and metadata
-- **Custom Properties** - Working with business metadata
-- **Real API Usage** - Practical patterns for Core API operations
-
-**🏃 Run the example:**
-```bash
-python examples/pydantic_models_examples.py
-```
-
-### 📊 Comparison: With vs Without Pydantic
-See **[examples/without_pydantic_comparison.py](../examples/without_pydantic_comparison.py)** for a detailed comparison showing:
-
-- **Raw dictionaries** vs **Pydantic models**
-- **Manual type checking** vs **automatic validation**
-- **Error-prone string access** vs **type-safe properties**
-- **Complex date parsing** vs **automatic datetime conversion**
-- **Verbose defensive code** vs **clean maintainable code**
-
-**🏃 Run the comparison:**
-```bash
-python examples/without_pydantic_comparison.py
-```
-
-## 🔄 Without Pydantic Models
-
-If you didn't have Pydantic models, you'd be working with raw dictionaries:
+### Ticket Management
 
 ```python
-# Raw API response - just dictionaries
-response = {
-    "list": {
-        "entries": [
-            {
-                "entry": {
-                    "id": "workspace://SpacesStore/12345",
-                    "name": "document.pdf",
-                    "isFile": True,
-                    "createdAt": "2024-01-15T10:30:45.123Z",  # String, not datetime!
-                    "properties": {"cm:title": "Some Document"}
-                }
-            }
-        ]
-    }
-}
+from python_alfresco_api.models.alfresco_auth_models import (
+    TicketBody,
+    TicketEntry,
+    ValidTicket
+)
 
-# Manual, error-prone access
-node_name = response["list"]["entries"][0]["entry"]["name"]  # Typo-prone
-is_file = response["list"]["entries"][0]["entry"].get("isFile")  # Defensive
-created_str = response["list"]["entries"][0]["entry"]["createdAt"]  # Manual parsing needed!
+# Type-safe ticket creation
+ticket_request = TicketBody(
+    userId="admin",
+    password="admin"
+)
 
-# Manual date conversion required
-from datetime import datetime
-created_date = datetime.fromisoformat(created_str.replace('Z', '+00:00'))
+# Create ticket
+ticket_response = clients['auth'].create_ticket(ticket_request)
+ticket_id = ticket_response.entry.id
+
+# Validate ticket
+validation_response = clients['auth'].validate_ticket(ticket_id)
+if validation_response.entry.id:
+    print(f"Ticket {ticket_id} is valid")
 ```
 
-### Problems Without Pydantic:
-- ❌ **No type safety** - runtime errors only
-- ❌ **No IDE autocomplete** - manual field names
-- ❌ **No validation** - bad data accepted silently
-- ❌ **Manual date parsing** - complex and error-prone
-- ❌ **Verbose code** - lots of defensive programming
+## ✅ Type Safety Benefits
 
-## 🛠️ Advanced Usage
-
-### Custom Model Extensions
-You can extend the generated Pydantic models for your specific needs:
+### 1. IDE Support and Autocomplete
 
 ```python
-from enhanced_generated.models.alfresco_core_models import Node
-from pydantic import computed_field
+from python_alfresco_api.models.alfresco_core_models import Node
 
-class EnhancedNode(Node):
-    @computed_field
-    @property
-    def file_extension(self) -> str:
-        """Get file extension from name."""
-        if self.isFile and '.' in self.name:
-            return self.name.split('.')[-1].lower()
-        return ""
+# Full IDE autocomplete and type hints
+def process_node(node: Node):
+    # IDE knows all available properties
+    print(f"Node ID: {node.id}")
+    print(f"Name: {node.name}")
+    print(f"Type: {node.nodeType}")
+    print(f"Created: {node.createdAt}")
+    print(f"Modified: {node.modifiedAt}")
     
-    @computed_field
-    @property
-    def is_document(self) -> bool:
-        """Check if this is a document type."""
-        doc_extensions = {'pdf', 'doc', 'docx', 'txt', 'rtf'}
-        return self.file_extension in doc_extensions
+    # IDE knows content might be None
+    if node.content:
+        print(f"Size: {node.content.sizeInBytes}")
+        print(f"MIME Type: {node.content.mimeType}")
+    
+    # IDE knows properties is a dict
+    if node.properties:
+        title = node.properties.get("cm:title")
+        if title:
+            print(f"Title: {title}")
+```
+
+### 2. Validation and Error Prevention
+
+```python
+from python_alfresco_api.models.alfresco_search_models import SearchRequest
+from pydantic import ValidationError
+
+try:
+    # This will validate all fields
+    search_request = SearchRequest(
+        query={
+            "query": "TYPE:'cm:content'",
+            "language": "afts"
+        },
+        paging={
+            "maxItems": 25,  # Must be positive integer
+            "skipCount": 0   # Must be non-negative
+        }
+    )
+    
+    # Guaranteed to be valid when it reaches here
+    results = clients['search'].search(search_request)
+    
+except ValidationError as e:
+    print(f"Validation error: {e}")
+    # Handle validation errors appropriately
+```
+
+### 3. JSON Serialization
+
+```python
+from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate
+
+# Create model
+node_data = NodeBodyCreate(
+    name="test-document.txt",
+    nodeType="cm:content",
+    properties={"cm:title": "Test Document"}
+)
+
+# Perfect JSON serialization
+json_data = node_data.model_dump_json()
+print(json_data)
+# Output: {"name":"test-document.txt","nodeType":"cm:content","properties":{"cm:title":"Test Document"}}
+
+# Deserialize back to model
+recreated_node = NodeBodyCreate.model_validate_json(json_data)
+```
+
+## 🤖 AI/LLM Integration
+
+### Perfect for AI Tools
+
+```python
+from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate
+from python_alfresco_api.models.alfresco_search_models import SearchRequest
+
+def create_ai_content_tool(name: str, content_type: str, title: str, description: str) -> dict:
+    """AI tool function for creating Alfresco content"""
+    
+    # Type-safe model creation
+    node_data = NodeBodyCreate(
+        name=name,
+        nodeType=content_type,
+        properties={
+            "cm:title": title,
+            "cm:description": description
+        }
+    )
+    
+    # Return serialized data for AI systems
+    return node_data.model_dump()
+
+def search_content_tool(query: str, max_items: int = 10) -> dict:
+    """AI tool function for searching Alfresco content"""
+    
+    # Type-safe search request
+    search_request = SearchRequest(
+        query={"query": query, "language": "afts"},
+        paging={"maxItems": max_items, "skipCount": 0}
+    )
+    
+    return search_request.model_dump()
+
+# Usage in AI applications
+ai_node_data = create_ai_content_tool(
+    name="ai-generated-report.pdf",
+    content_type="cm:content", 
+    title="AI Generated Report",
+    description="Automatically generated report from AI analysis"
+)
+
+ai_search_data = search_content_tool(
+    query="TYPE:'cm:content' AND ASPECT:'cm:titled'",
+    max_items=20
+)
+```
+
+### MCP Server Integration
+
+```python
+from python_alfresco_api.models.alfresco_core_models import Node, NodeBodyCreate
+from python_alfresco_api.models.alfresco_search_models import SearchRequest
+import json
+
+class AlfrescoMCPServer:
+    """Model Context Protocol server for Alfresco integration"""
+    
+    def __init__(self, factory):
+        self.clients = factory.create_all_clients()
+    
+    def search_content(self, query: str, max_items: int = 10) -> str:
+        """MCP tool for content search"""
+        search_request = SearchRequest(
+            query={"query": query, "language": "afts"},
+            paging={"maxItems": max_items}
+        )
+        
+        results = self.clients['search'].search(search_request)
+        
+        # Return structured data for AI consumption
+        return json.dumps({
+            "total_items": results.list.pagination.totalItems,
+            "results": [
+                {
+                    "id": entry.entry.id,
+                    "name": entry.entry.name,
+                    "type": entry.entry.nodeType,
+                    "created": entry.entry.createdAt.isoformat() if entry.entry.createdAt else None,
+                    "modified": entry.entry.modifiedAt.isoformat() if entry.entry.modifiedAt else None
+                }
+                for entry in results.list.entries
+            ]
+        })
+    
+    def create_content(self, name: str, node_type: str, properties: dict) -> str:
+        """MCP tool for content creation"""
+        node_data = NodeBodyCreate(
+            name=name,
+            nodeType=node_type,
+            properties=properties
+        )
+        
+        # Return the validated model data
+        return node_data.model_dump_json()
+```
+
+## 🚀 Advanced Usage
+
+### Model Composition
+
+```python
+from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate
+from python_alfresco_api.models.alfresco_search_models import SearchRequest
+from typing import List, Optional
+
+class ContentManager:
+    """Advanced content management with type safety"""
+    
+    def __init__(self, clients):
+        self.clients = clients
+    
+    def create_structured_content(
+        self,
+        base_name: str,
+        content_items: List[dict],
+        folder_properties: Optional[dict] = None
+    ) -> List[NodeBodyCreate]:
+        """Create multiple related content items"""
+        
+        nodes = []
+        
+        # Create folder
+        folder_node = NodeBodyCreate(
+            name=f"{base_name}-folder",
+            nodeType="cm:folder",
+            properties=folder_properties or {"cm:title": f"{base_name} Folder"}
+        )
+        nodes.append(folder_node)
+        
+        # Create content items
+        for i, item in enumerate(content_items):
+            content_node = NodeBodyCreate(
+                name=f"{base_name}-{i+1}.txt",
+                nodeType="cm:content",
+                properties={
+                    "cm:title": item.get("title", f"{base_name} Item {i+1}"),
+                    "cm:description": item.get("description", "")
+                }
+            )
+            nodes.append(content_node)
+        
+        return nodes
+    
+    def advanced_search(
+        self,
+        content_type: str,
+        aspects: List[str],
+        date_range: Optional[tuple] = None,
+        max_items: int = 50
+    ) -> SearchRequest:
+        """Build complex search queries with type safety"""
+        
+        # Build query parts
+        query_parts = [f"TYPE:'{content_type}'"]
+        
+        # Add aspect filters
+        for aspect in aspects:
+            query_parts.append(f"ASPECT:'{aspect}'")
+        
+        # Add date range if provided
+        if date_range:
+            start_date, end_date = date_range
+            query_parts.append(f"cm:modified:[{start_date} TO {end_date}]")
+        
+        # Create type-safe search request
+        search_request = SearchRequest(
+            query={
+                "query": " AND ".join(query_parts),
+                "language": "afts"
+            },
+            paging={
+                "maxItems": max_items,
+                "skipCount": 0
+            },
+            sort=[
+                {"field": "cm:modified", "ascending": False}
+            ]
+        )
+        
+        return search_request
+```
+
+### Error Handling with Models
+
+```python
+from python_alfresco_api.models.alfresco_core_models import Node
+from pydantic import ValidationError
+from typing import Optional
+
+def safe_node_processing(node_data: dict) -> Optional[Node]:
+    """Safely process node data with validation"""
+    try:
+        # Validate and create Node model
+        node = Node.model_validate(node_data)
+        
+        # Process with type safety
+        print(f"Processing node: {node.name}")
+        print(f"Type: {node.nodeType}")
+        
+        if node.content:
+            print(f"Content size: {node.content.sizeInBytes}")
+        
+        return node
+        
+    except ValidationError as e:
+        print(f"Invalid node data: {e}")
+        return None
+    except Exception as e:
+        print(f"Processing error: {e}")
+        return None
 
 # Usage
-node_data = {...}  # From API response
-enhanced = EnhancedNode(**node_data)
-print(f"Is document: {enhanced.is_document}")
+node_data = {"id": "123", "name": "test.txt", "nodeType": "cm:content"}
+processed_node = safe_node_processing(node_data)
 ```
 
-### Validation Customization
+## 📝 Best Practices
+
+### 1. Always Use Type Hints
+
 ```python
-from enhanced_generated.models.alfresco_core_models import NodeBodyCreate
-from pydantic import field_validator
+from python_alfresco_api.models.alfresco_core_models import Node, NodeEntry
+from typing import List, Optional
 
-class StrictNodeCreate(NodeBodyCreate):
-    @field_validator('name')
-    @classmethod
-    def validate_name(cls, v: str) -> str:
-        if len(v) > 255:
-            raise ValueError('Name too long')
-        if any(char in v for char in ['<', '>', ':', '"', '|', '?', '*']):
-            raise ValueError('Invalid characters in name')
-        return v
+def process_nodes(node_entries: List[NodeEntry]) -> List[str]:
+    """Process node entries and return names"""
+    return [entry.entry.name for entry in node_entries if entry.entry.name]
 
-# This will validate the name strictly
-strict_node = StrictNodeCreate(
-    name="Valid Name.txt",
-    nodeType="cm:content"
+def get_node_title(node: Node) -> Optional[str]:
+    """Safely get node title"""
+    if node.properties:
+        return node.properties.get("cm:title")
+    return None
+```
+
+### 2. Validate External Data
+
+```python
+from python_alfresco_api.models.alfresco_search_models import SearchRequest
+from pydantic import ValidationError
+
+def create_search_from_user_input(user_query: str, max_items: str) -> Optional[SearchRequest]:
+    """Create search request from user input with validation"""
+    try:
+        search_request = SearchRequest(
+            query={"query": user_query, "language": "afts"},
+            paging={"maxItems": int(max_items), "skipCount": 0}
+        )
+        return search_request
+    except (ValidationError, ValueError) as e:
+        print(f"Invalid search parameters: {e}")
+        return None
+```
+
+### 3. Use Model Methods
+
+```python
+from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate
+
+# Create model
+node_data = NodeBodyCreate(
+    name="document.pdf",
+    nodeType="cm:content",
+    properties={"cm:title": "Important Document"}
 )
-```
 
-## 🔗 Model Relationships
+# Use built-in methods
+json_str = node_data.model_dump_json()          # Serialize to JSON
+dict_data = node_data.model_dump()              # Convert to dict
+copy_data = node_data.model_copy()              # Create a copy
 
-Pydantic models in the Alfresco client follow these patterns:
-
-### Response Wrappers
-- `NodeEntry` wraps `Node`
-- `NodePaging` contains list of `NodeEntry`
-- `NodeListResponse` contains `NodePaging`
-
-### Request/Response Pairs
-- `NodeBodyCreate` → creates → `NodeEntry` 
-- `NodeBodyUpdate` → updates → `NodeEntry`
-- `SearchRequest` → searches → `ResultSetPaging`
-
-### Inheritance Hierarchies
-```python
-Node                    # Base node
-├── NodeAssociation     # Node with association info
-├── NodeChildAssociation # Node with child association info
-└── DeletedNode         # Node in trash can
-```
-
-## 📖 Best Practices
-
-### 1. Use Type Hints
-```python
-from enhanced_generated.models.alfresco_core_models import NodeListResponse
-
-def process_folder(response: NodeListResponse) -> None:
-    """Type hints provide IDE support and documentation."""
-    for entry in response.list.entries:
-        # IDE knows 'entry.entry' is a Node
-        print(entry.entry.name)
-```
-
-### 2. Validate Early
-```python
-# Validate data as soon as you receive it
+# Validation
 try:
-    validated_response = NodeListResponse(**raw_api_data)
+    NodeBodyCreate.model_validate({"name": "test"})  # Will fail - missing required fields
 except ValidationError as e:
-    logger.error(f"Invalid API response: {e}")
-    return
+    print("Validation failed:", e)
 ```
 
-### 3. Use Model Serialization
-```python
-# Convert back to dict/JSON for API calls
-node_data = my_node.model_dump()
-json_data = my_node.model_dump_json()
+## 🎯 Summary
 
-# Only include changed fields
-updates = my_node.model_dump(exclude_unset=True)
-```
+The Pydantic v2 models in Python Alfresco API v1.0 provide:
 
-### 4. Handle Optional Fields
-```python
-# Safe property access
-if node.properties and 'cm:title' in node.properties:
-    title = node.properties['cm:title']
+- ✅ **Complete Type Safety** - Full IDE support and error prevention
+- ✅ **Perfect AI Integration** - Ideal for LLM tools and MCP servers  
+- ✅ **Validation** - Automatic data validation and error handling
+- ✅ **Serialization** - JSON serialization for API calls and storage
+- ✅ **Documentation** - Self-documenting code with type hints
+- ✅ **1,400+ Models** - Comprehensive coverage of all Alfresco APIs
 
-# Or use get() for optional fields
-title = (node.properties or {}).get('cm:title', 'No title')
-```
+Start with the Core API models for most use cases, then explore Search API models for advanced querying. The type safety ensures your code is robust and maintainable!
 
-## 🎯 Performance Considerations
-
-### Validation Overhead
-- **Minimal**: Usually <1ms per model creation
-- **Benefits outweigh costs**: Catches errors early vs debugging production issues
-- **Memory**: ~10-20% increase for type safety and validation
-
-### When to Use Raw Dictionaries
-Consider raw dictionaries only for:
-- **High-frequency operations** where every microsecond matters
-- **Simple data passing** without processing
-- **Temporary prototyping** (but migrate to Pydantic for production)
-
-### Optimization Tips
-```python
-# Disable validation for trusted data sources
-trusted_node = Node.model_construct(**trusted_data)
-
-# Partial loading for large responses
-node_minimal = Node.model_validate(data, strict=False)
-```
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-#### Validation Errors
-```python
-# Problem: Field type mismatch
-try:
-    node = Node(**api_data)
-except ValidationError as e:
-    print(f"Validation failed: {e}")
-    # Check the specific field causing issues
-    for error in e.errors():
-        print(f"Field: {error['loc']}, Error: {error['msg']}")
-```
-
-#### Missing Fields
-```python
-# Problem: Required field missing
-# Solution: Check API response structure
-print(f"Available fields: {list(api_data.keys())}")
-```
-
-#### Date Parsing Issues
-```python
-# Problem: Invalid date format
-# Solution: Check timezone and format
-from datetime import datetime
-try:
-    parsed_date = datetime.fromisoformat(date_string.replace('Z', '+00:00'))
-except ValueError:
-    # Handle invalid date format
-    pass
-```
-
-## 🔮 Future Enhancements
-
-The Pydantic model support could be enhanced:
-
-- **Enhanced validation rules** based on Alfresco constraints
-- **Custom field types** for Alfresco-specific data
-- **Model inheritance** for specialized node types
-- **Async model support** for high-performance operations
-- **GraphQL-style field selection** for optimal data loading
-
-## 📞 Support
-
-For Pydantic model issues:
-
-1. **Check the examples**: [pydantic_models_examples.py](../examples/pydantic_models_examples.py)
-2. **Run the comparison**: [without_pydantic_comparison.py](../examples/without_pydantic_comparison.py)
-3. **Review model definitions**: `enhanced_generated/models/`
-4. **Check Pydantic docs**: https://docs.pydantic.dev/
-
----
-
-**🎉 Pydantic models transform the Alfresco API experience from error-prone dictionary manipulation into type-safe, IDE-friendly, self-documenting code!** 
+For more information:
+- **[API Documentation Index](API_DOCUMENTATION_INDEX.md)** - Complete API reference
+- **[Master Client Guide](MASTER_CLIENT_GUIDE.md)** - Using models with clients
+- **[examples/llm_integration.py](../examples/llm_integration.py)** - AI integration examples 
