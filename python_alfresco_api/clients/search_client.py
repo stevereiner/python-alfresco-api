@@ -23,14 +23,14 @@ if raw_client_path.exists():
 class AlfrescoSearchClient:
     """
     Individual client for Alfresco SEARCH API.
-
+    
     Features:
     - Uses generated HTTP client internally
     - Automatic authentication with AuthUtil
     - Pydantic model integration
     - Both sync and async methods
     """
-
+    
     def __init__(
         self,
         base_url: str,
@@ -40,7 +40,7 @@ class AlfrescoSearchClient:
     ):
         """
         Initialize search client.
-
+        
         Args:
             base_url: Base URL of Alfresco instance
             auth_util: Optional AuthUtil instance for authentication
@@ -51,11 +51,11 @@ class AlfrescoSearchClient:
         self.auth_util = auth_util
         self.verify_ssl = verify_ssl
         self.timeout = timeout
-
+        
         # Initialize the generated client
         self._init_generated_client()
-
-    def _init_generated_client(self) -> None:
+    
+    def _init_generated_client(self):
         """Initialize the generated HTTP client"""
         try:
             from client import Client
@@ -65,16 +65,16 @@ class AlfrescoSearchClient:
             print(f"⚠️  Generated client not available for search: {e}")
             self.client = None
             self._client_available = False
-
+    
     def is_available(self) -> bool:
         """Check if the generated client is available"""
         return self._client_available
-
-    async def _ensure_auth(self) -> None:
+    
+    async def _ensure_auth(self):
         """Ensure authentication before API calls"""
         if self.auth_util:
             await self.auth_util.ensure_authenticated()
-
+    
     def get_client_info(self) -> Dict[str, Any]:
         """Get information about this client"""
         return {

@@ -16,7 +16,7 @@ from .auth_util import AuthUtil
 
 # Individual clients
 from .clients.auth_client import AlfrescoAuthClient
-from .clients.core_client import AlfrescoCoreClient
+from .clients.core_client import AlfrescoCoreClient  
 from .clients.discovery_client import AlfrescoDiscoveryClient
 from .clients.search_client import AlfrescoSearchClient
 from .clients.workflow_client import AlfrescoWorkflowClient
@@ -31,13 +31,13 @@ __all__ = [
     # Factory & utilities
     "ClientFactory",
     "AuthUtil",
-
+    
     # Individual clients
     "AlfrescoAuthClient",
-    "AlfrescoCoreClient",
+    "AlfrescoCoreClient", 
     "AlfrescoDiscoveryClient",
     "AlfrescoSearchClient",
-    "AlfrescoWorkflowClient",
+    "AlfrescoWorkflowClient", 
     "AlfrescoModelClient",
     "AlfrescoSearchSQLClient"
 ]

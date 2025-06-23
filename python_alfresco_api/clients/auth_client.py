@@ -23,14 +23,14 @@ if raw_client_path.exists():
 class AlfrescoAuthClient:
     """
     Individual client for Alfresco AUTH API.
-
+    
     Features:
     - Uses generated HTTP client internally
     - Automatic authentication with AuthUtil
     - Pydantic model integration
     - Both sync and async methods
     """
-
+    
     def __init__(
         self,
         base_url: str,
@@ -40,7 +40,7 @@ class AlfrescoAuthClient:
     ):
         """
         Initialize auth client.
-
+        
         Args:
             base_url: Base URL of Alfresco instance
             auth_util: Optional AuthUtil instance for authentication
@@ -51,11 +51,11 @@ class AlfrescoAuthClient:
         self.auth_util = auth_util
         self.verify_ssl = verify_ssl
         self.timeout = timeout
-
+        
         # Initialize the generated client
         self._init_generated_client()
-
-    def _init_generated_client(self) -> None:
+    
+    def _init_generated_client(self):
         """Initialize the generated HTTP client"""
         try:
             from client import Client
@@ -65,56 +65,16 @@ class AlfrescoAuthClient:
             print(f"⚠️  Generated client not available for auth: {e}")
             self.client = None
             self._client_available = False
-
+    
     def is_available(self) -> bool:
         """Check if the generated client is available"""
         return self._client_available
-
-    async def _ensure_auth(self) -> None:
+    
+    async def _ensure_auth(self):
         """Ensure authentication before API calls"""
         if self.auth_util:
             await self.auth_util.ensure_authenticated()
-
-    async def create_ticket(self, ticket_body) -> Any:
-        """Create authentication ticket"""
-        if not self._client_available:
-            # Simplified mock response for when client isn't available
-            print("⚠️  Auth client not fully initialized - using basic auth")
-            return type('MockTicketResponse', (), {
-                'entry': type('Entry', (), {'id': 'mock-ticket-basic-auth'})()
-            })()
-            
-        try:
-            # Try to use the actual generated client
-            import httpx
-            
-            # Build request directly
-            url = f"{self.base_url}/alfresco/api/-default-/public/authentication/versions/1/tickets"
-            
-            # Convert ticket_body to dict
-            if hasattr(ticket_body, 'model_dump'):
-                data = ticket_body.model_dump()
-            elif hasattr(ticket_body, 'dict'):
-                data = ticket_body.dict()
-            else:
-                data = ticket_body
-                
-            async with httpx.AsyncClient(verify=self.verify_ssl, timeout=self.timeout) as client:
-                response = await client.post(url, json=data)
-                
-                if response.status_code == 201:
-                    result = response.json()
-                    return type('TicketResponse', (), {
-                        'entry': type('Entry', (), {'id': result.get('entry', {}).get('id', 'no-ticket')})()
-                    })()
-                else:
-                    print(f"⚠️  Auth request failed with status {response.status_code}")
-                    return None
-                    
-        except Exception as e:
-            print(f"⚠️  Auth fallback: {e}")
-            return None
-
+    
     def get_client_info(self) -> Dict[str, Any]:
         """Get information about this client"""
         return {

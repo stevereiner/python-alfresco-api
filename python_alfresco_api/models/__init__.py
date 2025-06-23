@@ -3,7 +3,7 @@ Pydantic v2 Models for Alfresco APIs
 
 Auto-generated models perfect for:
 - LLM tool interfaces
-- MCP server implementations
+- MCP server implementations  
 - Type-safe API interactions
 - Data validation and serialization
 """
