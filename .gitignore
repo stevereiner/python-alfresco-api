@@ -108,6 +108,7 @@ env/
 venv/
 venv-shared/
 build-env/
+test-env/
 ENV/
 env.bak/
 venv.bak/
@@ -178,6 +179,12 @@ logs/
 # Test artifacts
 test-reports/
 coverage-reports/
+
+# Release preparation files (temporary)
+publish_to_pypi.py
+RELEASE_NOTES_*.md
+RELEASE_INSTRUCTIONS.md
+RELEASE_SUMMARY.md
 
 # Development and testing tools
 .benchmarks/

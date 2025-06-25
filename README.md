@@ -7,6 +7,8 @@ Note this uses the remote Alfresco REST APIs. Not for in-process development in 
 
 A modern, type-safe Python client library for Alfresco Content Services REST APIs with comprehensive Pydantic v2 model integration and async support.
 
+[![PyPI version](https://img.shields.io/pypi/v/python-alfresco-api.svg)](https://pypi.org/project/python-alfresco-api/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/python-alfresco-api.svg)](https://pypi.org/project/python-alfresco-api/)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![Pydantic](https://img.shields.io/badge/pydantic-v2-green.svg)](https://pydantic.dev/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
@@ -31,9 +33,19 @@ A modern, type-safe Python client library for Alfresco Content Services REST API
 
 ## 📦 Installation
 
-### Virtual Environment Setup
+### Quick Install from PyPI
 
-**Recommended**: Always use a virtual environment to avoid dependency conflicts and leave base clean
+[![PyPI](https://img.shields.io/pypi/v/python-alfresco-api.svg)](https://pypi.org/project/python-alfresco-api/)
+
+```bash
+pip install python-alfresco-api
+```
+
+**All features included** - No optional dependencies needed! Includes event system, async support, and all 7 Alfresco APIs.
+
+### Virtual Environment Setup (Recommended)
+
+**Best Practice**: Always use a virtual environment to avoid dependency conflicts
 
 #### Windows
 
