@@ -1,8 +1,7 @@
 # python-alfresco-api v1.0
 
 **A Complete Python client package for developing python code and apps for Alfresco. Great for doing AI development 
-with Python based LangChain, LlamaIndex, neo4j-graphrag (see graphrag projects in this
-repository), etc. Also great for creating MCP servers (see python-alfreso-mcp-server in this repository), and other AI integrations.**
+with Python based LangChain, LlamaIndex, neo4j-graphrag, etc. Also great for creating MCP servers (see python-alfreso-mcp-server in this repository).**
 
 Note this uses the remote Alfresco REST APIs. Not for in-process development in Alfresco.
 
@@ -18,7 +17,7 @@ A modern, type-safe Python client library for Alfresco Content Services REST API
 - **Complete API Coverage**: All 7 Alfresco REST APIs (Auth, Core, Discovery, Search, Workflow, Model, Search SQL)
 - **1,400+ Pydantic v2 Models**: Type-safe data validation and serialization
 - **Async/Sync Support**: Both synchronous and asynchronous API calls
-- **Enterprise Patterns**: Individual client architecture for scalability
+- **Modular Architecture**: Individual client design for scalability
 - **LLM/AI Ready**: Type-safe Pydantic v2 models perfect for AI integration and tool interfaces
 - **Event System**: ActiveMQ and Event Gateway support for Python apps to handle change events 
 - **Docker Compatible**: Works with Alfresco running in separate Docker Compose setups
@@ -177,23 +176,79 @@ async def main():
 asyncio.run(main())
 ```
 
-### Master Client Pattern
+### Architecture Options
+
+#### Option 1: Individual Clients + Factory Pattern (Recommended)
 
 ```python
-from python_alfresco_api import AlfrescoMasterClient
+from python_alfresco_api import ClientFactory
 
-# Single client with all APIs
-master = AlfrescoMasterClient(
+# Factory pattern for easy configuration
+factory = ClientFactory(
     base_url="http://localhost:8080",
     username="admin",
     password="admin"
 )
 
-# Access individual APIs
-people = master.core.people
-nodes = master.core.nodes
-search = master.search
+# Individual clients for modular architecture
+auth_client = factory.create_auth_client()
+core_client = factory.create_core_client()
+search_client = factory.create_search_client()
+workflow_client = factory.create_workflow_client()
 ```
+
+#### Option 2: Master Client Pattern (Unified Interface)
+
+```python
+from python_alfresco_api import ClientFactory
+
+# Create factory
+factory = ClientFactory(
+    base_url="http://localhost:8080",
+    username="admin",
+    password="admin"
+)
+
+# Master client with dot syntax access
+master_client = factory.create_master_client()
+
+# Use dot syntax for API access
+nodes = master_client.core.get_node("some-node-id")
+results = master_client.search.search("my query")
+ticket = master_client.auth.create_ticket()
+processes = master_client.workflow.list_processes()
+```
+
+#### Option 3: Direct Individual Clients (No Factory)
+
+```python
+# Direct client creation without factory
+from python_alfresco_api.clients import (
+    AlfrescoAuthClient,
+    AlfrescoCoreClient,
+    AlfrescoSearchClient,
+    AlfrescoWorkflowClient
+)
+from python_alfresco_api import AuthUtil
+
+# Create auth utility
+auth_util = AuthUtil(
+    base_url="http://localhost:8080",
+    username="admin",
+    password="admin"
+)
+
+# Create individual clients directly
+auth_client = AlfrescoAuthClient("http://localhost:8080")
+core_client = AlfrescoCoreClient("http://localhost:8080", auth_util)
+search_client = AlfrescoSearchClient("http://localhost:8080", auth_util)
+```
+
+All approaches provide:
+- **Type Safety**: Full Pydantic v2 model integration
+- **Async Support**: Modern async/await patterns
+- **Authentication**: Automatic ticket-based auth with renewal
+- **Error Handling**: Comprehensive error management
 
 ### Pydantic Models
 
@@ -216,38 +271,7 @@ node_json = node_data.model_dump_json()
 ticket = TicketBody(userId="admin", password="admin")
 ```
 
-## 🏗️ Architecture
 
-### Individual Client Pattern
-
-```python
-# Each API has its own client
-from python_alfresco_api.clients import (
-    AlfrescoAuthClient,
-    AlfrescoCoreClient,
-    AlfrescoSearchClient,
-    AlfrescoWorkflowClient
-)
-
-# Create individual clients
-auth = AlfrescoAuthClient("http://localhost:8080")
-core = AlfrescoCoreClient("http://localhost:8080", auth_util)
-search = AlfrescoSearchClient("http://localhost:8080", auth_util)
-```
-
-### Factory Pattern
-
-```python
-# Centralized client creation
-from python_alfresco_api import ClientFactory
-
-factory = ClientFactory(base_url="http://localhost:8080")
-clients = factory.create_all_clients()
-
-# Access by name
-auth_client = clients['auth']
-core_client = clients['core']
-```
 
 ## 🔧 Code Regeneration
 
@@ -411,15 +435,15 @@ To run tests against a live Alfresco server (tested with Community Edition 23.2.
 
 ### Test Coverage
 
-Current test coverage: **80%** with **106/106 tests passing** (100% success rate)
+Current test coverage: **80%** of code lines tested with **106/106 tests passing** (100% success rate)
 
-- **Core Components**: 80%+ coverage
-- **Pydantic Models**: 100% coverage (1,400+ classes)  
+- **Core Components**: 80%+ test coverage
+- **Pydantic Models**: 100% test coverage (1,400+ classes)  
 - **Live Integration**: 100% functional validation (tested with Community Edition 23.2.0 and 25.1)
-- **Individual Clients**: 81% coverage each
-- **Authentication**: 81% coverage
-- **Client Factory**: 94% coverage
-- **Master Client**: 70% coverage
+- **Individual Clients**: 81% test coverage each
+- **Authentication**: 81% test coverage
+- **Client Factory**: 94% test coverage
+- **Master Client**: 70% test coverage
 
 ### Test Runner Script
 
@@ -481,57 +505,73 @@ await event_client.start_listening()
 
 ## 🤖 MCP Server / LLM Integration ([see python-alfresco-mcp-server](https://github.com/stevereiner/python-alfresco-mcp-server))
 
-Perfect for Model Context Protocol (MCP) servers and AI applications with type-safe Pydantic v2 models:
+Perfect for Model Context Protocol (MCP) servers with FastMCP 2.0 and type-safe Pydantic v2 models:
 
-### MCP Server Examples
+### FastMCP 2.0 Server Example
 
 ```python
+from fastmcp import FastMCP
 from python_alfresco_api import ClientFactory
-from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate
 
-def create_document_tool(name: str, content: str) -> dict:
-    """Create a document in Alfresco - MCP Server Tool"""
-    factory = ClientFactory(base_url="http://localhost:8080")
-    
-    # Type-safe model creation - perfect for MCP servers
-    node_data = NodeBodyCreate(
-        name=name,
-        nodeType="cm:content",
-        properties={"cm:content": content}
-    )
-    
-    # API call with full validation
-    result = factory.core.nodes.create_node(node_data)
-    return result.model_dump()
+# Create MCP server with FastMCP 2.0
+mcp = FastMCP("Alfresco Content Management")
+
+# Initialize Alfresco client
+factory = ClientFactory(
+    base_url="http://localhost:8080",
+    username="admin", 
+    password="admin"
+)
+
+@mcp.tool()
+def search_documents(query: str) -> str:
+    """Search for documents in Alfresco"""
+    search_client = factory.create_search_client()
+    results = search_client.search({
+        "query": {"query": query, "language": "afts"},
+        "paging": {"maxItems": 10}
+    })
+    return f"Found {results.list.pagination.totalItems} documents"
+
+@mcp.tool()
+def get_repository_info() -> str:
+    """Get Alfresco repository information"""
+    discovery_client = factory.create_discovery_client()
+    info = discovery_client.get_repository_info()
+    return f"Connected to {info.entry.repository.name} v{info.entry.repository.version.major}.{info.entry.repository.version.minor}"
+
+if __name__ == "__main__":
+    mcp.run()
 ```
 
-### Search MCP Server Tool
+### Master Client with FastMCP 2.0
 
 ```python
-from typing import List
-from python_alfresco_api.models.alfresco_search_models import SearchRequest
+from fastmcp import FastMCP
+from python_alfresco_api import ClientFactory
 
-def search_documents_tool(query: str) -> List[dict]:
-    """
-    Search for documents in Alfresco - MCP Server Tool
-    
-    Args:
-        query: Search query string
-        
-    Returns:
-        List of matching documents with full type safety
-    """
-    # Pydantic models provide perfect type hints for MCP servers
-    search_req = SearchRequest(
-        query={"query": query, "language": "afts"},
-        paging={"maxItems": 10}
-    )
-    
-    # Type-safe execution
-    factory = ClientFactory(base_url="http://localhost:8080")
-    results = factory.search.search(search_req)
-    
-    return [item.model_dump() for item in results.list.entries]
+mcp = FastMCP("Alfresco Master Client")
+
+# Use master client for dot syntax access
+master = ClientFactory(
+    base_url="http://localhost:8080",
+    username="admin",
+    password="admin"
+).create_master_client()
+
+@mcp.tool()
+def list_root_nodes() -> str:
+    """List root nodes in Alfresco"""
+    nodes = master.core.get_nodes()
+    return f"Found {len(nodes.list.entries)} root nodes"
+
+@mcp.tool()  
+def search_content(query: str) -> str:
+    """Search content with master client"""
+    results = master.search.search({
+        "query": {"query": query, "language": "afts"}
+    })
+    return f"Search returned {results.list.pagination.totalItems} results"
 ```
 
 ## 📁 Project Structure

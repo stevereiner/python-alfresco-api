@@ -10,14 +10,19 @@ import sys
 import os
 import json
 
-from AlfrescoClient import AlfrescoClient
+from python_alfresco_api import ClientFactory
 
 def main():
     """Discovery API examples."""
     print("🔍 Discovery API Examples")
     
-    # Initialize client
-    client = AlfrescoClient(host="http://localhost:8080", username="admin", password="admin")
+    # Initialize client factory and create master client
+    factory = ClientFactory(
+        base_url="http://localhost:8080",
+        username="admin",
+        password="admin"
+    )
+    client = factory.create_master_client()
     
     if not client.discovery:
         print("❌ Discovery API not available")

@@ -26,7 +26,7 @@ from .clients.search_sql_client import AlfrescoSearchSqlClient
 # Pydantic models for LLM integration
 from .models import *
 
-__version__ = "2.0.0"
+__version__ = "1.0.0"
 __all__ = [
     # Factory & utilities
     "ClientFactory",

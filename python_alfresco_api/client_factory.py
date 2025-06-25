@@ -15,6 +15,22 @@ from .clients.workflow_client import AlfrescoWorkflowClient
 from .clients.model_client import AlfrescoModelClient
 from .clients.search_sql_client import AlfrescoSearchSqlClient
 
+class MasterClient:
+    """
+    Master client with dot syntax access to all APIs.
+    Provides unified interface: master_client.core.something()
+    """
+    
+    def __init__(self, clients_dict: Dict[str, Any]):
+        """Initialize master client with all API clients."""
+        self.auth = clients_dict['auth']
+        self.core = clients_dict['core'] 
+        self.discovery = clients_dict['discovery']
+        self.search = clients_dict['search']
+        self.workflow = clients_dict['workflow']
+        self.model = clients_dict['model']
+        self.search_sql = clients_dict['search_sql']
+
 class ClientFactory:
     """
     Factory for creating Alfresco API clients.
@@ -88,3 +104,8 @@ class ClientFactory:
             "model": self.create_model_client(),
             "search_sql": self.create_search_sql_client()
         }
+    
+    def create_master_client(self) -> MasterClient:
+        """Create master client with dot syntax access"""
+        clients = self.create_all_clients()
+        return MasterClient(clients)

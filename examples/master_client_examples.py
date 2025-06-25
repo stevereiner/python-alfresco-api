@@ -18,7 +18,7 @@ import os
 import json
 from datetime import datetime
 
-from AlfrescoClient import AlfrescoClient
+from python_alfresco_api import ClientFactory
 
 def print_section(title):
     """Print a formatted section header."""
@@ -40,12 +40,13 @@ def main():
     
     # Initialize the master client
     print("🚀 Initializing Alfresco Master Client...")
-    client = AlfrescoClient(
-        host="http://localhost:8080",
+    factory = ClientFactory(
+        base_url="http://localhost:8080",
         username="admin", 
         password="admin",
         verify_ssl=False
     )
+    client = factory.create_master_client()
     
     # Test connection
     try:

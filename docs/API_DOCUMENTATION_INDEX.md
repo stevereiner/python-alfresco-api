@@ -4,58 +4,72 @@ This document provides a comprehensive index of all documentation and examples f
 
 ## 📚 Table of Contents
 
-- [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
 - [Individual API Clients](#individual-api-clients)
-- [Master Client](#master-client)
+- [Master Client Pattern](#👑-master-client)
 - [Examples](#examples)
 - [Authentication & Security](#authentication--security)
 - [Testing Documentation](#testing-documentation)
 
-## 🚀 Quick Start
 
-### Modern ClientFactory Pattern (Recommended)
+
+## 🏗️ Architecture Overview
+
+### Three Usage Patterns Available
+
+**Option 1: Individual Clients + Factory Pattern (Recommended)**
 ```python
 from python_alfresco_api import ClientFactory
 
-# Create client factory
-factory = ClientFactory(
-    base_url="http://localhost:8080",
-    username="admin",
-    password="admin"
-)
+factory = ClientFactory(base_url="http://localhost:8080", username="admin", password="admin")
 
-# Get individual clients
+# Create individual clients as needed
 auth_client = factory.create_auth_client()
 core_client = factory.create_core_client()
 search_client = factory.create_search_client()
 
-# Or get all clients at once
-clients = factory.create_all_clients()
-
-# Use the clients
-repo_info = clients['discovery'].get_repository_info()
-search_results = clients['search'].search({"query": {"query": "*", "language": "afts"}})
+# Or create all clients at once
+all_clients = factory.create_all_clients()
+core_operations = all_clients['core'].get_nodes()
 ```
 
-### Master Client Pattern (Alternative)
+**Option 2: Master Client with Dot Syntax (Simplified Access)**
 ```python
-from python_alfresco_api import AlfrescoMasterClient
+from python_alfresco_api import ClientFactory
 
-# Unified client with all APIs
-master = AlfrescoMasterClient(
+factory = ClientFactory(base_url="http://localhost:8080", username="admin", password="admin")
+
+# Create master client with dot syntax access
+master_client = factory.create_master_client()
+
+# Intuitive dot syntax for all operations
+core_operations = master_client.core.get_nodes()
+search_results = master_client.search.search(search_request)
+repo_info = master_client.discovery.get_repository_info()
+```
+
+**Option 3: Direct Individual Clients (No Factory)**
+```python
+# Direct client creation without factory
+from python_alfresco_api.clients import (
+    AlfrescoAuthClient,
+    AlfrescoCoreClient,
+    AlfrescoSearchClient
+)
+from python_alfresco_api import AuthUtil
+
+# Create auth utility
+auth_util = AuthUtil(
     base_url="http://localhost:8080",
     username="admin",
     password="admin"
 )
 
-# Access individual APIs through properties
-repo_info = master.discovery.get_repository_info()
-search_results = master.search.search({"query": {"query": "*", "language": "afts"}})
-nodes = master.core.get_nodes()
+# Create individual clients directly
+auth_client = AlfrescoAuthClient("http://localhost:8080")
+core_client = AlfrescoCoreClient("http://localhost:8080", auth_util)
+search_client = AlfrescoSearchClient("http://localhost:8080", auth_util)
 ```
-
-## 🏗️ Architecture Overview
 
 ### Modern Individual Client Architecture
 The library uses a clean individual client architecture following enterprise patterns:
@@ -294,32 +308,39 @@ results = search_sql_client.search(sql_request)
 
 ## 👑 Master Client
 
-### Unified Access Pattern
+### Unified Access Pattern with Dot Syntax
 ```python
-from python_alfresco_api import AlfrescoMasterClient
+from python_alfresco_api import ClientFactory
 
-# Single client with all APIs
-master = AlfrescoMasterClient(
+# Create factory first
+factory = ClientFactory(
     base_url="http://localhost:8080",
     username="admin",
     password="admin"
 )
 
-# Access individual APIs through properties
-auth_info = master.auth.get_current_user()
-repo_info = master.discovery.get_repository_info()
-nodes = master.core.get_nodes()
-search_results = master.search.search(search_request)
-processes = master.workflow.get_process_definitions()
-models = master.model.get_models()
-sql_results = master.search_sql.search(sql_request)
+# Create master client with unified access
+master_client = factory.create_master_client()
+
+# Access individual APIs through intuitive dot syntax
+repo_info = master_client.discovery.get_repository_info()
+nodes = master_client.core.get_nodes()
+search_results = master_client.search.search(search_request)
+processes = master_client.workflow.get_process_definitions()
+models = master_client.model.get_models()
+sql_results = master_client.search_sql.search(sql_request)
+
+# All clients share the same authentication
+print(f"All clients authenticated: {master_client.auth.is_authenticated()}")
 ```
 
 **Benefits**:
 - ✅ Single authentication across all APIs
+- ✅ Intuitive dot syntax access (e.g., `master_client.core.get_nodes()`)
 - ✅ Simplified client management
 - ✅ Consistent error handling
 - ✅ Automatic session management
+- ✅ Type-safe client access with proper IDE support
 
 ## 📖 Examples
 
@@ -333,7 +354,7 @@ All examples are located in the `examples/` directory and are fully functional:
 | **[llm_integration.py](../examples/llm_integration.py)** | AI/LLM integration examples | ✅ Working |
 | **[auth_examples.py](../examples/auth_examples.py)** | Authentication patterns | ✅ Working |
 | **[auth_helpers.py](../examples/auth_helpers.py)** | Authentication utilities | ✅ Working |
-| **[alfresco_client_usage.py](../examples/alfresco_client_usage.py)** | Master client usage | ✅ Working |
+| **[master_client_examples.py](../examples/master_client_examples.py)** | Master client usage patterns | ✅ Working |
 
 ### Example Categories
 
@@ -507,7 +528,7 @@ pytest tests/test_integration_live_server.py
 
 #### **System Integration**
 - **[Model API](#6-model-api--100-working)** - Content models
-- **[Master Client](#master-client)** - Unified access
+- **[Master Client Pattern](#👑-master-client)** - Unified access with dot syntax
 
 ## 📊 Current Status Summary
 
@@ -524,7 +545,7 @@ pytest tests/test_integration_live_server.py
 ### 📈 Success Metrics
 - **7/7 APIs** fully functional (100%)
 - **106/106 tests** passing (100%)
-- **80% code coverage** (excellent for v2.0)
+- **80% code coverage** (excellent for v1.0)
 - **100% documentation coverage**
 - **100% example coverage**
 - **Live server validation** ✅
@@ -537,7 +558,7 @@ pytest tests/test_integration_live_server.py
 2. **[Quick Start](#quick-start)** - Try the ClientFactory pattern
 3. **[examples/basic_usage.py](../examples/basic_usage.py)** - See working code
 4. **[examples/live_test.py](../examples/live_test.py)** - Test with your server
-5. **Choose your pattern**: ClientFactory (recommended) or Master Client
+5. **Choose your pattern**: Individual Clients (enterprise) or Master Client (simplified)
 6. **Explore specific APIs** based on your needs
 
 **The ClientFactory pattern provides the best experience for most users!** 🚀 

@@ -226,29 +226,109 @@ from python_alfresco_api.event_client import AlfrescoEventClient
 event_client = AlfrescoEventClient.from_config("config/events.yaml")
 ```
 
-## Phase 2 Integration
+## Integration Architecture
 
-This event system is **Phase 2** of the [8-phase Alfresco-AI roadmap][[memory:5182191768171681496]]:
+This event system provides real-time monitoring capabilities for Alfresco content changes, enabling responsive AI workflows and automated content processing.
 
-- ✅ **Phase 1**: Core API clients (Complete)  
-- ✅ **Phase 2**: Event Gateway integration (Complete)
-- 🚧 **Phase 3**: MCP server implementation (Next)
+## Custom MCP Server Integration
 
-## MCP Server Integration
-
-The event system is designed for Model Context Protocol (MCP) integration:
+The event system can be integrated into custom MCP servers that handle events internally. Since MCP servers cannot relay events externally, the event handling must be managed within the server itself:
 
 ```python
-# Future MCP server usage
+from fastmcp import FastMCP
 from python_alfresco_api.event_client import AlfrescoEventClient
-from mcp import Server
+import asyncio
+import threading
 
-@server.tool("monitor_content")
-async def monitor_alfresco_content():
-    """Monitor Alfresco content changes via events"""
-    event_client = AlfrescoEventClient(auto_detect=True)
-    await event_client.setup_content_monitoring()
-    return "Content monitoring started"
+# Custom MCP server with internal event handling
+mcp = FastMCP("Alfresco Content Monitor")
+
+class ContentMonitor:
+    def __init__(self):
+        self.event_client = None
+        self.is_monitoring = False
+        self.recent_events = []
+        self.max_events = 100
+    
+    async def start_monitoring(self):
+        """Start internal event monitoring"""
+        if self.is_monitoring:
+            return "Already monitoring"
+        
+        self.event_client = AlfrescoEventClient(auto_detect=True)
+        await asyncio.sleep(2)  # Wait for detection
+        
+        # Setup internal event handlers
+        def internal_handler(notification):
+            # Store events internally for MCP tools to access
+            self.recent_events.append({
+                'timestamp': notification.timestamp.isoformat(),
+                'event_type': notification.event_type,
+                'node_id': notification.node_id,
+                'node_type': notification.node_type,
+                'user_id': notification.user_id
+            })
+            
+            # Keep only recent events
+            if len(self.recent_events) > self.max_events:
+                self.recent_events.pop(0)
+        
+        # Register handlers for key events
+        self.event_client.register_event_handler("node.created", internal_handler)
+        self.event_client.register_event_handler("node.updated", internal_handler)
+        self.event_client.register_event_handler("node.deleted", internal_handler)
+        
+        # Start monitoring in background
+        self.is_monitoring = True
+        await self.event_client.start_listening()
+        return "Content monitoring started"
+
+# Global monitor instance
+monitor = ContentMonitor()
+
+@mcp.tool()
+def start_content_monitoring() -> str:
+    """Start monitoring Alfresco content changes internally"""
+    # Run async monitoring in background thread
+    def run_monitor():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(monitor.start_monitoring())
+    
+    if not monitor.is_monitoring:
+        thread = threading.Thread(target=run_monitor, daemon=True)
+        thread.start()
+        return "Content monitoring started (background thread)"
+    
+    return "Already monitoring content changes"
+
+@mcp.tool()
+def get_recent_events(limit: int = 10) -> str:
+    """Get recent content events (stored internally)"""
+    if not monitor.is_monitoring:
+        return "Monitoring not active. Start monitoring first."
+    
+    recent = monitor.recent_events[-limit:]
+    if not recent:
+        return "No recent events captured"
+    
+    result = f"Recent {len(recent)} events:\n"
+    for event in recent:
+        result += f"- {event['timestamp']}: {event['event_type']} on {event['node_id']}\n"
+    
+    return result
+
+@mcp.tool()
+def get_monitoring_status() -> str:
+    """Get current monitoring status"""
+    if not monitor.is_monitoring:
+        return "Not monitoring"
+    
+    event_count = len(monitor.recent_events)
+    return f"Monitoring active, {event_count} events captured"
+
+if __name__ == "__main__":
+    mcp.run()
 ```
 
 ## Troubleshooting
@@ -281,13 +361,15 @@ event_client = AlfrescoEventClient(debug=True)
 
 ## Next Steps
 
-With Phase 2 complete, the next phase is **MCP Server implementation** using the [official MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) to create:
+The event system enables building custom MCP servers with internal event handling capabilities. This provides the foundation for:
 
-- **python-alfresco-mcp-server** - A separate project
-- Natural language interfaces for Alfresco operations
-- AI-powered content management workflows
-- GraphRAG capabilities for document understanding
+- Real-time content change monitoring within MCP servers
+- AI-powered content analysis triggered by events
+- Automated workflow responses to content changes
+- Custom notification and alerting systems
+
+For a complete MCP server implementation that could be extended with event handling, see the [python-alfresco-mcp-server](https://github.com/stevereiner/python-alfresco-mcp-server) project. This provides a comprehensive MCP server with FastMCP 2.0 integration and complete Alfresco functionality - its code can serve as the foundation for adding custom event handling capabilities.
 
 ---
 
-*This completes Phase 2 of the Alfresco-AI integration roadmap. The event system provides the foundation for real-time AI-powered content management workflows.* 
+*The event system provides a foundation for building intelligent, event-driven content management applications.* 

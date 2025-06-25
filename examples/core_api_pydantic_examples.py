@@ -15,7 +15,7 @@ import os
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
-from AlfrescoClient import AlfrescoClient
+from python_alfresco_api import ClientFactory
 
 # Import Pydantic for creating example models
 from pydantic import BaseModel, ValidationError, Field
@@ -76,7 +76,8 @@ def main():
     print("="*80)
     
     # Initialize client
-    client = AlfrescoClient(host="http://localhost:8080", username="admin", password="admin")
+    factory = ClientFactory(base_url="http://localhost:8080", username="admin", password="admin")
+    client = factory.create_master_client()
     
     # =============================================================================
     # Example 1: Node Model - The Foundation of Everything

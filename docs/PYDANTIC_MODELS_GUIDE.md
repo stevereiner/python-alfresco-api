@@ -293,53 +293,99 @@ ai_search_data = search_content_tool(
 )
 ```
 
-### MCP Server Integration
+### FastMCP 2.0 Integration
 
 ```python
+from fastmcp import FastMCP
+from python_alfresco_api import ClientFactory
 from python_alfresco_api.models.alfresco_core_models import Node, NodeBodyCreate
 from python_alfresco_api.models.alfresco_search_models import SearchRequest
 import json
 
-class AlfrescoMCPServer:
-    """Model Context Protocol server for Alfresco integration"""
+# Create FastMCP 2.0 server
+mcp = FastMCP("Alfresco Content Manager")
+
+# Initialize Alfresco clients
+factory = ClientFactory(
+    base_url="http://localhost:8080",
+    username="admin",
+    password="admin"
+)
+clients = factory.create_all_clients()
+
+@mcp.tool()
+def search_content(query: str, max_items: int = 10) -> str:
+    """Search Alfresco content with type-safe models"""
+    # Create type-safe search request
+    search_request = SearchRequest(
+        query={"query": query, "language": "afts"},
+        paging={"maxItems": max_items, "skipCount": 0}
+    )
     
-    def __init__(self, factory):
-        self.clients = factory.create_all_clients()
+    # Execute search
+    results = clients['search'].search(search_request)
     
-    def search_content(self, query: str, max_items: int = 10) -> str:
-        """MCP tool for content search"""
-        search_request = SearchRequest(
-            query={"query": query, "language": "afts"},
-            paging={"maxItems": max_items}
-        )
+    # Return structured data for AI consumption
+    return json.dumps({
+        "total_items": results.list.pagination.totalItems,
+        "results": [
+            {
+                "id": entry.entry.id,
+                "name": entry.entry.name,
+                "type": entry.entry.nodeType,
+                "created": entry.entry.createdAt.isoformat() if entry.entry.createdAt else None,
+                "modified": entry.entry.modifiedAt.isoformat() if entry.entry.modifiedAt else None,
+                "size": entry.entry.content.sizeInBytes if entry.entry.content else None
+            }
+            for entry in results.list.entries
+        ]
+    })
+
+@mcp.tool()
+def create_content_spec(name: str, node_type: str, title: str, description: str = "") -> str:
+    """Create type-safe content specification"""
+    # Create validated model
+    node_data = NodeBodyCreate(
+        name=name,
+        nodeType=node_type,
+        properties={
+            "cm:title": title,
+            "cm:description": description
+        }
+    )
+    
+    # Return validated JSON for content creation
+    return node_data.model_dump_json(indent=2)
+
+@mcp.tool()
+def get_node_info(node_id: str) -> str:
+    """Get detailed node information with type safety"""
+    try:
+        # Get node (when available)
+        # node_response = clients['core'].get_node(node_id)
+        # node = node_response.entry
         
-        results = self.clients['search'].search(search_request)
-        
-        # Return structured data for AI consumption
+        # For demo, return structure
         return json.dumps({
-            "total_items": results.list.pagination.totalItems,
-            "results": [
-                {
-                    "id": entry.entry.id,
-                    "name": entry.entry.name,
-                    "type": entry.entry.nodeType,
-                    "created": entry.entry.createdAt.isoformat() if entry.entry.createdAt else None,
-                    "modified": entry.entry.modifiedAt.isoformat() if entry.entry.modifiedAt else None
+            "message": "Node info requires get_node API endpoint",
+            "node_id": node_id,
+            "structure": {
+                "id": "string",
+                "name": "string", 
+                "nodeType": "string",
+                "properties": "dict",
+                "content": {
+                    "mimeType": "string",
+                    "sizeInBytes": "number"
                 }
-                for entry in results.list.entries
-            ]
-        })
-    
-    def create_content(self, name: str, node_type: str, properties: dict) -> str:
-        """MCP tool for content creation"""
-        node_data = NodeBodyCreate(
-            name=name,
-            nodeType=node_type,
-            properties=properties
-        )
+            }
+        }, indent=2)
         
-        # Return the validated model data
-        return node_data.model_dump_json()
+    except Exception as e:
+        return f"Error getting node info: {str(e)}"
+
+if __name__ == "__main__":
+    mcp.run()
 ```
 
 ## 🚀 Advanced Usage

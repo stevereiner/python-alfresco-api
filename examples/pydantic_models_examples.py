@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
-from AlfrescoClient import AlfrescoClient
+from python_alfresco_api import ClientFactory
 
 # Import Pydantic for creating example models
 from pydantic import BaseModel, ValidationError, Field

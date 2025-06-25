@@ -22,7 +22,7 @@ import sys
 import base64
 from pathlib import Path
 
-from AlfrescoClient import AlfrescoClient
+from python_alfresco_api import ClientFactory
 
 def create_auth_ticket(client, username='admin', password='admin'):
     """
@@ -143,11 +143,13 @@ def main():
     print(f"   🌐 Host: {host}")
     print(f"   👤 User: {username}")
     
-    client = AlfrescoClient(
-        host=host,
+    factory = ClientFactory(
+        base_url=host,
         username=username,
-        password=password
+        password=password,
+        verify_ssl=False
     )
+    client = factory.create_master_client()
     
     # Fix client configurations
     print("\n🔧 Fixing client configurations...")

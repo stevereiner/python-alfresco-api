@@ -114,6 +114,73 @@ class TestCurrentArchitecture:
         for client_name, client in clients.items():
             # All clients should be available (raw clients exist)
             assert client.is_available(), f"Client {client_name} should be available"
+    
+    def test_master_client_creation(self, client_factory):
+        """Test MasterClient creation and dot syntax access."""
+        # Test MasterClient creation
+        master_client = client_factory.create_master_client()
+        
+        # Test MasterClient type
+        assert master_client is not None, "MasterClient should be created"
+        assert hasattr(master_client, 'auth'), "MasterClient should have auth attribute"
+        assert hasattr(master_client, 'core'), "MasterClient should have core attribute"
+        assert hasattr(master_client, 'discovery'), "MasterClient should have discovery attribute"
+        assert hasattr(master_client, 'search'), "MasterClient should have search attribute"
+        assert hasattr(master_client, 'workflow'), "MasterClient should have workflow attribute"
+        assert hasattr(master_client, 'model'), "MasterClient should have model attribute"
+        assert hasattr(master_client, 'search_sql'), "MasterClient should have search_sql attribute"
+    
+    def test_master_client_dot_syntax(self, client_factory):
+        """Test MasterClient dot syntax access returns correct client types."""
+        master_client = client_factory.create_master_client()
+        
+        # Test that dot syntax returns the correct client types
+        from python_alfresco_api.clients.auth_client import AlfrescoAuthClient
+        from python_alfresco_api.clients.core_client import AlfrescoCoreClient
+        from python_alfresco_api.clients.discovery_client import AlfrescoDiscoveryClient
+        from python_alfresco_api.clients.search_client import AlfrescoSearchClient
+        from python_alfresco_api.clients.workflow_client import AlfrescoWorkflowClient
+        from python_alfresco_api.clients.model_client import AlfrescoModelClient
+        from python_alfresco_api.clients.search_sql_client import AlfrescoSearchSqlClient
+        
+        assert isinstance(master_client.auth, AlfrescoAuthClient), "master_client.auth should be AlfrescoAuthClient"
+        assert isinstance(master_client.core, AlfrescoCoreClient), "master_client.core should be AlfrescoCoreClient"
+        assert isinstance(master_client.discovery, AlfrescoDiscoveryClient), "master_client.discovery should be AlfrescoDiscoveryClient"
+        assert isinstance(master_client.search, AlfrescoSearchClient), "master_client.search should be AlfrescoSearchClient"
+        assert isinstance(master_client.workflow, AlfrescoWorkflowClient), "master_client.workflow should be AlfrescoWorkflowClient"
+        assert isinstance(master_client.model, AlfrescoModelClient), "master_client.model should be AlfrescoModelClient"
+        assert isinstance(master_client.search_sql, AlfrescoSearchSqlClient), "master_client.search_sql should be AlfrescoSearchSqlClient"
+    
+    def test_master_client_vs_individual_clients(self, client_factory):
+        """Test that MasterClient provides same clients as individual creation."""
+        # Create clients both ways
+        master_client = client_factory.create_master_client()
+        individual_auth = client_factory.create_auth_client()
+        individual_core = client_factory.create_core_client()
+        
+        # Test that they're the same type of clients
+        assert type(master_client.auth) == type(individual_auth), "MasterClient.auth should be same type as individual auth client"
+        assert type(master_client.core) == type(individual_core), "MasterClient.core should be same type as individual core client"
+        
+        # Test that they have the same configuration
+        master_auth_info = master_client.auth.get_client_info()
+        individual_auth_info = individual_auth.get_client_info()
+        
+        assert master_auth_info['api'] == individual_auth_info['api'], "Both auth clients should have same API name"
+        assert master_auth_info['base_url'] == individual_auth_info['base_url'], "Both auth clients should have same base URL"
+    
+    def test_master_client_shared_auth(self, client_factory):
+        """Test that MasterClient clients share the same auth utility."""
+        master_client = client_factory.create_master_client()
+        
+        # All clients in master should share the same auth utility
+        auth_util_1 = master_client.auth.auth_util
+        auth_util_2 = master_client.core.auth_util
+        auth_util_3 = master_client.search.auth_util
+        
+        assert auth_util_1 is auth_util_2, "Auth and Core clients should share same auth utility"
+        assert auth_util_2 is auth_util_3, "Core and Search clients should share same auth utility"
+        assert auth_util_1 is client_factory.auth, "Master client auth should be same as factory auth"
 
 class TestLiveServerIntegration:
     """Integration tests against live Alfresco server."""

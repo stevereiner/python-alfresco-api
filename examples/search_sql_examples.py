@@ -20,7 +20,7 @@ Note: This API requires Solr to be properly configured with Alfresco.
 import sys
 import os
 
-from AlfrescoClient import AlfrescoClient
+from python_alfresco_api import ClientFactory
 
 def main():
     """Search SQL API examples."""
@@ -28,7 +28,8 @@ def main():
     print("Note: This API requires Solr configuration")
     
     # Initialize client
-    client = AlfrescoClient(host="http://localhost:8080", username="admin", password="admin")
+    factory = ClientFactory(base_url="http://localhost:8080", username="admin", password="admin")
+    client = factory.create_master_client()
     
     if not client.search_sql:
         print("❌ Search SQL API not available")

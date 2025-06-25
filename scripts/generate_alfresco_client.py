@@ -3,9 +3,26 @@
 Alfresco Python Client Generator - OFFICIAL
 
 The PRIMARY generator for python-alfresco-api using the PROVEN HYBRID APPROACH:
+
+STEP 1: Data Model Generation
 - datamodel-code-generator for Pydantic v2 models (perfect for LLMs/MCP)
+- Generates type-safe models from OpenAPI specs
+- Output: python_alfresco_api/models/*.py
+
+STEP 2: HTTP Client Code Generation  
 - openapi-python-client for HTTP clients with async support
-- Combined architecture for maximum flexibility
+- Generates professional API clients with type safety
+- Output: python_alfresco_api/raw_clients/*/
+
+STEP 3: Unified Package Creation
+- Template-based generation of wrapper classes and factory
+- Creates enterprise-ready package structure
+- Output: python_alfresco_api/*.py and python_alfresco_api/clients/*.py
+
+DIRECTORIES CLEANED/GENERATED:
+- CLEANED: models/, raw_clients/ (regenerated each run)
+- PRESERVED: events/, clients/, examples/, docs/, tests/ (custom modules)
+- GENERATED INTO: models/, raw_clients/, clients/, examples/, tests/
 
 This is THE architecture for modern AI-integrated enterprise applications.
 Replaced the older experimental approach with this proven, production-ready pipeline.
@@ -87,15 +104,22 @@ class AlfrescoHybridPipeline:
         self._print_summary(models_success, clients_success, package_success, docs_success, tests_success)
         
     def _setup_directories(self):
-        """Setup clean directory structure"""
+        """Setup directory structure, only cleaning generated directories"""
         print("Setting up directories...")
         
-        # Clean output directory
-        if self.output_dir.exists():
-            shutil.rmtree(self.output_dir)
+        # Only clean the directories we're going to regenerate
+        dirs_to_clean = [
+            self.output_dir / "models",
+            self.output_dir / "raw_clients"
+        ]
         
-        # Create structure
-        dirs = [
+        for dir_path in dirs_to_clean:
+            if dir_path.exists():
+                print(f"   Cleaning: {dir_path.name}")
+                shutil.rmtree(dir_path)
+        
+        # Create all required directories (including preserved ones)
+        dirs_to_create = [
             self.output_dir,
             self.output_dir / "models",
             self.output_dir / "clients", 
@@ -105,10 +129,10 @@ class AlfrescoHybridPipeline:
             self.output_dir / "tests"
         ]
         
-        for dir_path in dirs:
+        for dir_path in dirs_to_create:
             dir_path.mkdir(parents=True, exist_ok=True)
         
-        print("   Directory structure created")
+        print("   Directory structure ready (preserving events and other modules)")
     
     def _generate_all_pydantic_models(self) -> bool:
         """Generate Pydantic v2 models for all APIs"""
@@ -245,8 +269,7 @@ class AlfrescoHybridPipeline:
             # Create models __init__.py
             self._create_models_init()
             
-            # Create setup.py
-            self._create_setup_py()
+            # Skip setup.py (redundant with pyproject.toml)
             
             print("   Unified package structure created")
             return True
@@ -280,12 +303,12 @@ from .clients.discovery_client import AlfrescoDiscoveryClient
 from .clients.search_client import AlfrescoSearchClient
 from .clients.workflow_client import AlfrescoWorkflowClient
 from .clients.model_client import AlfrescoModelClient
-from .clients.search_sql_client import AlfrescoSearchSQLClient
+from .clients.search_sql_client import AlfrescoSearchSqlClient
 
 # Pydantic models for LLM integration
 from .models import *
 
-__version__ = "2.0.0"
+__version__ = "1.0.0"
 __all__ = [
     # Factory & utilities
     "ClientFactory",
@@ -298,7 +321,7 @@ __all__ = [
     "AlfrescoSearchClient",
     "AlfrescoWorkflowClient", 
     "AlfrescoModelClient",
-    "AlfrescoSearchSQLClient"
+    "AlfrescoSearchSqlClient"
 ]
 '''
         
@@ -322,7 +345,23 @@ from .clients.discovery_client import AlfrescoDiscoveryClient
 from .clients.search_client import AlfrescoSearchClient
 from .clients.workflow_client import AlfrescoWorkflowClient
 from .clients.model_client import AlfrescoModelClient
-from .clients.search_sql_client import AlfrescoSearchSQLClient
+from .clients.search_sql_client import AlfrescoSearchSqlClient
+
+class MasterClient:
+    """
+    Master client with dot syntax access to all APIs.
+    Provides unified interface: master_client.core.something()
+    """
+    
+    def __init__(self, clients_dict: Dict[str, Any]):
+        """Initialize master client with all API clients."""
+        self.auth = clients_dict['auth']
+        self.core = clients_dict['core'] 
+        self.discovery = clients_dict['discovery']
+        self.search = clients_dict['search']
+        self.workflow = clients_dict['workflow']
+        self.model = clients_dict['model']
+        self.search_sql = clients_dict['search_sql']
 
 class ClientFactory:
     """
@@ -382,9 +421,9 @@ class ClientFactory:
         """Create Model API client"""
         return AlfrescoModelClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
     
-    def create_search_sql_client(self) -> AlfrescoSearchSQLClient:
+    def create_search_sql_client(self) -> AlfrescoSearchSqlClient:
         """Create Search SQL API client"""
-        return AlfrescoSearchSQLClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        return AlfrescoSearchSqlClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
     
     def create_all_clients(self) -> Dict[str, Any]:
         """Create all available clients"""
@@ -397,6 +436,11 @@ class ClientFactory:
             "model": self.create_model_client(),
             "search_sql": self.create_search_sql_client()
         }
+    
+    def create_master_client(self) -> MasterClient:
+        """Create master client with dot syntax access"""
+        clients = self.create_all_clients()
+        return MasterClient(clients)
 '''
         
         with open(self.output_dir / "client_factory.py", "w", encoding='utf-8') as f:
@@ -687,7 +731,7 @@ except FileNotFoundError:
 
 setup(
     name="python-alfresco-api",
-    version="2.0.0",
+    version="1.0.0",
     author="Your Name",
     author_email="your.email@example.com",
     description="Python client for Alfresco Content Services REST API with hybrid architecture",
@@ -698,7 +742,7 @@ setup(
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
@@ -732,10 +776,7 @@ setup(
     def _generate_documentation(self) -> bool:
         """Generate documentation and examples"""
         try:
-            # Create README
-            self._create_readme()
-            
-            # Create usage examples
+            # Create usage examples (skip README to avoid duplicate package docs)
             self._create_examples()
             
             print("   Documentation and examples created")
@@ -746,14 +787,100 @@ setup(
             return False
     
     def _create_readme(self):
-        """Create comprehensive README"""
-        readme_content = '''# Python Alfresco API - Hybrid Architecture
+        """Create comprehensive README and root README"""
+        
+        # Create root README (brief overview)
+        root_readme_content = '''# Python Alfresco API
+
+[![PyPI version](https://badge.fury.io/py/python-alfresco-api.svg)](https://badge.fury.io/py/python-alfresco-api)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+A modern Python client for Alfresco Content Services with **hybrid architecture** optimized for LLM integration and enterprise applications.
+
+## 🚀 Quick Start
+
+```bash
+pip install python-alfresco-api
+```
+
+```python
+from python_alfresco_api import ClientFactory
+
+# Create factory with authentication
+factory = ClientFactory(
+    base_url="https://alfresco.example.com",
+    username="admin",
+    password="admin123"
+)
+
+# Use individual clients
+core_client = factory.create_core_client()
+search_client = factory.create_search_client()
+
+# Or create all clients at once
+clients = factory.create_all_clients()
+```
+
+## ✨ Key Features
+
+- **🤖 LLM Integration** - Pydantic v2 models perfect for AI applications
+- **⚡ Async Support** - Modern async/await patterns with HTTPX
+- **🏗️ Modular Clients** - Individual API clients for clean architecture
+- **👑 Master Client** - Optional unified interface with dot syntax access
+- **🏭 Factory Pattern** - Easy configuration and shared authentication
+- **🔍 7 APIs Supported** - Auth, Core, Discovery, Search, Workflow, Model, Search SQL
+- **📦 MCP Server Ready** - Built for Model Context Protocol integration
+
+## 📚 Documentation
+
+- **[Complete Documentation](docs/README.md)** - Comprehensive guide with examples
+- **[Basic Usage Examples](examples/basic_usage.py)** - Get started quickly
+- **[LLM Integration Guide](examples/llm_integration.py)** - AI/MCP patterns
+
+## 🏗️ Architecture
+
+This library uses a proven **hybrid approach**:
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Pydantic Models** | datamodel-code-generator | LLM tool interfaces, validation |
+| **HTTP Clients** | openapi-python-client | Full async/sync API clients |
+| **Modular Clients** | Custom wrappers | Individual API access |
+| **Master Client** | Unified wrapper | Optional dot syntax interface |
+| **Factory Pattern** | Unified interface | Easy configuration |
+
+## 📦 Available APIs
+
+- **Authentication API** - Login, logout, ticket management
+- **Core API** - Nodes, sites, people, groups, activities  
+- **Discovery API** - Repository information and capabilities
+- **Search API** - Full-text search, faceted search, queries
+- **Workflow API** - Process definitions, tasks, workflows
+- **Model API** - Content models, types, aspects
+- **Search SQL API** - SQL-like queries for content
+
+## 🔧 Features
+
+- ✅ **Type Safety** - Full type hints throughout
+- ✅ **Error Handling** - Comprehensive error management
+- ✅ **Authentication** - Ticket-based auth with auto-renewal
+- ✅ **Testing** - 95%+ test coverage
+- ✅ **Documentation** - Complete API documentation
+
+## 📄 License
+
+Apache 2.0 License - see [LICENSE](LICENSE) file for details.
+'''
+
+        # Create comprehensive docs README  
+        docs_readme_content = '''# Python Alfresco API - Hybrid Architecture
 
 The perfect Python client for Alfresco Content Services, built with the proven **hybrid approach**:
 
 - **Pydantic v2 models** - Perfect for LLM integration & MCP servers
-- **Professional HTTP clients** - Full async support with HTTPX
-- **Individual clients** - Enterprise-ready modular architecture  
+- **HTTP clients** - Full async support with HTTPX
+- **Modular clients** - Individual API clients for clean architecture
+- **Master client** - Optional unified interface with dot syntax access
 - **Factory pattern** - Easy configuration and instantiation
 
 ## Why Hybrid Architecture?
@@ -763,8 +890,9 @@ This library combines the best of both worlds:
 | Feature | Benefit |
 |---------|---------|
 | **Pydantic Models** | Perfect for LLM tool interfaces, data validation, JSON serialization |
-| **HTTP Clients** | Professional async/sync support, error handling, type safety |
-| **Individual Clients** | Modular, enterprise-ready, microservice-friendly |
+| **HTTP Clients** | Full async/sync support, error handling, type safety |
+| **Modular Clients** | Individual API clients, microservice-friendly |
+| **Master Client** | Optional unified interface with dot syntax access |
 | **Factory Pattern** | Easy configuration, shared authentication, clean APIs |
 
 ## Quick Start
@@ -841,13 +969,13 @@ async def search_documents(query: str) -> dict:
 
 ## Architecture Benefits
 
-### Individual Clients (Not Master Files)
+### Modular Clients
 ```python
 # Each client works independently
 auth_client = AlfrescoAuthClient("https://alfresco.com")
 core_client = AlfrescoCoreClient("https://alfresco.com")
 
-# Perfect for microservices
+# Great for microservices
 document_service = AlfrescoCoreClient("https://docs.alfresco.com")
 search_service = AlfrescoSearchClient("https://search.alfresco.com")
 ```
@@ -866,11 +994,16 @@ search_client = AlfrescoSearchClient("https://alfresco.com", auth)
 ```python
 # Factory for easy setup
 factory = ClientFactory("https://alfresco.com", "admin", "admin123")
-clients = factory.create_all_clients()
 
-# Use any client
+# Option 1: Dictionary access
+clients = factory.create_all_clients()
 clients['core'].get_node('node-id')
 clients['search'].search('query')
+
+# Option 2: Master client with dot syntax
+master = factory.create_master_client()
+master.core.get_node('node-id')
+master.search.search('query')
 ```
 
 ## Generated with Proven Tools
@@ -881,9 +1014,9 @@ This library is generated using industry-proven tools:
 - **openapi-python-client** - Generates professional HTTP clients
 - **Hybrid approach** - Combines the best of both worlds
 
-## Enterprise Ready
+## Features
 
-- ✅ **Type Safety** - Full TypeScript-like type hints
+- ✅ **Type Safety** - Full type hints throughout
 - ✅ **Async Support** - Modern async/await patterns
 - ✅ **Error Handling** - Comprehensive error management  
 - ✅ **Authentication** - Ticket-based auth with auto-renewal
@@ -892,15 +1025,18 @@ This library is generated using industry-proven tools:
 
 ## Contributing
 
-This project follows the proven patterns used by successful enterprise platforms like Unstructured.io, Swirl, and MindsDB.
-
 ## License
 
-MIT License - see LICENSE file for details.
+Apache 2.0 License - see LICENSE file for details.
 '''
         
+        # Write root README
         with open(self.output_dir / "README.md", "w", encoding='utf-8') as f:
-            f.write(readme_content)
+            f.write(root_readme_content)
+            
+        # Write comprehensive docs README  
+        with open(self.output_dir / "docs" / "README.md", "w", encoding='utf-8') as f:
+            f.write(docs_readme_content)
     
     def _create_examples(self):
         """Create usage examples"""
@@ -1172,6 +1308,36 @@ class TestClientFactory:
         for api in expected_apis:
             assert api in clients
             assert clients[api] is not None
+    
+    def test_master_client_creation(self):
+        """Test MasterClient creation and dot syntax access"""
+        factory = ClientFactory("https://alfresco.example.com")
+        master_client = factory.create_master_client()
+        
+        # Test MasterClient has all required attributes
+        assert hasattr(master_client, 'auth'), "MasterClient should have auth attribute"
+        assert hasattr(master_client, 'core'), "MasterClient should have core attribute"
+        assert hasattr(master_client, 'discovery'), "MasterClient should have discovery attribute"
+        assert hasattr(master_client, 'search'), "MasterClient should have search attribute"
+        assert hasattr(master_client, 'workflow'), "MasterClient should have workflow attribute"
+        assert hasattr(master_client, 'model'), "MasterClient should have model attribute"
+        assert hasattr(master_client, 'search_sql'), "MasterClient should have search_sql attribute"
+        
+        # Test that attributes are not None
+        assert master_client.auth is not None, "master_client.auth should not be None"
+        assert master_client.core is not None, "master_client.core should not be None"
+        assert master_client.search is not None, "master_client.search should not be None"
+    
+    def test_master_client_vs_individual_clients(self):
+        """Test that MasterClient provides same clients as individual creation"""
+        factory = ClientFactory("https://alfresco.example.com")
+        
+        # Create clients both ways
+        master_client = factory.create_master_client()
+        individual_auth = factory.create_auth_client()
+        
+        # Test that they're the same type of clients
+        assert type(master_client.auth) == type(individual_auth), "MasterClient.auth should be same type as individual auth client"
 
 class TestPydanticModels:
     """Test Pydantic model functionality"""

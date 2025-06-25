@@ -9,14 +9,15 @@ The Workflow API provides access to process definitions, process instances, and 
 import sys
 import os
 
-from AlfrescoClient import AlfrescoClient
+from python_alfresco_api import ClientFactory
 
 def main():
     """Workflow API examples."""
     print("⚙️ Workflow API Examples")
     
     # Initialize client
-    client = AlfrescoClient(host="http://localhost:8080", username="admin", password="admin")
+    factory = ClientFactory(base_url="http://localhost:8080", username="admin", password="admin")
+    client = factory.create_master_client()
     
     if not client.workflow:
         print("❌ Workflow API not available")

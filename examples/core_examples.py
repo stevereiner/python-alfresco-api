@@ -23,7 +23,7 @@ which demonstrates all APIs including the improved Core API functionality.
 import sys
 import os
 
-from AlfrescoClient import AlfrescoClient
+from python_alfresco_api import ClientFactory
 
 def print_section(title):
     """Print a formatted section header."""
@@ -43,14 +43,15 @@ def main():
     """Core API examples."""
     print_section("Alfresco Core API Examples")
     
-    # Initialize client
+    # Initialize client factory and create master client
     print("🚀 Initializing Alfresco Client...")
-    client = AlfrescoClient(
-        host="http://localhost:8080", 
+    factory = ClientFactory(
+        base_url="http://localhost:8080", 
         username="admin", 
         password="admin",
         verify_ssl=False
     )
+    client = factory.create_master_client()
     
     if not client.core:
         print("❌ Core API not available")
@@ -227,11 +228,12 @@ def demonstrate_real_usage():
     print_section("Real-World Usage Example")
     
     # This shows how you would typically use the Core API
-    client = AlfrescoClient(
-        host="http://localhost:8080", 
+    factory = ClientFactory(
+        base_url="http://localhost:8080", 
         username="admin", 
         password="admin"
     )
+    client = factory.create_master_client()
     
     if not client.core:
         print("❌ Core API not available")

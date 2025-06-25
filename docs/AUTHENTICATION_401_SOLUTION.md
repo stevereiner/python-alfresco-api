@@ -9,22 +9,23 @@ This guide provides comprehensive solutions for resolving HTTP 401 (Unauthorized
 ```python
 from python_alfresco_api import ClientFactory
 
-# Use the modern ClientFactory pattern
+# Create factory with your Alfresco server details
 factory = ClientFactory(
-    base_url="http://localhost:8080",  # Note: /alfresco/api suffix
+    base_url="http://localhost:8080",  # Server URL only (factory adds /alfresco/api)
     username="admin",
     password="admin",
     verify_ssl=False  # For local development
 )
 
-clients = factory.create_all_clients()
+# Get all clients
+all_clients = factory.create_all_clients()
 
 # Test authentication
 try:
-    repo_info = clients['discovery'].get_repository_info()
-    print(f"✅ Success! Connected to {repo_info.entry.repository.name}")
+    repo_info = all_clients['discovery'].get_repository_info()
+    print(f"✅ Authentication Success! Connected to {repo_info.entry.repository.name}")
 except Exception as e:
-    print(f"❌ Still failing: {e}")
+    print(f"❌ Authentication Failed: {e}")
 ```
 
 ## 🔍 Diagnosis Steps
@@ -32,19 +33,19 @@ except Exception as e:
 ### Step 1: Verify Base URL Format
 
 ```python
-# ✅ CORRECT formats
+# ✅ CORRECT formats (server URLs - factory adds /alfresco/api internally)
 base_urls = [
-    "http://localhost:8080",                       # Standard local (server URL)
-    "https://your-domain.com/alfresco/api",         # HTTPS production
-    "http://alfresco.company.com:8080/alfresco/api" # Custom domain
+    "http://localhost:8080",                    # Standard local development
+    "https://your-domain.com",                  # HTTPS production
+    "http://alfresco.company.com:8080"          # Custom domain with port
 ]
 
-# ❌ INCORRECT formats (will cause 401)
+# ❌ INCORRECT formats (will cause issues)
 bad_urls = [
-    "http://localhost:8080",                    # Missing /alfresco/api
-    "http://localhost:8080/alfresco",          # Missing /api
-    "http://localhost:8080/alfresco/api/",     # Trailing slash
-    "http://localhost:8080/api",               # Missing /alfresco
+    "http://localhost:8080/alfresco/api",       # Don't include /alfresco/api (factory adds it)
+    "http://localhost:8080/alfresco",           # Don't include /alfresco
+    "http://localhost:8080/",                   # Trailing slash can cause issues
+    "http://localhost:8080/api",                # Don't include /api
 ]
 ```
 
@@ -68,10 +69,10 @@ def test_authentication(base_url, username, password):
             verify_ssl=False
         )
         
-        clients = factory.create_all_clients()
+        all_clients = factory.create_all_clients()
         
         # Test with discovery API (lightest test)
-        repo_info = clients['discovery'].get_repository_info()
+        repo_info = all_clients['discovery'].get_repository_info()
         
         print(f"✅ SUCCESS!")
         print(f"   Server: {repo_info.entry.repository.name}")
@@ -98,21 +99,21 @@ for base_url, username, password in test_configs:
 
 ### 1. Wrong Base URL
 
-**Problem**: Using incorrect URL format
+**Problem**: Using incorrect URL format (including API path in base_url)
 ```python
-# ❌ This will cause 401
+# ❌ This will cause 401 (double /alfresco/api)
 factory = ClientFactory(
-    base_url="http://localhost:8080",  # Missing /alfresco/api
+    base_url="http://localhost:8080/alfresco/api",  # DON'T include /alfresco/api
     username="admin",
     password="admin"
 )
 ```
 
-**Solution**: Use correct URL format
+**Solution**: Use server URL only (factory adds API path automatically)
 ```python
-# ✅ Correct format
+# ✅ Correct format - just the server URL
 factory = ClientFactory(
-    base_url="http://localhost:8080",  # Include /alfresco/api
+    base_url="http://localhost:8080",  # Server URL only, factory adds /alfresco/api
     username="admin",
     password="admin"
 )
@@ -249,30 +250,22 @@ def debug_authentication():
         print("✅ Factory created successfully")
         
         # Get clients
-        clients = factory.create_all_clients()
+        all_clients = factory.create_all_clients()
         print("✅ Clients created successfully")
         
-        # Test each client
-        print("\n🧪 Testing individual clients:")
+        # Test authentication
+        print("\n🧪 Testing authentication:")
         
-        # Discovery (no auth required)
+        # Discovery (minimal auth test)
         try:
-            repo_info = clients['discovery'].get_repository_info()
+            repo_info = all_clients['discovery'].get_repository_info()
             print(f"✅ Discovery: {repo_info.entry.repository.name}")
         except Exception as e:
             print(f"❌ Discovery failed: {e}")
         
-        # Auth (requires credentials)
+        # Core (full auth test)
         try:
-            # This might not work depending on implementation
-            current_user = clients['auth'].get_current_user()
-            print(f"✅ Auth: {current_user.entry.id}")
-        except Exception as e:
-            print(f"❌ Auth failed: {e}")
-        
-        # Core (requires auth)
-        try:
-            nodes = clients['core'].get_nodes()
+            nodes = all_clients['core'].get_nodes()
             print(f"✅ Core: Found {len(nodes.list.entries)} nodes")
         except Exception as e:
             print(f"❌ Core failed: {e}")
@@ -367,10 +360,10 @@ def comprehensive_connection_test():
                 verify_ssl=config['verify_ssl']
             )
             
-            clients = factory.create_all_clients()
+            all_clients = factory.create_all_clients()
             
             # Test discovery
-            repo_info = clients['discovery'].get_repository_info()
+            repo_info = all_clients['discovery'].get_repository_info()
             
             result = {
                 "config": config['name'],
@@ -530,21 +523,22 @@ def final_verification():
             verify_ssl=False
         )
         
-        clients = factory.create_all_clients()
+        # Get clients
+        all_clients = factory.create_all_clients()
         
-        # Test key operations
-        print("🔍 Testing key operations...")
+        # Test authentication
+        print("🔍 Testing authentication...")
         
-        # 1. Discovery
-        repo_info = clients['discovery'].get_repository_info()
+        # 1. Discovery (basic connectivity)
+        repo_info = all_clients['discovery'].get_repository_info()
         print(f"✅ Discovery: {repo_info.entry.repository.name}")
         
-        # 2. Core
-        nodes = clients['core'].get_nodes()
+        # 2. Core (authenticated operations)
+        nodes = all_clients['core'].get_nodes()
         print(f"✅ Core: {len(nodes.list.entries)} root nodes")
         
-        # 3. Search
-        search_results = clients['search'].search({
+        # 3. Search (authenticated search)
+        search_results = all_clients['search'].search({
             "query": {"query": "*", "language": "afts"},
             "paging": {"maxItems": 1}
         })

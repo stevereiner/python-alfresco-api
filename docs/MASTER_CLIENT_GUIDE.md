@@ -2,11 +2,11 @@
 
 ## Overview
 
-The Master Client provides a unified interface to all 7 Alfresco APIs through a single client instance. This guide covers both the modern ClientFactory pattern (recommended) and the legacy Master Client pattern.
+The Python Alfresco API v1.0 provides two clean patterns for accessing all 7 Alfresco APIs. This guide covers both patterns and helps you choose the right approach for your needs.
 
 ## Quick Start
 
-### Modern ClientFactory Pattern (Recommended)
+### Option 1: Individual Clients Pattern
 
 ```python
 from python_alfresco_api import ClientFactory
@@ -18,31 +18,39 @@ factory = ClientFactory(
     password="admin"
 )
 
-# Get all clients at once
-clients = factory.create_all_clients()
+# Create individual clients as needed
+auth_client = factory.create_auth_client()
+core_client = factory.create_core_client()
+search_client = factory.create_search_client()
+discovery_client = factory.create_discovery_client()
+workflow_client = factory.create_workflow_client()
 
 # Use individual APIs
-repo_info = clients['discovery'].get_repository_info()
-search_results = clients['search'].search({"query": {"query": "*", "language": "afts"}})
-nodes = clients['core'].get_nodes()
+repo_info = discovery_client.get_repository_info()
+search_results = search_client.search({"query": {"query": "*", "language": "afts"}})
+nodes = core_client.get_nodes()
 ```
 
-### Legacy Master Client Pattern
+### Option 2: Master Client Pattern (Simplified Access)
 
 ```python
-from python_alfresco_api import AlfrescoMasterClient
+from python_alfresco_api import ClientFactory
 
-# Single unified client
-master = AlfrescoMasterClient(
+# Create factory
+factory = ClientFactory(
     base_url="http://localhost:8080",
     username="admin",
     password="admin"
 )
 
-# Access APIs through properties
-repo_info = master.discovery.get_repository_info()
-search_results = master.search.search({"query": {"query": "*", "language": "afts"}})
-nodes = master.core.get_nodes()
+# Create master client with dot syntax access
+master_client = factory.create_master_client()
+
+# Use intuitive dot syntax for all APIs
+repo_info = master_client.discovery.get_repository_info()
+nodes = master_client.core.get_nodes()
+search_results = master_client.search.search({"query": {"query": "*", "language": "afts"}})
+processes = master_client.workflow.get_process_definitions()
 ```
 
 ## Complete API Reference
@@ -50,27 +58,29 @@ nodes = master.core.get_nodes()
 ### 1. Authentication API
 
 ```python
-# ClientFactory pattern
+# Option 1: Individual client
 auth_client = factory.create_auth_client()
 ticket = auth_client.create_ticket({"userId": "admin", "password": "admin"})
 
-# Master client pattern
-ticket = master.auth.create_ticket({"userId": "admin", "password": "admin"})
+# Option 2: Master client with dot syntax
+master_client = factory.create_master_client()
+ticket = master_client.auth.create_ticket({"userId": "admin", "password": "admin"})
 ```
 
 ### 2. Core API - Content Management
 
 ```python
-# ClientFactory pattern
+# Option 1: Individual client
 core_client = factory.create_core_client()
 nodes = core_client.get_nodes()
 sites = core_client.get_sites()
 people = core_client.get_people()
 
-# Master client pattern
-nodes = master.core.get_nodes()
-sites = master.core.get_sites()
-people = master.core.get_people()
+# Option 2: Master client with dot syntax
+master_client = factory.create_master_client()
+nodes = master_client.core.get_nodes()
+sites = master_client.core.get_sites()
+people = master_client.core.get_people()
 ```
 
 **Available Core Operations**:
@@ -88,10 +98,13 @@ people = master.core.get_people()
 ### 3. Discovery API
 
 ```python
-# Get repository information
-repo_info = clients['discovery'].get_repository_info()
-# or
-repo_info = master.discovery.get_repository_info()
+# Option 1: Individual client
+discovery_client = factory.create_discovery_client()
+repo_info = discovery_client.get_repository_info()
+
+# Option 2: Master client with dot syntax
+master_client = factory.create_master_client()
+repo_info = master_client.discovery.get_repository_info()
 
 print(f"Alfresco version: {repo_info.entry.repository.version.major}.{repo_info.entry.repository.version.minor}")
 ```
@@ -113,37 +126,43 @@ search_request = SearchRequest(
     }
 )
 
-# Execute search
-results = clients['search'].search(search_request)
-# or
-results = master.search.search(search_request)
+# Option 1: Individual client
+search_client = factory.create_search_client()
+results = search_client.search(search_request)
+
+# Option 2: Master client with dot syntax
+master_client = factory.create_master_client()
+results = master_client.search.search(search_request)
 ```
 
 ### 5. Workflow API
 
 ```python
-# Get process definitions
-processes = clients['workflow'].get_process_definitions()
-# or
-processes = master.workflow.get_process_definitions()
+# Option 1: Individual client
+workflow_client = factory.create_workflow_client()
+processes = workflow_client.get_process_definitions()
+tasks = workflow_client.get_tasks()
 
-# Get tasks
-tasks = clients['workflow'].get_tasks()
-# or
-tasks = master.workflow.get_tasks()
+# Option 2: Master client with dot syntax
+master_client = factory.create_master_client()
+processes = master_client.workflow.get_process_definitions()
+tasks = master_client.workflow.get_tasks()
 ```
 
 ### 6. Model API
 
 ```python
-# Get content models
-models = clients['model'].get_models()
-# or
-models = master.model.get_models()
+# Option 1: Individual client
+model_client = factory.create_model_client()
+models = model_client.get_models()
+types = model_client.get_types()
+aspects = model_client.get_aspects()
 
-# Get types and aspects
-types = clients['model'].get_types()
-aspects = clients['model'].get_aspects()
+# Option 2: Master client with dot syntax
+master_client = factory.create_master_client()
+models = master_client.model.get_models()
+types = master_client.model.get_types()
+aspects = master_client.model.get_aspects()
 ```
 
 ### 7. Search SQL API
@@ -158,9 +177,13 @@ sql_request = SQLSearchRequest(
     timezone="GMT"
 )
 
-results = clients['search_sql'].search(sql_request)
-# or
-results = master.search_sql.search(sql_request)
+# Option 1: Individual client
+search_sql_client = factory.create_search_sql_client()
+results = search_sql_client.search(sql_request)
+
+# Option 2: Master client with dot syntax
+master_client = factory.create_master_client()
+results = master_client.search_sql.search(sql_request)
 ```
 
 ## Error Handling
@@ -169,7 +192,6 @@ results = master.search_sql.search(sql_request)
 
 ```python
 from python_alfresco_api import ClientFactory
-from python_alfresco_api.exceptions import AlfrescoAPIException
 
 try:
     factory = ClientFactory(
@@ -178,17 +200,17 @@ try:
         password="admin"
     )
     
-    clients = factory.create_all_clients()
+    # Option 1: Test with individual clients
+    all_clients = factory.create_all_clients()
     
     # Test each API
     apis_to_test = {
-        'auth': lambda: clients['auth'].get_current_user(),
-        'discovery': lambda: clients['discovery'].get_repository_info(),
-        'search': lambda: clients['search'].search({"query": {"query": "*", "language": "afts"}}),
-        'core': lambda: clients['core'].get_nodes(),
-        'workflow': lambda: clients['workflow'].get_process_definitions(),
-        'model': lambda: clients['model'].get_models(),
-        'search_sql': lambda: clients['search_sql'].search({"stmt": "SELECT * FROM alfresco LIMIT 1"})
+        'discovery': lambda: all_clients['discovery'].get_repository_info(),
+        'search': lambda: all_clients['search'].search({"query": {"query": "*", "language": "afts"}}),
+        'core': lambda: all_clients['core'].get_nodes(),
+        'workflow': lambda: all_clients['workflow'].get_process_definitions(),
+        'model': lambda: all_clients['model'].get_models(),
+        'search_sql': lambda: all_clients['search_sql'].search({"stmt": "SELECT * FROM alfresco LIMIT 1"})
     }
     
     results = {}
@@ -242,7 +264,12 @@ search_request = SearchRequest(
 )
 
 # Execute with type safety
-results = clients['search'].search(search_request)
+search_client = factory.create_search_client()
+results = search_client.search(search_request)
+
+# Or with master client
+master_client = factory.create_master_client()
+results = master_client.search.search(search_request)
 ```
 
 ## Advanced Usage Patterns
@@ -259,25 +286,25 @@ def content_management_workflow():
         password="admin"
     )
     
-    clients = factory.create_all_clients()
+    master_client = factory.create_master_client()
     
     # 1. Get repository info
-    repo_info = clients['discovery'].get_repository_info()
+    repo_info = master_client.discovery.get_repository_info()
     print(f"Connected to Alfresco {repo_info.entry.repository.version.major}.{repo_info.entry.repository.version.minor}")
     
     # 2. List root nodes
-    nodes = clients['core'].get_nodes()
+    nodes = master_client.core.get_nodes()
     print(f"Found {len(nodes.list.entries)} root nodes")
     
     # 3. Search for content
-    search_results = clients['search'].search({
+    search_results = master_client.search.search({
         "query": {"query": "TYPE:'cm:content'", "language": "afts"},
         "paging": {"maxItems": 5}
     })
     print(f"Found {search_results.list.pagination.totalItems} content items")
     
     # 4. Get workflow processes
-    processes = clients['workflow'].get_process_definitions()
+    processes = master_client.workflow.get_process_definitions()
     print(f"Available processes: {len(processes.data)}")
     
     return {
@@ -303,7 +330,7 @@ def batch_content_operations():
         password="admin"
     )
     
-    clients = factory.create_all_clients()
+    all_clients = factory.create_all_clients()
     
     # Batch search across different content types
     content_types = ["cm:content", "cm:folder", "st:site"]
@@ -311,7 +338,7 @@ def batch_content_operations():
     
     for content_type in content_types:
         try:
-            results = clients['search'].search({
+            results = all_clients['search'].search({
                 "query": {"query": f"TYPE:'{content_type}'", "language": "afts"},
                 "paging": {"maxItems": 10}
             })
@@ -351,7 +378,9 @@ def safe_api_call(api_function, *args, **kwargs):
         return {"success": False, "error": str(e)}
 
 # Usage
-result = safe_api_call(clients['core'].get_nodes)
+factory = ClientFactory(base_url="http://localhost:8080", username="admin", password="admin")
+all_clients = factory.create_all_clients()
+result = safe_api_call(all_clients['core'].get_nodes)
 if result["success"]:
     nodes = result["data"]
 else:
@@ -382,20 +411,6 @@ clients = factory.create_all_clients()
 ## Migration Guide
 
 ### From Old Enhanced Generated to New Architecture
-
-**Old Code (deprecated)**:
-```python
-
-client = AlfrescoClient(
-    host="http://localhost:8080",
-    username="admin",
-    password="admin"
-)
-
-# Old bracket notation
-if isinstance(client.core, dict) and 'actions' in client.core:
-    actions = client.core['actions'].list_actions()
-```
 
 **New Code (python_alfresco_api)**:
 ```python
