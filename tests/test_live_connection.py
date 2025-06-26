@@ -5,7 +5,7 @@ Simple Live Connection Test
 Test the hybrid python-alfresco-api with running Alfresco instance.
 """
 
-from python_alfresco_api import ClientFactory, AlfrescoMasterClient
+from python_alfresco_api import ClientFactory
 from python_alfresco_api.models import TicketBody
 
 def test_basic_connection():
@@ -41,11 +41,13 @@ def test_basic_connection():
     
     # Test master client
     print("\n2. Testing Master Client...")
-    master = AlfrescoMasterClient(base_url="http://localhost:8080")
-    master_info = master.get_client_info()
-    print(f"Master client info: {master_info}")
-    assert master_info is not None, "Master client info should not be None"
-    assert isinstance(master_info, dict), "Master client info should be a dict"
+    master = factory.create_master_client()
+    # Test that master client has expected API clients
+    assert hasattr(master, 'auth'), "Master client should have auth API"
+    assert hasattr(master, 'core'), "Master client should have core API"
+    assert hasattr(master, 'discovery'), "Master client should have discovery API"
+    print(f"Master client APIs: auth={hasattr(master, 'auth')}, core={hasattr(master, 'core')}, discovery={hasattr(master, 'discovery')}")
+    print("✅ Master client created with dot syntax access")
 
 def test_pydantic_models():
     """Test Pydantic model functionality"""

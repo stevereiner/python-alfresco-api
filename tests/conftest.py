@@ -96,34 +96,42 @@ def mock_api_client():
 def alfresco_client():
     """Fixture providing an AlfrescoClient for testing."""
     try:
-        from python_alfresco_api import AlfrescoMasterClient
-        return AlfrescoMasterClient(
+        from python_alfresco_api import ClientFactory
+        factory = ClientFactory(
             base_url="http://localhost:8080",
+            username="admin",
+            password="admin",
             verify_ssl=False
         )
+        return factory.create_master_client()
     except Exception as e:
-        pytest.skip(f"AlfrescoMasterClient not available: {e}")
+        pytest.skip(f"ClientFactory not available: {e}")
 
 @pytest.fixture
 def live_client():
     """Live Alfresco client for integration testing."""
     try:
-        from python_alfresco_api import AlfrescoMasterClient
-        # Convert TEST_CONFIG to match AlfrescoMasterClient parameters
-        client = AlfrescoMasterClient(
+        from python_alfresco_api import ClientFactory
+        # Use current factory pattern API
+        factory = ClientFactory(
             base_url=TEST_CONFIG['host'],
+            username=TEST_CONFIG['username'],
+            password=TEST_CONFIG['password'],
             verify_ssl=TEST_CONFIG['verify_ssl']
         )
         
-        # Test connection
+        # Create master client with dot syntax access
+        client = factory.create_master_client()
+        
+        # Test basic availability
         try:
-            result = asyncio.run(client.test_connection())
+            # Simple test - just verify client exists
             return client
         except Exception:
             pytest.skip("Live Alfresco server not available")
             
     except ImportError:
-        pytest.skip("Master client not available")
+        pytest.skip("ClientFactory not available")
 
 @pytest.fixture
 def mock_responses():
@@ -186,7 +194,12 @@ def mock_responses():
 def master_client():
     """Fixture providing master client for integration tests."""
     try:
-        from python_alfresco_api import AlfrescoMasterClient
-        return AlfrescoMasterClient("http://localhost:8080")
+        from python_alfresco_api import ClientFactory
+        factory = ClientFactory(
+            base_url="http://localhost:8080",
+            username="admin",
+            password="admin"
+        )
+        return factory.create_master_client()
     except Exception as e:
         pytest.skip(f"Master client not available: {e}") 

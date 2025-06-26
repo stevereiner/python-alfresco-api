@@ -15,7 +15,7 @@ import pytest
 # Add the python_alfresco_api to the path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from python_alfresco_api import AlfrescoMasterClient, ClientFactory
+from python_alfresco_api import ClientFactory
 
 def test_client_imports():
     """Test that all API clients can be imported correctly."""
@@ -30,7 +30,7 @@ def test_client_imports():
     from python_alfresco_api.clients.search_sql_client import AlfrescoSearchSqlClient
     
     # Test master client import
-    assert AlfrescoMasterClient is not None
+    assert ClientFactory is not None
     assert ClientFactory is not None
     
     print("✅ All client imports successful")
@@ -82,7 +82,8 @@ def test_search_sql_client_creation():
 def test_master_client_creation():
     """Test master client can be created and has all APIs."""
     try:
-        master_client = AlfrescoMasterClient("http://localhost:8080")
+        factory = ClientFactory("http://localhost:8080", "admin", "admin")
+        master_client = factory.create_master_client()
         
         # Test all clients exist
         assert hasattr(master_client, 'auth')

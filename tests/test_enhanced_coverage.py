@@ -17,7 +17,7 @@ class TestMasterClient:
     
     @pytest.fixture
     def alfresco_config(self):
-        """Alfresco configuration for testing."""
+        """Configuration for testing."""
         return {
             'base_url': 'http://localhost:8080',
             'username': 'admin',
@@ -26,22 +26,20 @@ class TestMasterClient:
     
     def test_master_client_creation(self, alfresco_config):
         """Test MasterClient creation and initialization."""
-        from python_alfresco_api.master_client import AlfrescoMasterClient
-        from python_alfresco_api.auth_util import AuthUtil
+        from python_alfresco_api import ClientFactory
         
-        auth_util = AuthUtil(
+        factory = ClientFactory(
             base_url=alfresco_config['base_url'],
             username=alfresco_config['username'],
             password=alfresco_config['password']
         )
         
-        master_client = AlfrescoMasterClient(
-            base_url=alfresco_config['base_url'],
-            auth_util=auth_util
-        )
+        master_client = factory.create_master_client()
         
-        assert master_client.base_url == alfresco_config['base_url']
-        assert master_client.auth_util == auth_util
+        # Test that master client has expected APIs
+        assert hasattr(master_client, 'auth')
+        assert hasattr(master_client, 'core')
+        assert hasattr(master_client, 'discovery')
     
     def test_master_client_info(self, alfresco_config):
         """Test MasterClient info methods."""
@@ -61,11 +59,15 @@ class TestMasterClient:
     
     def test_master_client_api_access(self, alfresco_config):
         """Test MasterClient API access methods."""
-        from python_alfresco_api.master_client import AlfrescoMasterClient
+        from python_alfresco_api import ClientFactory
         
-        master_client = AlfrescoMasterClient(
-            base_url=alfresco_config['base_url']
+        factory = ClientFactory(
+            base_url=alfresco_config['base_url'],
+            username=alfresco_config['username'],
+            password=alfresco_config['password']
         )
+        
+        master_client = factory.create_master_client()
         
         # Test that it has access to all APIs
         assert hasattr(master_client, 'auth')
@@ -199,7 +201,6 @@ class TestPackageIntegration:
         # Test main exports
         assert hasattr(python_alfresco_api, 'ClientFactory')
         assert hasattr(python_alfresco_api, 'AuthUtil')
-        assert hasattr(python_alfresco_api, 'AlfrescoMasterClient')
         
         # Test individual clients
         assert hasattr(python_alfresco_api, 'AlfrescoAuthClient')

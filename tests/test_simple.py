@@ -1,120 +1,104 @@
 #!/usr/bin/env python3
 """
-Simple Test Suite
-
-Quick tests to verify the basic functionality works.
+Simple tests for python-alfresco-api package.
 """
 
-import sys
-import os
-from pathlib import Path
-
-# Add python_alfresco_api to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
-from python_alfresco_api import AlfrescoMasterClient
 import pytest
 
 def test_import():
-    """Test that AlfrescoClient can be imported."""
-    print("🧪 Testing import...")
-    from python_alfresco_api import AlfrescoMasterClient
-    assert AlfrescoMasterClient is not None
-    print("   ✅ AlfrescoMasterClient imported successfully")
+    """Test basic import."""
+    print("Testing basic import...")
+    
+    try:
+        from python_alfresco_api import ClientFactory
+        assert ClientFactory is not None
+        print("   ✅ ClientFactory imported successfully")
+    except ImportError as e:
+        print(f"   ❌ Import failed: {e}")
+        raise
 
 def test_client_creation():
-    """Test that AlfrescoClient can be created."""
-    print("🧪 Testing client creation...")
-    from python_alfresco_api import AlfrescoMasterClient
+    """Test client creation.""" 
+    print("Testing client creation...")
     
     try:
-        client = AlfrescoMasterClient("http://localhost:8080")
+        from python_alfresco_api import ClientFactory
+        
+        factory = ClientFactory("http://localhost:8080", "admin", "admin")
+        client = factory.create_master_client()
         assert client is not None
-        print("   ✅ AlfrescoMasterClient created successfully")
+        print("   ✅ Master client created successfully")
     except Exception as e:
-        print(f"   ⚠️  Client creation: {e}")
+        print(f"   ❌ Client creation failed: {e}")
+        raise
 
-def test_client_properties():
-    """Test that AlfrescoClient has expected properties."""
-    print("🧪 Testing client properties...")
-    from python_alfresco_api import AlfrescoMasterClient
+def test_client_attributes():
+    """Test client has expected attributes."""
+    print("Testing client attributes...")
     
     try:
-        client = AlfrescoMasterClient("http://localhost:8080")
+        from python_alfresco_api import ClientFactory
         
-        # Test basic properties
-        assert hasattr(client, 'base_url')
-        assert hasattr(client, 'auth')
-        assert hasattr(client, 'core')
-        assert hasattr(client, 'discovery')
-        assert hasattr(client, 'search')
+        factory = ClientFactory("http://localhost:8080", "admin", "admin")
+        client = factory.create_master_client()
         
-        print("   ✅ AlfrescoMasterClient has expected properties")
+        expected_apis = ['auth', 'core', 'discovery', 'search', 'workflow', 'model', 'search_sql']
+        for api in expected_apis:
+            assert hasattr(client, api), f"Client should have {api} API"
+        
+        print("   ✅ Master client has expected properties")
     except Exception as e:
-        print(f"   ⚠️  Client properties: {e}")
+        print(f"   ❌ Attribute test failed: {e}")
+        raise
 
-def test_client_info():
-    """Test client info functionality."""
-    print("🧪 Testing client info...")
-    from python_alfresco_api import AlfrescoMasterClient
+def test_factory_methods():
+    """Test factory has all expected methods."""
+    print("Testing factory methods...")
     
     try:
-        client = AlfrescoMasterClient("http://localhost:8080")
-        info = client.get_client_info()
+        from python_alfresco_api import ClientFactory
         
-        assert isinstance(info, dict)
-        assert 'base_url' in info
-        assert 'available_apis' in info
+        factory = ClientFactory("http://localhost:8080", "admin", "admin")
         
-        print("   ✅ Client info working")
+        expected_methods = [
+            'create_auth_client', 'create_core_client', 'create_discovery_client',
+            'create_search_client', 'create_workflow_client', 'create_model_client',
+            'create_search_sql_client', 'create_master_client', 'create_all_clients'
+        ]
+        
+        for method in expected_methods:
+            assert hasattr(factory, method), f"Factory should have {method} method"
+        
+        print("   ✅ Factory has all expected methods")
     except Exception as e:
-        print(f"   ⚠️  Client info: {e}")
+        print(f"   ❌ Factory method test failed: {e}")
+        raise
 
 def test_individual_clients():
-    """Test individual client access."""
-    print("🧪 Testing individual clients...")
-    from python_alfresco_api import AlfrescoMasterClient
+    """Test individual client creation."""
+    print("Testing individual client creation...")
     
     try:
-        client = AlfrescoMasterClient("http://localhost:8080")
+        from python_alfresco_api import ClientFactory
         
-        # Test accessing individual clients
-        auth_client = client.auth_client
-        core_client = client.core_client
-        discovery_client = client.discovery_client
+        factory = ClientFactory("http://localhost:8080", "admin", "admin")
         
+        # Test creating individual clients
+        auth_client = factory.create_auth_client()
         assert auth_client is not None
-        assert core_client is not None
+        
+        discovery_client = factory.create_discovery_client()
         assert discovery_client is not None
         
-        print("   ✅ Individual clients accessible")
+        print("   ✅ Individual clients created successfully")
     except Exception as e:
-        print(f"   ⚠️  Individual clients: {e}")
-
-def test_client_factory():
-    """Test ClientFactory functionality."""
-    print("🧪 Testing ClientFactory...")
-    from python_alfresco_api.client_factory import ClientFactory
-    
-    try:
-        # Test creating individual clients through factory
-        factory = ClientFactory("http://localhost:8080")
-        auth_client = factory.create_auth_client()
-        core_client = factory.create_core_client()
-        
-        assert auth_client is not None
-        assert core_client is not None
-        
-        print("   ✅ ClientFactory working")
-    except Exception as e:
-        print(f"   ⚠️  ClientFactory: {e}")
+        print(f"   ❌ Individual client test failed: {e}")
+        raise
 
 if __name__ == "__main__":
-    print("🚀 Running Simple Test Suite")
     test_import()
     test_client_creation()
-    test_client_properties()
-    test_client_info()
+    test_client_attributes()
+    test_factory_methods()
     test_individual_clients()
-    test_client_factory()
-    print("✅ Simple tests completed!") 
+    print("All tests passed!") 

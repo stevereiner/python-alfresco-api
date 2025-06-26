@@ -170,7 +170,7 @@ def main():
     
     # Check if Alfresco server is running
     server_check_success, _, _ = run_command(
-        "python -c \"import requests; requests.get('http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-', timeout=5)\"",
+        "python test_server.py",
         "Checking live Alfresco server"
     )
     
@@ -187,8 +187,7 @@ def main():
     
     if test_success:
         # Run a quick performance test
-        perf_cmd = "python -c \"from python_alfresco_api import ClientFactory; import time; start=time.time(); factory=ClientFactory('http://localhost:8080'); clients=factory.create_all_clients(); print(f'Client creation: {(time.time()-start)*1000:.2f}ms')\""
-        perf_success, perf_output, _ = run_command(perf_cmd, "Testing client creation performance")
+        perf_success, perf_output, _ = run_command("python test_performance.py", "Testing client creation performance")
         
         if perf_success and perf_output.strip():
             print(f"{Colors.GREEN}⚡ {perf_output.strip()}{Colors.END}")

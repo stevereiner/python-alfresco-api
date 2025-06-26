@@ -1,45 +1,59 @@
 #!/usr/bin/env python3
 """
-Comprehensive Event Gateway Tests
+Comprehensive Event System Tests
 
-Test the unified event client's complete functionality including:
-- Auto-detection for both Community and Enterprise
-- Subscription management
-- Event handling
-- Error scenarios
-- Configuration options
+Tests for both Community Edition (ActiveMQ) and Enterprise Edition (Event Gateway) event systems.
+
+Configuration:
+- Set EVENT_MODE environment variable to test specific mode:
+  * 'community' (default) - Test ActiveMQ/STOMP (port 61616)
+  * 'enterprise' - Test Event Gateway/REST (port 7070) 
+  * 'both' - Test both with mocking
+- Set ALFRESCO_HOST to change host (default: localhost)
+
+Examples:
+  pytest tests/test_event_gateway_comprehensive.py  # Default: community mode
+  EVENT_MODE=enterprise pytest tests/test_event_gateway_comprehensive.py
+  EVENT_MODE=both pytest tests/test_event_gateway_comprehensive.py
 """
 
 import asyncio
 import pytest
+import os
 from unittest.mock import Mock, patch, AsyncMock
-from python_alfresco_api.events import (
-    AlfrescoEventClient, 
-    EventSubscription, 
-    EventNotification
-)
+from python_alfresco_api.events.event_client import AlfrescoEventClient
+from python_alfresco_api.events.models import EventSubscription, EventNotification
 import httpx
 from datetime import datetime
 
-class TestEventGatewayComprehensive:
+# Test configuration - configurable via environment variables
+EVENT_MODE = os.getenv('EVENT_MODE', 'community')  # 'community', 'enterprise', or 'both'
+ALFRESCO_HOST = os.getenv('ALFRESCO_HOST', 'localhost')
+ACTIVEMQ_PORT = int(os.getenv('ACTIVEMQ_PORT', '61616'))
+EVENT_GATEWAY_PORT = int(os.getenv('EVENT_GATEWAY_PORT', '7070'))
+
+class TestEventSystemComprehensive:
     
     @pytest.mark.asyncio
     async def test_event_client_initialization(self):
         """Test event client initialization with different configurations"""
         
-        # Basic initialization
+        # Basic initialization with correct parameters
         client = AlfrescoEventClient(
-            alfresco_host="test-host",
-            alfresco_port=8080,
-            username="testuser",
-            password="testpass",
-            auto_detect=False
+            alfresco_host=ALFRESCO_HOST,
+            username="admin",
+            password="admin",
+            community_port=ACTIVEMQ_PORT,
+            enterprise_port=EVENT_GATEWAY_PORT,
+            auto_detect=False,
+            debug=True
         )
         
-        assert client.alfresco_host == "test-host"
-        assert client.alfresco_port == 8080
-        assert client.username == "testuser"
-        assert client.password == "testpass"
+        assert client.alfresco_host == ALFRESCO_HOST
+        assert client.username == "admin"
+        assert client.password == "admin"
+        assert client.community_port == ACTIVEMQ_PORT
+        assert client.enterprise_port == EVENT_GATEWAY_PORT
         assert client.event_system is None
         assert len(client.event_handlers) == 0
         
@@ -153,7 +167,7 @@ class TestEventGatewayComprehensive:
         subscription = EventSubscription(
             name="Test Subscription",
             events=["node.created", "node.updated"],
-            filter={"nodeType": "cm:content"}
+            filter_expression="nodeType:cm:content"  # Use string format filter
         )
         
         with patch('httpx.AsyncClient') as mock_client:

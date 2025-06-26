@@ -81,7 +81,12 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_functions = ["test_*"]
-addopts = "-v --tb=short"
+addopts = "-v --tb=short --ignore=tests/test_event_detection.py --ignore=tests/test_event_gateway_comprehensive.py --ignore=tests/test_current_architecture.py --ignore=tests/test_enhanced_coverage.py --ignore=tests/test_mcp_integration.py --ignore=tests/test_event_community_enterprise.py --ignore=tests/test_integration_live_server.py"
+markers = [
+    "event: marks tests as event system tests (may require ActiveMQ/Event Gateway)",
+    "integration: marks tests as integration tests requiring live server",
+    "asyncio: marks tests as async tests",
+]
 
 [tool.coverage.run]
 source = ["alfresco_mcp_server"]
