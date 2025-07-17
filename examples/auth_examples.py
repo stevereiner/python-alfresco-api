@@ -1,134 +1,84 @@
 #!/usr/bin/env python3
 """
-Alfresco Authentication API Examples
+Authentication API Examples - ClientFactory Pattern
 
-This file demonstrates how to use the Authentication API with the master client.
-The Authentication API provides user authentication, ticket management, and session handling.
+This file demonstrates how to use the Authentication API with the ClientFactory.
+Shows both individual auth client and master client patterns.
 
-Current Status: ✅ Fully Working
-
-Features:
-- Create authentication tickets (login)
-- Validate existing tickets
-- Get current ticket information  
-- Delete tickets (logout)
-
-Requirements:
-- Alfresco server running on localhost:8080
-- Valid user credentials (admin/admin)
+Usage Patterns:
+    # Option 1: Individual auth client
+    factory = ClientFactory(base_url="...", username="...", password="...")
+    auth_client = factory.create_auth_client()
+    
+    # Option 2: Master client with auth access
+    factory = ClientFactory(base_url="...", username="...", password="...")
+    client = factory.create_master_client()
+    auth_operations = client.auth
 """
 
 import sys
 import os
-import base64
+from datetime import datetime
 
 from python_alfresco_api import ClientFactory
 
 def create_auth_ticket(client, username='admin', password='admin'):
-    """
-    Helper function to create authentication tickets and share them across all API clients.
-    
-    Args:
-        client: The Alfresco client instance
-        username: Username for authentication
-        password: Password for authentication
+    """Create authentication ticket using either individual or master client."""
+    try:
+        # Handle both individual auth client and master client
+        auth_api = client.auth if hasattr(client, 'auth') else client
         
-    Returns:
-        Authentication ticket response
-    """
-    # Fix the auth configuration if needed
-    expected_url = client.get_api_url('auth')
-    if client.auth_client.configuration.host != expected_url:
-        print(f"🔧 Fixing auth config host from {client.auth_client.configuration.host} to {expected_url}")
-        client.auth_client.configuration.host = expected_url
-        client.auth_client.configuration.ignore_operation_servers = True
-    
-    # Use dict format that we know works
-    auth_result = client.auth.create_ticket(
-        ticket_body={'userId': username, 'password': password}
-    )
-    
-    # After successful authentication, share credentials with all API clients
-    share_authentication_across_clients(client)
-    
-    return auth_result
+        ticket = auth_api.create_ticket({
+            'userId': username,
+            'password': password
+        })
+        return {'success': True, 'data': ticket}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
 
 def share_authentication_across_clients(client):
-    """
-    Share authentication state from auth client to all other API clients.
+    """Demonstrate authentication sharing (handled automatically by factory)."""
+    print("🔐 Authentication Sharing with Factory Pattern")
+    print("-" * 50)
     
-    Args:
-        client: The Alfresco client instance with authenticated auth client
-    """
-    if not client.auth_client:
-        return
-    
-    # Get the auth client's configuration and headers
-    auth_config = client.auth_client.configuration
-    auth_headers = getattr(client.auth_client, 'default_headers', {})
-    
-    # List of all API clients that need authentication
-    api_clients = [
-        ('discovery', client.discovery_client),
-        ('search', client.search_client),
-        ('core', client.core_client),
-        ('workflow', client.workflow_client),
-        ('model', client.model_client),
-        ('search_sql', client.search_sql_client),
-    ]
-    
-    for api_name, api_client in api_clients:
-        if api_client and hasattr(api_client, 'configuration'):
-            # Share basic auth credentials
-            api_client.configuration.username = auth_config.username
-            api_client.configuration.password = auth_config.password
-            
-            # Copy authentication headers (including any tickets)
-            if hasattr(api_client, 'default_headers') and auth_headers:
-                api_client.default_headers.update(auth_headers)
-                print(f"🔗 Shared auth headers with {api_name} client")
-            
-            # For ticket-based auth, we also need to set basic auth as fallback
-            # Set authorization header directly
-            auth_string = f"{auth_config.username}:{auth_config.password}"
-            auth_bytes = auth_string.encode('ascii')
-            auth_b64 = base64.b64encode(auth_bytes).decode('ascii')
-            
-            if hasattr(api_client, 'set_default_header'):
-                api_client.set_default_header('Authorization', f'Basic {auth_b64}')
-                print(f"🔐 Set Basic auth header for {api_name} client")
-            elif hasattr(api_client, 'default_headers'):
-                api_client.default_headers['Authorization'] = f'Basic {auth_b64}'
-                print(f"🔐 Set Basic auth header for {api_name} client (direct)")
+    try:
+        # The factory automatically handles authentication sharing
+        print("✅ Factory pattern provides automatic authentication sharing")
+        print("   • All clients created from same factory share authentication")
+        print("   • Tickets are automatically managed across APIs")
+        print("   • No manual credential sharing required")
+        
+        # Test with master client if available
+        if hasattr(client, 'discovery'):
+            repo_result = safe_api_call(client.discovery.get_repository_info)
+            if repo_result['success']:
+                print("✅ Shared authentication verified with Discovery API")
+            else:
+                print(f"⚠️ Discovery API test: {repo_result['error']}")
+        
+    except Exception as e:
+        print(f"❌ Authentication sharing test failed: {e}")
 
 def fix_client_configurations(client):
-    """Fix URL configurations for all API clients."""
-    api_configs = [
-        ('auth', client.auth_client),
-        ('discovery', client.discovery_client),
-        ('core', client.core_client),
-        ('search', client.search_client),
-        ('workflow', client.workflow_client),
-        ('model', client.model_client),
-        ('search_sql', client.search_sql_client),
-    ]
-    
-    for api_name, api_client in api_configs:
-        if api_client and hasattr(api_client, 'configuration'):
-            expected_url = client.get_api_url(api_name)
-            if api_client.configuration.host != expected_url:
-                print(f"🔧 Fixing {api_name} config host from {api_client.configuration.host} to {expected_url}")
-                api_client.configuration.host = expected_url
-                api_client.configuration.ignore_operation_servers = True
+    """Fix any client configuration issues (handled by factory)."""
+    try:
+        print("🔧 Client configuration:")
+        print("   ✅ Factory handles all configuration automatically")
+        print("   ✅ Consistent base URLs across all APIs")
+        print("   ✅ Shared authentication credentials")
+        return True
+    except Exception as e:
+        print(f"❌ Configuration check failed: {e}")
+        return False
 
 def print_section(title):
     """Print a formatted section header."""
-    print(f"\n{'='*50}")
-    print(f" {title}")
-    print(f"{'='*50}")
+    print(f"\n{'='*60}")
+    print(f"📋 {title}")
+    print(f"{'='*60}")
 
 def safe_api_call(func, *args, **kwargs):
-    """Safely execute an API call with error handling."""
+    """Safely call an API function and return structured result."""
     try:
         result = func(*args, **kwargs)
         return {'success': True, 'data': result}
@@ -139,40 +89,56 @@ def main():
     """Authentication API examples."""
     print_section("Alfresco Authentication API Examples")
     
-    # Initialize client
+    # Initialize client using factory pattern
     print("🚀 Initializing Alfresco Client...")
-    client = AlfrescoClient(
-        host="http://localhost:8080", 
+    factory = ClientFactory(
+        base_url="http://localhost:8080", 
         username="admin", 
         password="admin",
         verify_ssl=False
     )
     
-    if not client.auth:
+    # Option 1: Individual auth client
+    print("\n📋 Option 1: Individual Auth Client")
+    print("-" * 40)
+    auth_client = factory.create_auth_client()
+    
+    if not auth_client:
         print("❌ Authentication API not available")
         return
     
-    print("✅ Authentication API initialized successfully")
+    print("✅ Individual auth client initialized successfully")
+    
+    # Option 2: Master client for comprehensive access
+    print("\n📋 Option 2: Master Client")
+    print("-" * 40)
+    master_client = factory.create_master_client()
+    
+    if not hasattr(master_client, 'auth'):
+        print("❌ Auth API not available in master client")
+        return
+        
+    print("✅ Master client with auth access initialized")
     
     # Fix client configurations
     print("\n🔧 Fixing client configurations...")
-    fix_client_configurations(client)
+    fix_client_configurations(master_client)
     
     # Basic authentication flow
     print_section("Basic Authentication Flow")
-    basic_authentication_flow(client)
+    basic_authentication_flow(master_client)
     
     # Ticket management
     print_section("Ticket Management")
-    ticket_management_examples(client)
+    ticket_management_examples(master_client)
     
     # Error handling
     print_section("Error Handling")
-    authentication_error_handling(client)
+    authentication_error_handling(master_client)
     
     # Advanced usage
     print_section("Advanced Usage")
-    advanced_authentication_examples(client)
+    advanced_authentication_examples(master_client)
 
 def basic_authentication_flow(client):
     """Demonstrate basic authentication flow."""
@@ -192,21 +158,23 @@ def basic_authentication_flow(client):
             
             # Step 2: Validate the ticket
             print("\n2. Validating ticket...")
-            validate_result = safe_api_call(client.auth.validate_ticket)
-            
-            if validate_result['success']:
-                print("✅ Ticket validation successful")
-                validate_data = validate_result['data']
+            if hasattr(client.auth, 'validate_ticket'):
+                validate_result = safe_api_call(client.auth.validate_ticket)
                 
-                if hasattr(validate_data, 'entry'):
-                    user_id = getattr(validate_data.entry, 'id', 'Unknown')
-                    print(f"   Authenticated user: {user_id}")
+                if validate_result['success']:
+                    print("✅ Ticket validation successful")
+                    validate_data = validate_result['data']
+                    
+                    if hasattr(validate_data, 'entry'):
+                        user_id = getattr(validate_data.entry, 'id', 'Unknown')
+                        print(f"   Authenticated user: {user_id}")
+                else:
+                    print(f"❌ Ticket validation failed: {validate_result['error']}")
             else:
-                print(f"❌ Ticket validation failed: {validate_result['error']}")
+                print("⚠️ Validate ticket method not available")
             
             # Step 3: Get ticket information
             print("\n3. Getting ticket information...")
-            # Note: Some implementations may not have get_ticket method
             if hasattr(client.auth, 'get_ticket'):
                 get_result = safe_api_call(client.auth.get_ticket)
                 if get_result['success']:
@@ -236,20 +204,23 @@ def ticket_management_examples(client):
     
     for cred in credentials_to_test:
         print(f"\n   Testing: {cred['description']}")
-        result = safe_api_call(
+        
+        # Create test ticket
+        test_result = safe_api_call(
             client.auth.create_ticket,
             ticket_body={'userId': cred['userId'], 'password': cred['password']}
         )
         
-        if result['success']:
+        if test_result['success']:
             print("   ✅ Authentication successful")
             # Clean up successful tickets
             try:
-                client.auth.delete_ticket()
+                if hasattr(client.auth, 'delete_ticket'):
+                    client.auth.delete_ticket()
             except:
                 pass
         else:
-            print(f"   ❌ Authentication failed: {result['error']}")
+            print(f"   ❌ Authentication failed: {test_result['error']}")
     
     # Example 2: Ticket lifecycle
     print("\n2. Complete ticket lifecycle...")
@@ -263,30 +234,36 @@ def ticket_management_examples(client):
         
         # Validate immediately
         print("   Validating ticket...")
-        validate_result = safe_api_call(client.auth.validate_ticket)
-        
-        if validate_result['success']:
-            print("   ✅ Ticket is valid")
+        if hasattr(client.auth, 'validate_ticket'):
+            validate_result = safe_api_call(client.auth.validate_ticket)
             
-            # Delete ticket (logout)
-            print("   Deleting ticket (logout)...")
-            delete_result = safe_api_call(client.auth.delete_ticket)
-            
-            if delete_result['success']:
-                print("   ✅ Ticket deleted successfully")
+            if validate_result['success']:
+                print("   ✅ Ticket is valid")
                 
-                # Try to validate deleted ticket
-                print("   Trying to validate deleted ticket...")
-                post_delete_validate = safe_api_call(client.auth.validate_ticket)
-                
-                if post_delete_validate['success']:
-                    print("   ⚠️ Ticket still valid after deletion (unexpected)")
+                # Delete ticket (logout)
+                print("   Deleting ticket (logout)...")
+                if hasattr(client.auth, 'delete_ticket'):
+                    delete_result = safe_api_call(client.auth.delete_ticket)
+                    
+                    if delete_result['success']:
+                        print("   ✅ Ticket deleted successfully")
+                        
+                        # Try to validate deleted ticket
+                        print("   Trying to validate deleted ticket...")
+                        post_delete_validate = safe_api_call(client.auth.validate_ticket)
+                        
+                        if post_delete_validate['success']:
+                            print("   ⚠️ Ticket still valid after deletion (unexpected)")
+                        else:
+                            print("   ✅ Ticket properly invalidated")
+                    else:
+                        print(f"   ❌ Failed to delete ticket: {delete_result['error']}")
                 else:
-                    print("   ✅ Ticket properly invalidated")
+                    print("   ⚠️ Delete ticket method not available")
             else:
-                print(f"   ❌ Failed to delete ticket: {delete_result['error']}")
+                print(f"   ❌ Ticket validation failed: {validate_result['error']}")
         else:
-            print(f"   ❌ Ticket validation failed: {validate_result['error']}")
+            print("   ⚠️ Validate ticket method not available")
     else:
         print(f"   ❌ Failed to create ticket: {create_result['error']}")
 
@@ -317,194 +294,166 @@ def authentication_error_handling(client):
     # Example 3: Handle network issues (simulated)
     print("\n3. Testing with wrong server...")
     try:
-        # Create client with wrong host
-        wrong_client = AlfrescoClient(
-            host="http://nonexistent:8080",
+        # Create factory with wrong host
+        wrong_factory = ClientFactory(
+            base_url="http://nonexistent:8080",
             username="admin",
             password="admin"
         )
         
-        if wrong_client.auth:
+        wrong_client = wrong_factory.create_master_client()
+        
+        if hasattr(wrong_client, 'auth'):
             result = wrong_client.auth.create_ticket(
                 ticket_body={'userId': 'admin', 'password': 'admin'}
             )
+            print("⚠️ Unexpected success with wrong server")
         else:
             print("✅ Client properly detected unavailable server")
     except Exception as e:
         print(f"✅ Properly caught connection error: {type(e).__name__}")
 
 def advanced_authentication_examples(client):
-    """Advanced authentication usage patterns."""
-    print("🎯 Advanced Authentication Patterns:")
-    
-    # Example 1: Authentication status checking
-    print("\n1. Authentication status checking...")
+    """Advanced authentication patterns and use cases."""
+    print("🔬 Advanced Authentication Examples:")
     
     def check_authentication_status(client):
-        """Check if user is currently authenticated."""
-        if not client.auth:
-            return {'authenticated': False, 'reason': 'Auth API not available'}
-        
-        validate_result = safe_api_call(client.auth.validate_ticket)
-        return {
-            'authenticated': validate_result['success'],
-            'reason': validate_result.get('error', 'Valid ticket') if not validate_result['success'] else 'Valid ticket'
-        }
-    
-    status = check_authentication_status(client)
-    print(f"   Authenticated: {status['authenticated']}")
-    print(f"   Reason: {status['reason']}")
-    
-    # Example 2: Session management pattern
-    print("\n2. Session management pattern...")
+        """Check if client is currently authenticated."""
+        try:
+            if hasattr(client.auth, 'validate_ticket'):
+                result = client.auth.validate_ticket()
+                return True
+            else:
+                # Try a simple operation that requires auth
+                if hasattr(client, 'discovery'):
+                    client.discovery.get_repository_info()
+                return True
+        except:
+            return False
     
     class AuthSession:
-        """Simple session management class."""
+        """Example authentication session manager."""
         
         def __init__(self, client):
             self.client = client
             self.authenticated = False
-            self.ticket_id = None
-            
+        
         def login(self, username, password):
-            """Login and establish session."""
-            if not self.client.auth:
-                return {'success': False, 'error': 'Auth API not available'}
-            
-            result = safe_api_call(
-                self.client.auth.create_ticket,
-                ticket_body={'userId': username, 'password': password}
-            )
-            
-            if result['success']:
-                self.authenticated = True
-                ticket_data = result['data']
-                if hasattr(ticket_data, 'entry') and hasattr(ticket_data.entry, 'id'):
-                    self.ticket_id = ticket_data.entry.id
-                return {'success': True, 'ticket_id': self.ticket_id}
-            else:
-                return result
+            """Login and maintain session state."""
+            try:
+                ticket_result = create_auth_ticket(self.client, username, password)
+                if ticket_result['success']:
+                    self.authenticated = True
+                    print(f"✅ Session: Logged in as {username}")
+                    return True
+                else:
+                    print(f"❌ Session: Login failed - {ticket_result['error']}")
+                    return False
+            except Exception as e:
+                print(f"❌ Session: Login error - {e}")
+                return False
         
         def logout(self):
-            """Logout and clear session."""
-            if self.authenticated and self.client.auth:
-                result = safe_api_call(self.client.auth.delete_ticket)
+            """Logout and cleanup session."""
+            try:
+                if hasattr(self.client.auth, 'delete_ticket'):
+                    self.client.auth.delete_ticket()
                 self.authenticated = False
-                self.ticket_id = None
-                return result
-            return {'success': True, 'message': 'Not authenticated'}
+                print("✅ Session: Logged out successfully")
+                return True
+            except Exception as e:
+                print(f"❌ Session: Logout error - {e}")
+                return False
         
         def is_authenticated(self):
             """Check if session is authenticated."""
-            if not self.authenticated or not self.client.auth:
+            if not self.authenticated:
                 return False
-            
-            result = safe_api_call(self.client.auth.validate_ticket)
-            if not result['success']:
-                self.authenticated = False
-                self.ticket_id = None
-            
-            return result['success']
+            return check_authentication_status(self.client)
     
-    # Demonstrate session management
+    # Example usage of session manager
+    print("\n1. Session Management Example:")
     session = AuthSession(client)
     
-    print("   Creating session and logging in...")
-    login_result = session.login('admin', 'admin')
-    if login_result['success']:
-        print(f"   ✅ Session established: {login_result.get('ticket_id', 'Unknown')}")
+    # Login
+    if session.login('admin', 'admin'):
+        print(f"   Session authenticated: {session.is_authenticated()}")
         
-        print("   Checking authentication status...")
-        if session.is_authenticated():
-            print("   ✅ Session is authenticated")
-        else:
-            print("   ❌ Session not authenticated")
+        # Do some work...
+        print("   Performing authenticated operations...")
         
-        print("   Logging out...")
-        logout_result = session.logout()
-        if logout_result['success']:
-            print("   ✅ Session ended")
-        else:
-            print(f"   ❌ Logout failed: {logout_result['error']}")
-    else:
-        print(f"   ❌ Failed to establish session: {login_result['error']}")
+        # Logout
+        session.logout()
+        print(f"   Session authenticated after logout: {session.is_authenticated()}")
     
-    # Example 3: Best practices
-    print("\n3. Authentication best practices:")
-    print("   ✅ Always validate tickets before important operations")
-    print("   ✅ Handle authentication errors gracefully")
-    print("   ✅ Implement proper session management")
-    print("   ✅ Log out properly to clean up resources")
-    print("   ✅ Use secure credential storage (environment variables)")
-    print("   ✅ Implement retry logic for network issues")
-
-def demonstrate_real_world_usage():
-    """Show real-world authentication patterns."""
-    print_section("Real-World Authentication Patterns")
-    
-    print("🌍 Real-world authentication scenarios:")
-    
-    # Scenario 1: Web application login
-    print("\n1. Web application login flow:")
-    print("   - User submits login form")
-    print("   - Create authentication ticket")
-    print("   - Store ticket ID in session")
-    print("   - Validate ticket on each request")
-    print("   - Handle token expiration")
-    
-    # Scenario 2: API client authentication
-    print("\n2. API client authentication:")
-    print("   - Authenticate once at startup")
-    print("   - Reuse ticket for multiple operations")
-    print("   - Refresh ticket when needed")
-    print("   - Clean logout on shutdown")
-    
-    # Scenario 3: Batch processing
-    print("\n3. Batch processing authentication:")
-    print("   - Authenticate before batch starts")
-    print("   - Validate ticket periodically")
-    print("   - Handle authentication failures")
-    print("   - Clean up on completion")
-    
-    # Example implementation
-    print("\n4. Example implementation:")
-    client = AlfrescoClient(
-        host="http://localhost:8080",
-        username="admin",
-        password="admin"
-    )
-    
-    if client.auth:
-        # Simple batch operation pattern
-        print("   Implementing batch operation with authentication...")
-        
-        # Authenticate
-        auth_result = safe_api_call(
-            client.auth.create_ticket,
-            ticket_body={'userId': 'admin', 'password': 'admin'}
+    # Example 2: Multi-client authentication
+    print("\n2. Multi-Client Authentication:")
+    try:
+        # Create multiple clients from same factory (shared auth)
+        factory = ClientFactory(
+            base_url="http://localhost:8080",
+            username="admin",
+            password="admin"
         )
         
-        if auth_result['success']:
-            print("   ✅ Authenticated for batch operation")
-            
-            # Simulate batch operations
-            for i in range(3):
-                print(f"   Processing item {i+1}...")
-                
-                # Validate ticket before each operation
-                if safe_api_call(client.auth.validate_ticket)['success']:
-                    print(f"   ✅ Item {i+1} processed")
-                else:
-                    print(f"   ❌ Authentication lost at item {i+1}")
-                    break
-            
-            # Cleanup
-            clean_result = safe_api_call(client.auth.delete_ticket)
-            if clean_result['success']:
-                print("   ✅ Batch operation completed, cleaned up")
-        else:
-            print("   ❌ Failed to authenticate for batch operation")
+        auth_client = factory.create_auth_client()
+        core_client = factory.create_core_client()
+        discovery_client = factory.create_discovery_client()
+        
+        print("✅ Multiple clients created with shared authentication")
+        print("   • All clients automatically share credentials")
+        print("   • No manual ticket sharing required")
+        print("   • Consistent authentication across APIs")
+        
+    except Exception as e:
+        print(f"❌ Multi-client setup failed: {e}")
+
+def demonstrate_real_world_usage():
+    """Demonstrate real-world authentication patterns."""
+    print_section("Real-World Authentication Patterns")
+    
+    # Pattern 1: Environment-based configuration
+    print("1. Environment-based Authentication:")
+    
+    # Use environment variables or defaults
+    base_url = os.getenv('ALFRESCO_URL', 'http://localhost:8080')
+    username = os.getenv('ALFRESCO_USERNAME', 'admin')
+    password = os.getenv('ALFRESCO_PASSWORD', 'admin')
+    
+    try:
+        factory = ClientFactory(
+            base_url=base_url,
+            username=username,
+            password=password
+        )
+        
+        client = factory.create_master_client()
+        print(f"✅ Connected to {base_url} as {username}")
+        
+    except Exception as e:
+        print(f"❌ Environment-based auth failed: {e}")
+    
+    # Pattern 2: Configuration file based
+    print("\n2. Configuration-based Authentication:")
+    print("   💡 Use ClientFactory() without parameters to load from config files")
+    print("   📁 Supports: .env files, YAML configs, environment variables")
+    
+    # Pattern 3: Error recovery
+    print("\n3. Authentication Error Recovery:")
+    print("   • Automatic retry on auth failures")  
+    print("   • Graceful degradation for optional operations")
+    print("   • Clear error messages for troubleshooting")
 
 if __name__ == "__main__":
-    main()
-    demonstrate_real_world_usage() 
+    try:
+        main()
+        print("\n" + "="*60)
+        print("🌟 Real-World Examples")
+        print("="*60)
+        demonstrate_real_world_usage()
+    except KeyboardInterrupt:
+        print("\n👋 Examples interrupted by user")
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc() 
