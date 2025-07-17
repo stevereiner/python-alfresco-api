@@ -2,6 +2,17 @@
 """
 Alfresco Python Client Generator - OFFICIAL
 
+🚨 **CUSTOM CODE PROTECTION ACTIVE** 🚨
+TEMPLATE FUNCTIONS DISABLED TO PROTECT AUTHENTICATION BREAKTHROUGH:
+- _create_client_factory() - DISABLED (protects custom auth_util integration)
+- _create_auth_utility() - DISABLED (protects query parameter authentication)
+- _create_client_wrappers() - DISABLED (protects inheritance-based clients)
+
+SAFE FUNCTIONS STILL ACTIVE:
+- Pydantic model generation ✅
+- Raw HTTP client generation ✅  
+- Package init files ✅
+
 The PRIMARY generator for python-alfresco-api using the PROVEN HYBRID APPROACH:
 
 STEP 1: Data Model Generation
@@ -250,28 +261,32 @@ class AlfrescoHybridPipeline:
         return success_count == len(self.apis)
     
     def _create_unified_package(self) -> bool:
-        """Create unified package structure"""
+        """Create unified package structure - CUSTOM CODE PROTECTION"""
         print("Creating unified package...")
+        print("🔒 PROTECTING CUSTOM AUTHENTICATION CODE - Only generating safe files")
         
         try:
             # Create main __init__.py
             self._create_main_init()
             
-            # Create client factory
-            self._create_client_factory()
+            # 🚨 DISABLED: Create client factory - WOULD OVERWRITE CUSTOM AUTH BREAKTHROUGH
+            # self._create_client_factory()
+            print("   SKIPPED: client_factory.py (protecting custom authentication code)")
             
-            # Create auth utility
-            self._create_auth_utility()
+            # 🚨 DISABLED: Create auth utility - WOULD OVERWRITE CUSTOM AUTH BREAKTHROUGH  
+            # self._create_auth_utility()
+            print("   SKIPPED: auth_util.py (protecting custom authentication code)")
             
-            # Create individual client wrappers
-            self._create_client_wrappers()
+            # 🚨 DISABLED: Create individual client wrappers - WOULD OVERWRITE CUSTOM CLIENTS
+            # self._create_client_wrappers()
+            print("   SKIPPED: client wrappers (protecting custom client inheritance)")
             
             # Create models __init__.py
             self._create_models_init()
             
             # Skip setup.py (redundant with pyproject.toml)
             
-            print("   Unified package structure created")
+            print("   ✅ SAFE package structure created (custom code protected)")
             return True
             
         except Exception as e:
@@ -328,340 +343,12 @@ __all__ = [
         with open(self.output_dir / "__init__.py", "w", encoding='utf-8') as f:
             f.write(init_content)
     
-    def _create_client_factory(self):
-        """Create client factory for easy instantiation"""
-        factory_content = '''"""
-Client Factory for Alfresco APIs
-
-Provides easy instantiation of individual clients with shared configuration.
-Perfect for enterprise applications and microservices.
-"""
-
-from typing import Optional, Dict, Any
-from .auth_util import AuthUtil
-from .clients.auth_client import AlfrescoAuthClient
-from .clients.core_client import AlfrescoCoreClient
-from .clients.discovery_client import AlfrescoDiscoveryClient
-from .clients.search_client import AlfrescoSearchClient
-from .clients.workflow_client import AlfrescoWorkflowClient
-from .clients.model_client import AlfrescoModelClient
-from .clients.search_sql_client import AlfrescoSearchSqlClient
-
-class MasterClient:
-    """
-    Master client with dot syntax access to all APIs.
-    Provides unified interface: master_client.core.something()
-    """
+    # REMOVED: _create_client_factory() - Dangerous template function that would overwrite custom authentication code
     
-    def __init__(self, clients_dict: Dict[str, Any]):
-        """Initialize master client with all API clients."""
-        self.auth = clients_dict['auth']
-        self.core = clients_dict['core'] 
-        self.discovery = clients_dict['discovery']
-        self.search = clients_dict['search']
-        self.workflow = clients_dict['workflow']
-        self.model = clients_dict['model']
-        self.search_sql = clients_dict['search_sql']
-
-class ClientFactory:
-    """
-    Factory for creating Alfresco API clients.
+    # REMOVED: _create_auth_utility() - Dangerous template function that would overwrite query parameter authentication breakthrough
     
-    Supports both individual client creation and shared authentication.
-    """
-    
-    def __init__(
-        self,
-        base_url: str,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
-        verify_ssl: bool = True,
-        timeout: int = 30
-    ):
-        """
-        Initialize the client factory.
-        
-        Args:
-            base_url: Base URL of Alfresco instance
-            username: Optional username for authentication
-            password: Optional password for authentication  
-            verify_ssl: Whether to verify SSL certificates
-            timeout: Request timeout in seconds
-        """
-        self.base_url = base_url
-        self.verify_ssl = verify_ssl
-        self.timeout = timeout
-        
-        # Initialize auth utility if credentials provided
-        self.auth = None
-        if username and password:
-            self.auth = AuthUtil(base_url, username, password, verify_ssl, timeout)
-    
-    def create_auth_client(self) -> AlfrescoAuthClient:
-        """Create Authentication API client"""
-        return AlfrescoAuthClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
-    
-    def create_core_client(self) -> AlfrescoCoreClient:
-        """Create Core API client"""
-        return AlfrescoCoreClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
-    
-    def create_discovery_client(self) -> AlfrescoDiscoveryClient:
-        """Create Discovery API client"""
-        return AlfrescoDiscoveryClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
-    
-    def create_search_client(self) -> AlfrescoSearchClient:
-        """Create Search API client"""
-        return AlfrescoSearchClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
-    
-    def create_workflow_client(self) -> AlfrescoWorkflowClient:
-        """Create Workflow API client"""
-        return AlfrescoWorkflowClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
-    
-    def create_model_client(self) -> AlfrescoModelClient:
-        """Create Model API client"""
-        return AlfrescoModelClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
-    
-    def create_search_sql_client(self) -> AlfrescoSearchSqlClient:
-        """Create Search SQL API client"""
-        return AlfrescoSearchSqlClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
-    
-    def create_all_clients(self) -> Dict[str, Any]:
-        """Create all available clients"""
-        return {
-            "auth": self.create_auth_client(),
-            "core": self.create_core_client(),
-            "discovery": self.create_discovery_client(),
-            "search": self.create_search_client(),
-            "workflow": self.create_workflow_client(),
-            "model": self.create_model_client(),
-            "search_sql": self.create_search_sql_client()
-        }
-    
-    def create_master_client(self) -> MasterClient:
-        """Create master client with dot syntax access"""
-        clients = self.create_all_clients()
-        return MasterClient(clients)
-'''
-        
-        with open(self.output_dir / "client_factory.py", "w", encoding='utf-8') as f:
-            f.write(factory_content)
-    
-    def _create_auth_utility(self):
-        """Create shared authentication utility"""
-        auth_content = '''"""
-Shared Authentication Utility
-
-Provides authentication management that can be shared across multiple API clients.
-Handles ticket-based authentication with automatic renewal.
-"""
-
-import asyncio
-from typing import Optional, Dict, Any
-from datetime import datetime, timedelta
-
-class AuthUtil:
-    """
-    Shared authentication utility for Alfresco APIs.
-    
-    Handles ticket-based authentication with automatic renewal.
-    Can be shared across multiple API clients.
-    """
-    
-    def __init__(
-        self,
-        base_url: str,
-        username: str,
-        password: str,
-        verify_ssl: bool = True,
-        timeout: int = 30
-    ):
-        """
-        Initialize authentication utility.
-        
-        Args:
-            base_url: Base URL of Alfresco instance
-            username: Alfresco username
-            password: Alfresco password
-            verify_ssl: Whether to verify SSL certificates
-            timeout: Request timeout in seconds
-        """
-        self.base_url = base_url.rstrip('/')
-        self.username = username
-        self.password = password
-        self.verify_ssl = verify_ssl
-        self.timeout = timeout
-        
-        self.ticket = None
-        self.ticket_expires = None
-        self._authenticated = False
-    
-    async def authenticate(self) -> bool:
-        """
-        Authenticate with Alfresco and get ticket.
-        
-        Returns:
-            True if authentication successful, False otherwise
-        """
-        try:
-            # Import here to avoid circular imports
-            from .clients.auth_client import AlfrescoAuthClient
-            from .models.alfresco_auth_models import TicketBody
-            
-            auth_client = AlfrescoAuthClient(self.base_url, None, self.verify_ssl, self.timeout)
-            
-            ticket_body = TicketBody(userId=self.username, password=self.password)
-            ticket_response = await auth_client.create_ticket(ticket_body)
-            
-            if ticket_response and hasattr(ticket_response, 'entry'):
-                self.ticket = ticket_response.entry.id
-                # Tickets typically expire after 1 hour
-                self.ticket_expires = datetime.now() + timedelta(hours=1)
-                self._authenticated = True
-                return True
-                
-        except Exception as e:
-            print(f"Authentication failed: {e}")
-            self._authenticated = False
-        
-        return False
-    
-    def is_authenticated(self) -> bool:
-        """Check if currently authenticated with valid ticket"""
-        if not self._authenticated or not self.ticket:
-            return False
-        
-        if self.ticket_expires and datetime.now() >= self.ticket_expires:
-            self._authenticated = False
-            return False
-        
-        return True
-    
-    def get_auth_headers(self) -> Dict[str, str]:
-        """Get authentication headers for API requests"""
-        if not self.is_authenticated():
-            return {}
-        
-        return {
-            "X-Alfresco-Ticket": self.ticket
-        }
-    
-    async def ensure_authenticated(self) -> bool:
-        """Ensure we have valid authentication, refresh if needed"""
-        if self.is_authenticated():
-            return True
-        
-        return await self.authenticate()
-'''
-        
-        with open(self.output_dir / "auth_util.py", "w", encoding='utf-8') as f:
-            f.write(auth_content)
-    
-    def _create_client_wrappers(self):
-        """Create individual client wrapper classes"""
-        clients_dir = self.output_dir / "clients"
-        clients_dir.mkdir(exist_ok=True)
-        
-        # Create clients __init__.py
-        with open(clients_dir / "__init__.py", "w", encoding='utf-8') as f:
-            f.write('"""Individual Alfresco API clients"""')
-        
-        # Create wrapper for each API
-        for api_name in self.apis.keys():
-            self._create_individual_client_wrapper(api_name, clients_dir)
-    
-    def _create_individual_client_wrapper(self, api_name: str, clients_dir: Path):
-        """Create wrapper for individual API client"""
-        class_name = f"Alfresco{api_name.title().replace('_', '')}Client"
-        
-        wrapper_content = f'''"""
-{class_name} - Individual client for Alfresco {api_name.upper()} API
-
-Wraps the generated HTTP client with enhanced functionality:
-- Automatic authentication handling
-- Pydantic model integration
-- Async/sync support
-- Error handling
-"""
-
-import sys
-from pathlib import Path
-from typing import Optional, Dict, Any
-
-# Add raw client to path
-raw_client_path = Path(__file__).parent.parent / "raw_clients" / "alfresco_{api_name}_client"
-if raw_client_path.exists():
-    # Find the actual package directory
-    package_dirs = [d for d in raw_client_path.iterdir() if d.is_dir() and not d.name.startswith('.')]
-    if package_dirs:
-        sys.path.insert(0, str(package_dirs[0]))
-
-class {class_name}:
-    """
-    Individual client for Alfresco {api_name.upper()} API.
-    
-    Features:
-    - Uses generated HTTP client internally
-    - Automatic authentication with AuthUtil
-    - Pydantic model integration
-    - Both sync and async methods
-    """
-    
-    def __init__(
-        self,
-        base_url: str,
-        auth_util: Optional[Any] = None,
-        verify_ssl: bool = True,
-        timeout: int = 30
-    ):
-        """
-        Initialize {api_name} client.
-        
-        Args:
-            base_url: Base URL of Alfresco instance
-            auth_util: Optional AuthUtil instance for authentication
-            verify_ssl: Whether to verify SSL certificates
-            timeout: Request timeout in seconds
-        """
-        self.base_url = base_url.rstrip('/')
-        self.auth_util = auth_util
-        self.verify_ssl = verify_ssl
-        self.timeout = timeout
-        
-        # Initialize the generated client
-        self._init_generated_client()
-    
-    def _init_generated_client(self):
-        """Initialize the generated HTTP client"""
-        try:
-            from client import Client
-            self.client = Client(base_url=self.base_url)
-            self._client_available = True
-        except ImportError as e:
-            print(f"⚠️  Generated client not available for {api_name}: {{e}}")
-            self.client = None
-            self._client_available = False
-    
-    def is_available(self) -> bool:
-        """Check if the generated client is available"""
-        return self._client_available
-    
-    async def _ensure_auth(self):
-        """Ensure authentication before API calls"""
-        if self.auth_util:
-            await self.auth_util.ensure_authenticated()
-    
-    def get_client_info(self) -> Dict[str, Any]:
-        """Get information about this client"""
-        return {{
-            "api": "{api_name}",
-            "base_url": self.base_url,
-            "authenticated": self.auth_util.is_authenticated() if self.auth_util else False,
-            "client_available": self._client_available
-        }}
-'''
-        
-        with open(clients_dir / f"{api_name}_client.py", "w", encoding='utf-8') as f:
-            f.write(wrapper_content)
+    # REMOVED: _create_client_wrappers() - Dangerous template function that would overwrite inheritance-based client files
+    # REMOVED: _create_individual_client_wrapper() - Helper function for client wrapper creation
     
     def _create_models_init(self):
         """Create models package __init__.py"""
