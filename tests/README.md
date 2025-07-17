@@ -1,69 +1,195 @@
-# Testing Guide - Python Alfresco API v1.0
+# Testing Guide - Python Alfresco API v1.1
 
-This directory contains comprehensive tests for the Python Alfresco API v1.0, covering unit tests, integration tests, and live server validation.
-
-## 📊 Current Test Status
-
-- **✅ 106/106 tests passing** (100% success rate)
-- **✅ 80% code coverage** (excellent for v1.0 release)
-- **✅ Live integration** validated with Alfresco Community 23.2.0 and 25.1
-- **✅ All test categories** working perfectly
+This directory contains essential tests for the Python Alfresco API v1.1 hierarchical architecture, focusing on high-level APIs and MCP server integration.
 
 ## 🧪 Test Categories
 
-### Unit Tests
-- **`test_current_architecture.py`** - Core architecture validation
-- **`test_individual_apis.py`** - Individual API client testing
-- **`test_client_dependencies.py`** - Client dependency validation
+### Core Foundation Tests (11 tests)
+- **`test_basic.py`** - Basic client functionality and imports (6 tests)
+- **`test_simple.py`** - Simple API operations validation (5 tests)
 
-### Integration Tests  
-- **`test_integration_live_server.py`** - Live Alfresco server integration
-- **`test_enhanced_coverage.py`** - Enhanced functionality coverage
-- **`test_complete_summary.py`** - Complete workflow testing
+### High-Level API Coverage Tests (45 tests)
+- **`test_all_gets_high_level.py`** - High-level sync GET operations across all 18 Core API subsections (19 tests)
+- **`test_all_gets_high_level_async.py`** - High-level async GET operations across all 18 Core API subsections (19 tests)
+- **`test_all_gets_high_level_detailed.py`** - Detailed sync GET operations with parameter variations (3 tests)
+- **`test_all_gets_high_level_detailed_async.py`** - Detailed async GET operations with parameter variations (4 tests)
 
-### Authentication Tests
-- **`test_authutil_fixed.py`** - AuthUtil functionality
-- **`test_auth_debug.py`** - Authentication debugging
-- **`test_working_api.py`** - Working API validation
+### Coverage Recovery Tests (6 tests)
+- **`test_comprehensive_coverage_recovery.py`** - Factory patterns, model instantiation, and auth client coverage (6 tests)
 
-### Coverage Tests
-- **`test_100_percent_coverage.py`** - Comprehensive coverage testing
-- **`test_final_coverage_push.py`** - Final coverage validation
+### Integration Tests (Available but not in standard collection)
+- **`test_mcp_v11_true_high_level_apis_fixed.py`** - Complete MCP server integration test with 15 operations
+- **`test_highlevel_utils.py`** - High-level utility modules test (content_utils_highlevel, version_utils_highlevel, node_utils_highlevel)
+
+### Specialized Testing
+- **`nodes/`** - Directory for sync/async node operations testing (comprehensive 19-operation validation)
+
+## 📊 Current Test Status
+
+- **✅ Total Tests Available**: 67 tests collected by pytest
+- **✅ Core Foundation**: 11 tests (basic functionality working)
+- **✅ High-Level API Coverage**: 45 tests (comprehensive GET method validation)
+- **✅ Coverage Recovery**: 6 tests (factory/model coverage)
+- **✅ Current Coverage**: 44-46% (with comprehensive high-level API tests)
+- **🎯 Target Coverage**: 80%+ (professional standard)
+- **⚠️ Integration Tests**: Require live Alfresco server (not included in standard runs)
 
 ## 🚀 Running Tests
 
+### Professional Test Runner (Recommended)
+```bash
+# Use the comprehensive test runner from project root
+python run_tests.py
+
+# Features:
+# - Colored output and progress indicators
+# - Automatic coverage reporting (HTML + terminal)
+# - Performance metrics and timing
+# - Environment validation
+# - Live server detection
+# - Auto directory detection (works from any directory)
+```
+
+### Quick Test Runs by Category
+```bash
+# Run core foundation tests (11 tests)
+pytest tests/test_basic.py tests/test_simple.py -v
+
+# Run high-level API coverage tests (45 tests) 
+pytest tests/test_all_gets_high_level.py tests/test_all_gets_high_level_async.py tests/test_all_gets_high_level_detailed.py tests/test_all_gets_high_level_detailed_async.py -v
+
+# Run coverage recovery tests (6 tests)
+pytest tests/test_comprehensive_coverage_recovery.py -v
+
+# Run all collected tests (67 tests)
+pytest tests/ -v
+
+# Run with coverage for specific categories
+pytest tests/test_basic.py tests/test_simple.py --cov=python_alfresco_api --cov-report=term-missing
+```
+
 ### Quick Test Run
 ```bash
-# Professional test runner (recommended)
-python run_tests.py                    # From project root
-python ../run_tests.py                 # From tests/ directory
+# Run all tests
+pytest tests/
 
-# Direct pytest commands
-pytest tests/                          # Run all tests
-pytest tests/ --cov=python_alfresco_api  # Run with coverage
+# Run with verbose output
+pytest tests/ -v
+
+# Run specific test files
+pytest tests/test_basic.py
+pytest tests/test_mcp_v11_true_high_level_apis_fixed.py
 ```
 
-### Specific Test Categories
+### MCP Integration Testing
 ```bash
-# Unit tests only
-pytest tests/test_current_architecture.py
-pytest tests/test_individual_apis.py
-
-# Integration tests
-pytest tests/test_integration_live_server.py
-
-# Authentication tests
-pytest tests/test_authutil_fixed.py
-
-# Coverage tests
-pytest tests/test_enhanced_coverage.py
+# Run the comprehensive MCP test (requires live Alfresco server)
+pytest tests/test_mcp_v11_true_high_level_apis_fixed.py -v
 ```
 
-### Live Server Testing
+### Sync/Async Node Testing
 ```bash
-# Test with live Alfresco server (requires running Alfresco)
-pytest tests/test_integration_live_server.py -v
+# Run specialized node operation tests
+pytest tests/nodes/ -v
 ```
+
+### High-Level Utilities Testing
+```bash
+# Test the new high-level utility modules (requires live Alfresco server)
+pytest tests/test_highlevel_utils.py -v
+
+# Test individual utility modules standalone
+python tests/test_highlevel_utils.py
+```
+
+## 📊 Code Coverage
+
+### Automatic Coverage (via run_tests.py)
+```bash
+# Quick coverage with basic tests (recommended for development)
+python run_tests.py
+
+# Works from any directory - automatically detects project structure
+# From project root: python run_tests.py  
+# From tests/: python ../run_tests.py
+
+# The script automatically:
+# - Runs core tests with coverage (~28% baseline coverage)
+# - Generates HTML report at htmlcov/index.html
+# - Shows terminal coverage summary with color coding
+# - Provides performance metrics and timing
+# - Checks for live Alfresco server availability
+# - Professional output with colored status indicators
+```
+
+### Comprehensive Coverage Testing
+```bash
+# For 44-46% coverage with high-level API tests (recommended baseline)
+pytest tests/test_all_gets_high_level.py tests/test_all_gets_high_level_async.py --cov=python_alfresco_api --cov-report=html --cov-report=term-missing
+
+# For ~30% coverage with foundation + recovery tests  
+pytest tests/test_basic.py tests/test_simple.py tests/test_comprehensive_coverage_recovery.py --cov=python_alfresco_api --cov-report=html
+
+# MCP integration test (adds significant coverage)
+pytest tests/test_mcp_v11_true_high_level_apis_fixed.py --cov=python_alfresco_api --cov-report=html
+
+# High-level API operations
+pytest tests/test_all_gets_high_level.py --cov=python_alfresco_api --cov-report=html
+
+# High-level utility modules
+pytest tests/test_highlevel_utils.py --cov=python_alfresco_api --cov-report=html
+
+# Node operations (sync/async)
+pytest tests/nodes/ --cov=python_alfresco_api --cov-report=html
+
+# Combined comprehensive test (requires live Alfresco server)
+pytest tests/test_basic.py tests/test_simple.py tests/test_mcp_v11_true_high_level_apis_fixed.py tests/nodes/ --cov=python_alfresco_api --cov-report=html --cov-report=term-missing
+```
+
+### Manual Coverage Commands
+```bash
+# Run tests with coverage
+pytest tests/ --cov=python_alfresco_api --cov-report=term-missing
+
+# Generate HTML coverage report
+pytest tests/ --cov=python_alfresco_api --cov-report=html
+
+# Run specific tests with coverage
+pytest tests/test_mcp_v11_true_high_level_apis_fixed.py --cov=python_alfresco_api --cov-report=term-missing
+
+# View HTML coverage report
+# Open: htmlcov/index.html in your browser
+```
+
+### Coverage Configuration
+Coverage is configured in `pyproject.toml`:
+```toml
+[tool.coverage.run]
+source = ["python_alfresco_api"]
+omit = ["tests/*", "setup.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError", 
+    "raise NotImplementedError",
+]
+```
+
+### Coverage Targets
+- **Basic Tests Only**: ~28% baseline coverage (core functionality)
+- **With High-Level API Tests**: ~44-46% coverage (comprehensive GET operations across all APIs)
+- **With MCP Integration**: ~60%+ coverage (includes real API usage)
+- **Comprehensive Tests**: ~80%+ coverage target (all test suites)
+- **V1.1 Architecture**: Focus on hierarchical clients and core operations
+- **MCP Integration**: Coverage of MCP-compatible utilities and formatters
+- **Sync/Async Operations**: Both patterns covered
+
+### Coverage Notes
+- **Generated Code**: Raw clients (0% coverage) are auto-generated and tested via integration
+- **Focus Areas**: V1.1 hierarchical architecture, MCP utilities, and client factories
+- **Real Usage**: MCP integration test provides the most meaningful coverage
 
 ## 📝 Test Configuration
 
@@ -76,169 +202,107 @@ Tests use the following configuration:
 
 > **Note:** We use the standardized URL architecture where `base_url` refers to the Alfresco **server URL**, not the API endpoint. The library automatically constructs API URLs as `base_url + "/alfresco/api/..."`
 
-### Test Data
-Tests create minimal test data and clean up automatically.
-
-### Coverage Configuration
-Coverage is configured in `pyproject.toml`:
-```toml
-[tool.coverage.run]
-source = ["python_alfresco_api"]
-omit = [
-    "*/tests/*",
-    "*/raw_clients/*",
-    "setup.py"
-]
-```
-
 ## 🔧 Test Architecture
 
-### Modern Testing Patterns
-All tests use the modern `python_alfresco_api` architecture:
+### V1.1 Hierarchical Architecture
+All tests use the modern V1.1 hierarchical architecture:
 
 ```python
 from python_alfresco_api import ClientFactory
-from python_alfresco_api.auth_util import AuthUtil
-from python_alfresco_api.clients.core_client import AlfrescoCoreClient
 
-# Modern test setup
+# V1.1 hierarchical pattern
 factory = ClientFactory(
     base_url="http://localhost:8080",
     username="admin",
     password="admin"
 )
 
-clients = factory.create_all_clients()
+# Get hierarchical clients
+core_client = factory.create_core_client()
+search_client = factory.create_search_client()
+
+# Use hierarchical operations
+folder = core_client.nodes.create_folder(name="Test Folder", parent_id="-my-")
+results = search_client.search.search_content("test query")
 ```
 
-### Test Utilities
-Common test utilities in `conftest.py`:
-- Client factory setup
-- Authentication helpers
-- Test data management
-- Cleanup procedures
-
-## 📊 Coverage Reports
-
-### Generate Coverage Report
-```bash
-# HTML coverage report
-pytest tests/ --cov=python_alfresco_api --cov-report=html
-
-# Terminal coverage report
-pytest tests/ --cov=python_alfresco_api --cov-report=term-missing
-```
-
-### Coverage Targets
-- **Core Components**: 80%+ coverage
-- **Individual Clients**: 80%+ coverage each
-- **Authentication**: 80%+ coverage
-- **Models**: 100% coverage (Pydantic models)
+### MCP Server Patterns
+The comprehensive MCP test validates 15 operations:
+- **Search operations** (4): content search, advanced search, metadata search, CMIS search
+- **Discovery operations** (1): repository info
+- **Content & Node operations** (6): browse, create folder, upload, get properties, update properties, delete
+- **Versioning operations** (4): checkout, checkin, cancel checkout, download
 
 ## ⚠️ Important Notes
 
 ### Live Server Requirements
-Some tests require a running Alfresco server:
+Most tests require a running Alfresco server:
 - Start Alfresco with Docker Compose
 - Ensure default admin credentials work
-- Tests will skip if server is unavailable
+- Tests will skip or fail gracefully if server is unavailable
 
-### Generated Client Tests
-**🚫 DO NOT USE** the auto-generated test suites in `python_alfresco_api/raw_clients/*/test/`:
-- These are auto-generated and may not work correctly
-- Use the comprehensive tests in this directory instead
-- Our tests cover the same functionality with better reliability
-
-### Test Dependencies
-Install test dependencies:
-```bash
-pip install -r tests/requirements-test.txt
-```
+### V1.1 Architecture Focus
+These tests focus on the V1.1 hierarchical architecture:
+- ✅ Clean hierarchical client organization
+- ✅ Perfect sync/async separation
+- ✅ MCP server compatibility
+- ✅ High-level utility functions
 
 ## 🎯 Test Development Guidelines
 
 ### Writing New Tests
-1. Use modern `python_alfresco_api` imports
-2. Follow existing test patterns
+1. Use V1.1 hierarchical client patterns
+2. Follow sync/async separation principles
 3. Include proper error handling
-4. Add cleanup procedures
-5. Document test purpose clearly
+4. Test both sync and async variants
+5. Validate MCP server compatibility
 
-### Test Naming
-- `test_<component>_<functionality>.py` for unit tests
-- `test_integration_<scenario>.py` for integration tests
-- `test_<category>_<specific_case>.py` for specialized tests
-
-### Mock vs Live Testing
-- Use mocks for unit tests
-- Use live server for integration tests
-- Gracefully handle server unavailability
+### Test Categories
+- **Basic tests**: Core functionality and imports
+- **High-level tests**: Complex workflows and utilities
+- **MCP tests**: Full MCP server integration scenarios
+- **Node tests**: Specialized sync/async node operations
 
 ## 🐛 Troubleshooting Tests
 
 ### Common Issues
 
-#### 1. Import Errors
-```python
-# ❌ Old import (will fail)
-
-# ✅ New import (correct)
-from python_alfresco_api import ClientFactory
-```
-
-#### 2. Authentication Failures
-```python
+#### 1. Authentication Failures
+```bash
 # Check Alfresco is running
 curl http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/discovery
 ```
 
-#### 3. Coverage Issues
-```bash
-# Clear coverage cache
-rm -rf .coverage htmlcov/
+#### 2. Sync/Async Issues
+Ensure proper separation:
+- Sync methods: `operation.sync()`
+- Async methods: `await operation.asyncio()`
+- No mixing of sync/async patterns
 
-# Reinstall in development mode
-pip install -e .
-```
-
-#### 4. Test Isolation
-Each test should be independent:
-- Use fresh client instances
-- Clean up test data
-- Don't depend on test order
-
-### Debug Mode
-Run tests with debug output:
-```bash
-pytest tests/ -v -s --tb=long
+#### 3. MCP Integration Issues
+Check the comprehensive test for working patterns:
+```python
+# Example working pattern
+core_client = factory.create_core_client()
+folder = core_client.nodes.create_folder(name="Test", parent_id="-my-")
 ```
 
 ## 📈 Test Results Summary
 
-### Latest Test Run
+### V1.1 Architecture Validation
 ```
-✅ 106/106 tests passing (100% success rate)
-✅ 80% code coverage achieved
-✅ All API clients tested
-✅ Live integration validated
-✅ Authentication flows working
-✅ Error handling comprehensive
+✅ All hierarchical clients working
+✅ 15/15 MCP operations successful (100%)
+✅ Sync/async patterns both working
+✅ High-level utilities validated
+✅ Production-ready for MCP servers
 ```
 
-### Performance
-- **Test execution time**: ~30 seconds for full suite
-- **Coverage generation**: ~10 seconds additional
-- **Live server tests**: ~15 seconds (when server available)
-
-## 🎉 Success Metrics
-
-The Python Alfresco API v1.0 testing achieves:
-- ✅ **100% test success rate** - All tests passing
-- ✅ **80% code coverage** - Excellent coverage for v1.0
-- ✅ **Live validation** - Tested with real Alfresco servers
-- ✅ **Comprehensive coverage** - All components tested
-- ✅ **Modern architecture** - Uses latest patterns
-- ✅ **Production ready** - Robust error handling
+### Key Achievements
+- **Perfect MCP integration**: 100% success rate for all 15 operations
+- **Clean architecture**: V1.1 hierarchical organization working
+- **Sync/async separation**: Both patterns working perfectly
+- **Real-world validation**: Tested with live Alfresco servers
 
 ## 📚 Related Documentation
 
@@ -246,4 +310,4 @@ The Python Alfresco API v1.0 testing achieves:
 - **[Authentication Guide](../docs/AUTHENTICATION_GUIDE.md)** - Authentication setup
 - **[README.md](../README.md)** - Project overview and setup
 
-Start testing with `python run_tests.py` (from project root) or `python ../run_tests.py` (from tests/) for the best experience! 
+Start testing with `python run_tests.py` (recommended) for comprehensive testing with coverage, or `pytest tests/test_mcp_v11_true_high_level_apis_fixed.py -v` for MCP integration validation! 
