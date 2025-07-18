@@ -45,12 +45,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     model arch and conversion, event system, testing, project structure, requirements, ref to package developer guide, ref to related projects
   - Added sample-dot-env.txt example for.env file
 
-#### Changed
+### Changed
   - In pyproject.toml minimum now Python 3.10, added Python 3.13. 
   - .gitignore ignores Cursor files
   - run_tests.py updated for tests available in v1.1 
-
-
 
 
 ### Added
