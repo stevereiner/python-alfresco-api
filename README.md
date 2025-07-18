@@ -1,35 +1,41 @@
-# python-alfresco-api v1.0
+# Python-Alfresco-API v1.1
 
 **A Complete Python client package for developing python code and apps for Alfresco. Great for doing AI development 
-with Python based LangChain, LlamaIndex, neo4j-graphrag, etc. Also great for creating MCP servers (see python-alfreso-mcp-server in this repository).**
+with Python based LangChain, LlamaIndex, neo4j-graphrag, etc. Also great for creating MCP servers (see [python-alfresco-mcp-server](https://github.com/stevereiner/python-alfresco-mcp-server)).**
 
 Note this uses the remote Alfresco REST APIs. Not for in-process development in Alfresco.
 
-A modern, type-safe Python client library for Alfresco Content Services REST APIs with comprehensive Pydantic v2 model integration and async support.
+A modern, type-safe Python client library for Alfresco Content Services REST APIs with dual model architecture (attrs + Pydantic) and async support.
 
 [![PyPI version](https://img.shields.io/pypi/v/python-alfresco-api.svg)](https://pypi.org/project/python-alfresco-api/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/python-alfresco-api.svg)](https://pypi.org/project/python-alfresco-api/)
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![Pydantic](https://img.shields.io/badge/pydantic-v2-green.svg)](https://pydantic.dev/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](#testing)
 
 ## 🚀 Features
 
 - **Complete API Coverage**: All 7 Alfresco REST APIs (Auth, Core, Discovery, Search, Workflow, Model, Search SQL)
-- **1,400+ Pydantic v2 Models**: Type-safe data validation and serialization
+- **328+ Complete Domain Models**: attrs-based raw client models with separate Pydantic models available for AI integration
+- **Model Conversion Utilities**: Bridge utilities for attrs ↔ Pydantic transformation when needed
 - **Async/Sync Support**: Both synchronous and asynchronous API calls
 - **Modular Architecture**: Individual client design for scalability
-- **LLM/AI Ready**: Type-safe Pydantic v2 models perfect for AI integration and tool interfaces
+- **AI/LLM Ready**: Pydantic models available for AI integration, MCP servers, and tool interfaces
 - **Event System**: ActiveMQ and Event Gateway support for Python apps to handle change events 
 - **Docker Compatible**: Works with Alfresco running in separate Docker Compose setups
-- **Comprehensive Testing**: 100% unit and live Alfresco integration tests
+- **Comprehensive Testing**: Extensive unit and live Alfresco integration tests
 
 ## 📚 Documentation & Examples
 
+- **[🏗️ Architecture Overview and Diagram](docs/ARCH_DIAGRAM_AND_OVERVIEW.md)** - V1.1 hierarchical architecture with visual diagram
 - **[📖 Complete Documentation](docs/)** - Comprehensive guides and API documentation
 - **[🎯 Working Examples](examples/)** - Live code examples and usage patterns
 - **[🧪 Test Suite](tests/)** - Complete test coverage and integration examples
+
+## 🤖 MCP Server / LLM Integration 
+
+### See [python-alfresco-mcp-server](https://github.com/stevereiner/python-alfresco-mcp-server)
+This is a MCP Server that uses Python Alfresco API
 
 ## 📦 Installation
 
@@ -40,8 +46,8 @@ A modern, type-safe Python client library for Alfresco Content Services REST API
 ```bash
 pip install python-alfresco-api
 ```
-
-**All features included** - No optional dependencies needed! Includes event system, async support, and all 7 Alfresco APIs.
+- **Requres**: Python: 3.10+
+- **All features included** - No optional dependencies needed! Includes event system, async support, and all 7 Alfresco APIs.
 
 ### Virtual Environment Setup (Recommended)
 
@@ -66,9 +72,6 @@ where python
 # Install dependencies
 pip install -r requirements.txt
 
-# For development (RECOMMENDED - includes mypy, black, pytest, etc.)
-pip install -e .[dev]
-
 # Deactivate when done
 deactivate
 ```
@@ -92,40 +95,23 @@ which python
 # Install dependencies
 pip install -r requirements.txt
 
-# For development (RECOMMENDED - includes mypy, black, pytest, etc.)
-pip install -e .[dev]
-
 # Deactivate when done
 deactivate
 ```
 
-#### Alternative: Using conda
 
-```bash
-# Create conda environment
-conda create -n alfresco-api python=3.11
-conda activate alfresco-api
+### Package Installation
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Deactivate when done
-conda deactivate
-```
-
-### Runtime Installation
-
-Install the package for production use:
+Install the package form PyPI use:
 
 ```bash
 pip install python-alfresco-api
 ```
 
-This installs all features including event system support.
 
-### Development Installation
+### Development with source
 
-For development, testing, or package regeneration:
+For development your project with source of python-alfresco-api for debugging
 
 ```bash
 # After setting up virtual environment above
@@ -136,37 +122,98 @@ cd python-alfresco-api
 # Windows: venv\Scripts\activate
 # Linux/macOS: source venv/bin/activate
 
-# Install development dependencies (RECOMMENDED)
-pip install -e .[dev]
-
-# Or install in development mode
+# Install in development mode
 pip install -e .
 ```
 
-## 🎯 Quick Start
+## Alfresco Installation 
 
-### Basic Usage
+If you don't have an Alfresco server installed you can get a docker for the 
+Community version from Github
+   ```bash
+   git clone https://github.com/Alfresco/acs-deployment.git
+```
+**Start Alfresco with Docker Compose**
+   ```bash
+   cd acs-deployment/docker-compose
+```
+   Note: you will likely need to comment out activemq ports other than 8161
+   in community-compose.yaml
+   ```bash   
+      ports:
+      - "8161:8161" # Web Console
+      #- "5672:5672" # AMQP
+      #- "61616:61616" # OpenWire
+      #- "61613:61613" # STOMP
+
+    docker-compose -f community-compose.yaml up
+```
+
+## 🎯 Environment Setup
+
+### Environment Configuration (Recommended)
+
+For easy configuration, copy the sample environment file:
+```bash
+cp sample-dot-env.txt .env
+# Edit .env with your Alfresco settings
+```
+
+## Factory Pattern 
+
+The factory pattern provides shared authentication and centralized configuration:
 
 ```python
 from python_alfresco_api import ClientFactory
 
-# Create client factory
+# Automatic configuration (loads from .env file or environment variables)
+factory = ClientFactory()  # Uses ALFRESCO_URL, ALFRESCO_USERNAME, etc.
+
+# Or explicit configuration
 factory = ClientFactory(
     base_url="http://localhost:8080",
     username="admin",
     password="admin"
 )
 
-# Get all clients
-clients = factory.create_all_clients()
-
-# Use individual clients
+# Create individual clients (all share same authentication session)
 auth_client = factory.create_auth_client()
 core_client = factory.create_core_client()
 search_client = factory.create_search_client()
+workflow_client = factory.create_workflow_client()
+discovery_client = factory.create_discovery_client()
+model_client = factory.create_model_client()
+search_sql_client = factory.create_search_sql_client()  # SOLR admin only
+
+# Can also use a master client like setup with all clients initialized
+master_client = factory.create_master_client()
+
 ```
 
-### Async Usage
+
+### Authentication
+
+For standard Alfresco authentication (recommended):
+
+```python
+from python_alfresco_api import AuthUtil, ClientFactory
+
+# Primary authentication pattern - Basic Auth with Alfresco
+auth_util = AuthUtil(
+    base_url="http://localhost:8080",
+    username="admin",
+    password="admin"
+)
+
+# Use with factory for shared authentication
+factory = ClientFactory(auth_util=auth_util)
+clients = factory.create_all_clients()
+```
+
+**Alternative Authentication:**
+- `OAuth2AuthUtil` is available for enterprise OAuth2-based authentication but has not been live tested
+
+### Sync and Async Usage
 
 ```python
 import asyncio
@@ -179,302 +226,194 @@ async def main():
         password="admin"
     )
     
-    # Authenticate
-    await factory.auth.authenticate()
+    # Create core client for node operations
+    core_client = factory.create_core_client()
     
-    # Use authenticated API calls
-    # Your async API operations here
+    # Sync node operation
+    sync_node = core_client.get_node("-my-")
+    print(f"Sync: User folder '{sync_node.entry.name}'")
+    
+    # Async node operation
+    async_node = await core_client.get_node_async("-my-")
+    print(f"Async: User folder '{async_node.entry.name}'")
 
+# Run the async example
 asyncio.run(main())
 ```
 
-### Architecture Options
+## 🎯 Key Operations & Examples
 
-#### Option 1: Individual Clients + Factory Pattern (Recommended)
+### Essential Operation Samples
 
+Quick examples of the most common operations. **👉 For complete coverage, see [📖 Essential Operations Guide](docs/ESSENTIAL_OPERATIONS_GUIDE.md)**
+
+#### Basic Setup
 ```python
 from python_alfresco_api import ClientFactory
+from python_alfresco_api.utils import content_utils_highlevel
 
-# Factory pattern for easy configuration
-factory = ClientFactory(
-    base_url="http://localhost:8080",
-    username="admin",
-    password="admin"
-)
-
-# Individual clients for modular architecture
-auth_client = factory.create_auth_client()
+factory = ClientFactory(base_url="http://localhost:8080", username="admin", password="admin")
 core_client = factory.create_core_client()
+```
+
+#### Create Folder & Upload Document
+```python
+# Create folder (High-Level Utility)
+folder_result = content_utils_highlevel.create_folder_highlevel(
+    core_client=core_client,
+    name="My Project Folder", 
+    parent_id="-my-"
+)
+
+# Upload document with auto-versioning
+document_result = content_utils_highlevel.create_and_upload_file_highlevel(
+    core_client=core_client,
+    file_path="/path/to/document.pdf",
+    parent_id=folder_result['id']
+)
+```
+
+#### Search Content
+```python
+from python_alfresco_api.utils import search_utils
+
 search_client = factory.create_search_client()
-workflow_client = factory.create_workflow_client()
+
+# Simple text search (already optimized!)
+results = search_utils.simple_search(
+    search_client=search_client,
+    query_str="finance AND reports",
+    max_items=25
+)
 ```
 
-#### Option 2: Master Client Pattern (Unified Interface)
+#### Download Document
+```python
+# Download document content
+content_response = core_client.nodes.get_content(node_id=document_id)
+
+# Save to file
+with open("downloaded_document.pdf", "wb") as file:
+    file.write(content_response.content)
+```
+
+#### Get & Set Properties
+```python
+from python_alfresco_api.utils import content_utils_highlevel
+
+# Get node properties and details
+node_info = content_utils_highlevel.get_node_info_highlevel(
+    core_client=core_client,
+    node_id=document_id
+)
+print(f"Title: {node_info.get('properties', {}).get('cm:title', 'No title')}")
+
+# Update node properties
+update_request = {
+    "properties": {
+        "cm:title": "Updated Document Title",
+        "cm:description": "Updated via Python API"
+    }
+}
+updated_node = core_client.nodes.update(node_id=document_id, request=update_request)
+```
+
+#### Document Versioning - Checkout & Checkin
+```python
+from python_alfresco_api.utils import version_utils_highlevel
+
+# Checkout document (lock for editing)
+checkout_result = version_utils_highlevel.checkout_document_highlevel(
+    core_client=core_client,
+    node_id=document_id
+)
+
+# Later: Checkin with updated content (create new version)
+checkin_result = version_utils_highlevel.checkin_document_highlevel(
+    core_client=core_client,
+    node_id=document_id,
+    content="Updated document content",
+    comment="Fixed formatting and added new section"
+)
+```
+
+### 📚 Complete Documentation & Examples
+
+| Resource | Purpose | What You'll Find |
+|----------|---------|------------------|
+| **[📖 Essential Operations Guide](docs/ESSENTIAL_OPERATIONS_GUIDE.md)** | **Complete operation coverage** | All operations with both high-level utilities and V1.1 APIs |
+| **[📁 examples/operations/](examples/operations/)** | **Copy-paste examples** | Windows-compatible, production-ready code |
+| **[🧪 tests/test_mcp_v11_true_high_level_apis_fixed.py](tests/test_mcp_v11_true_high_level_apis_fixed.py)** | **MCP Server patterns** | 15 operations with sync/async patterns |
+| **[🧪 tests/test_highlevel_utils.py](tests/test_highlevel_utils.py)** | **High-level utilities testing** | Real Alfresco integration examples |
+
+#### 🎯 Production-Ready Examples (examples/operations/)
+
+| Example File | Key Operations |
+|--------------|----------------|
+| **[upload_document.py](examples/operations/upload_document.py)** | Document upload, automatic versioning, batch uploads |
+| **[versioning_workflow.py](examples/operations/versioning_workflow.py)** | Checkout → Edit → Checkin workflow, version history |
+| **[basic_operations.py](examples/operations/basic_operations.py)** | Folder creation, CRUD operations, browsing, deletion |
+| **[search_operations.py](examples/operations/search_operations.py)** | Content search, metadata queries, advanced search |
+
+
+
+### 🔄 Model Architecture & Conversion (V1.1)
+
+V1.1 implements a dual model system with conversion utilities:
+
+| Component | Model Type | Purpose |
+|-----------|------------|---------|
+| **Raw Client Models** | `@_attrs_define` | Complete OpenAPI domain models (`RepositoryInfo`, `NodeEntry`, etc.) |
+| **Pydantic Models** | `BaseModel` | AI/LLM integration, validation, type safety |
+| **Conversion Utils** | Bridge utilities | Transformation between attrs ↔ Pydantic |
+
+**For detailed guidance**, see **[📖 Pydantic Models Guide](docs/PYDANTIC_MODELS_GUIDE.md)** and **[🔄 Conversion Utilities Design](docs/CONVERSION_UTILITIES_DESIGN.md)**.
 
 ```python
-from python_alfresco_api import ClientFactory
+# ✅ V1.1: Two model systems with conversion utilities
+from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate  # Pydantic
+from python_alfresco_api.raw_clients.alfresco_core_client.models import NodeBodyCreate as AttrsNodeBodyCreate  # attrs
+from python_alfresco_api.clients.conversion_utils import pydantic_to_attrs_dict
 
-# Create factory
-factory = ClientFactory(
-    base_url="http://localhost:8080",
-    username="admin",
-    password="admin"
-)
+# 1. Use Pydantic for validation and AI integration
+pydantic_model = NodeBodyCreate(name="document.pdf", nodeType="cm:content")
 
-# Master client with dot syntax access
-master_client = factory.create_master_client()
+# 2. Convert for raw client usage  
+factory = ClientFactory()
+core_client = factory.create_core_client()
 
-# Use dot syntax for API access
-nodes = master_client.core.get_node("some-node-id")
-results = master_client.search.search("my query")
-ticket = master_client.auth.create_ticket()
-processes = master_client.workflow.list_processes()
+# Option A: Manual conversion via model_dump()
+result = core_client.create_node(pydantic_model.model_dump())
+
+# Option B: Conversion utilities (V1.1)
+attrs_dict = pydantic_to_attrs_dict(pydantic_model, target_class_name="NodeBodyCreate") 
+result = core_client.create_node(attrs_dict)
+
+# 3. Raw clients return attrs-based domain models
+repository_info = discovery_client.get_repository_information()  # Returns attrs RepositoryInfo
+# Convert to dict for further processing
+repo_dict = repository_info.to_dict()
 ```
 
-#### Option 3: Direct Individual Clients (No Factory)
+### V1.2 Roadmap: Unified Pydantic Architecture
+
+V1.2 will migrate raw client models from attrs to Pydantic v2:
 
 ```python
-# Direct client creation without factory
-from python_alfresco_api.clients import (
-    AlfrescoAuthClient,
-    AlfrescoCoreClient,
-    AlfrescoSearchClient,
-    AlfrescoWorkflowClient
-)
-from python_alfresco_api import AuthUtil
+# 🎯 V1.2 Target: Single Pydantic model system
+from python_alfresco_api.raw_clients.alfresco_core_client.models import NodeBodyCreate  # Will be Pydantic!
 
-# Create auth utility
-auth_util = AuthUtil(
-    base_url="http://localhost:8080",
-    username="admin",
-    password="admin"
-)
-
-# Create individual clients directly
-auth_client = AlfrescoAuthClient("http://localhost:8080")
-core_client = AlfrescoCoreClient("http://localhost:8080", auth_util)
-search_client = AlfrescoSearchClient("http://localhost:8080", auth_util)
+# No conversion needed - everything is Pydantic BaseModel
+pydantic_model = NodeBodyCreate(name="document.pdf", nodeType="cm:content")
+result = core_client.create_node(pydantic_model)  # Direct usage!
 ```
 
-All approaches provide:
-- **Type Safety**: Full Pydantic v2 model integration
-- **Async Support**: Modern async/await patterns
-- **Authentication**: Automatic ticket-based auth with renewal
-- **Error Handling**: Comprehensive error management
+**Notes**
+- V1.1: Dual system with conversion utilities
+- Pydantic models: Available for AI/LLM integration and validation  
+- Raw client models: attrs-based with 328+ complete domain models
+- V1.2: Will unify to Pydantic v2 throughout
 
-### Pydantic Models
-
-```python
-from python_alfresco_api.models.alfresco_core_models import NodeBodyCreate
-from python_alfresco_api.models.alfresco_auth_models import TicketBody
-
-# Type-safe model creation
-node_data = NodeBodyCreate(
-    name="my-document.txt",
-    nodeType="cm:content",
-    properties={"cm:title": "My Document"}
-)
-
-# Serialize to dict/JSON
-node_dict = node_data.model_dump()
-node_json = node_data.model_dump_json()
-
-# Validation
-ticket = TicketBody(userId="admin", password="admin")
-```
-
-
-
-## 🔧 Code Regeneration
-
-The library uses OpenAPI 3.0 specifications for generating both Pydantic models and HTTP clients.
-These were derived from alfresco swagger / openapi 2.0 yaml files, processed to clean (still openapi 2.0) and then
-given to swagger2openapi to convert to openapi 3.0 .
-
-### Prerequisites
-
-Install development dependencies:
-
-```bash
-# RECOMMENDED - includes mypy, black, pytest, etc.
-pip install -e .[dev]
-
-# Alternative (may have missing dependencies)
-pip install -r requirements-dev.txt
-```
-
-### Regeneration Steps
-
-1. **Update OpenAPI Specifications**
-
-   Download the latest specifications from [Alfresco API Explorer](https://api-explorer.alfresco.com/api-explorer/) and place them in:
-   ```
-   openapi/openapi2/alfresco-auth.yaml
-   openapi/openapi2/alfresco-core.yaml
-   openapi/openapi2/alfresco-discovery.yaml
-   openapi/openapi2/alfresco-search.yaml
-   openapi/openapi2/alfresco-workflow.yaml
-   openapi/openapi2/alfresco-model.yaml
-   openapi/openapi2/alfresco-search-sql.yaml
-   ```
-
-2. **Run the Generation Pipeline**
-
-   ```bash
-   python scripts/generate_hybrid_pipeline.py
-   ```
-
-   This script:
-   - Processes and cleans the OpenAPI 2.0 specifications
-   - Converts them to OpenAPI 3.0 format
-   - Generates Pydantic v2 models from OpenAPI 3.0
-   - Generates HTTP clients from OpenAPI 3.0
-   - Creates the unified package structure
-
-3. **Manual Steps (if needed)**
-
-   Generate individual components:
-
-   ```bash
-   # Generate Pydantic models from OpenAPI 3.0
-   datamodel-codegen \
-     --input openapi/openapi3/alfresco-core.yaml \
-     --output python_alfresco_api/models/alfresco_core_models.py \
-     --target-python-version 3.8
-
-   # Generate HTTP client from OpenAPI 3.0
-   openapi-python-client generate \
-     --path openapi/openapi3/alfresco-core.yaml \
-     --config client_config.yaml
-   ```
-
-4. **Package Integration**
-
-   The pipeline automatically:
-   - Creates individual client wrappers
-   - Sets up the ClientFactory
-   - Configures AuthUtil integration
-   - Establishes the unified package structure
-
-### Generation Configuration
-
-Configuration files for all Alfresco API clients are organized in the `config/` folder:
-
-```
-config/
-├── auth.yaml          # Authentication API → auth_client
-├── core.yaml          # Core Repository API → core_client  
-├── discovery.yaml     # Discovery API → discovery_client
-├── search.yaml        # Search API → search_client
-├── workflow.yaml      # Workflow API → workflow_client
-├── model.yaml         # Model API → model_client
-├── search_sql.yaml    # Search SQL API → search_sql_client
-├── general.yaml       # Unified package → alfresco_client
-└── README.md          # Configuration documentation
-```
-
-**Example configuration** (`config/auth.yaml`):
-
-```yaml
-# Alfresco Auth API Client Configuration
-class_overrides:
-  "Error": "AuthError"
-  "HTTPValidationError": "AuthValidationError"
-
-project_name_override: "auth_client"
-package_name_override: "auth_client"
-
-field_constraints: true
-use_annotated: true
-```
-
-**Usage**:
-
-```bash
-# Generate specific API client
-openapi-python-client generate \
-  --path openapi/openapi3/alfresco-auth.yaml \
-  --config config/auth.yaml \
-  --output-path clients/auth_client
-```
-
-**Note**: All generated package names use short, practical names instead of the default long names. See `config/README.md` for complete documentation and customization options.
-
-## 🧪 Testing
-
-### Run Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=python_alfresco_api --cov-report=html
-
-# Run specific test suites
-pytest tests/test_current_architecture.py
-pytest tests/test_enhanced_coverage.py
-```
-
-### Live Integration Tests
-
-To run tests against a live Alfresco server (tested with Community Edition 23.2.0 and Community Edition 25.1):
-
-1. **Start Alfresco with Docker Compose**
-
-   ```yaml
-   # docker-compose.yml - Community Edition (tested with 23.2.0 and 25.1)
-   version: '3.8'
-   services:
-     alfresco:
-       image: alfresco/alfresco-content-repository-community:23.2.0
-       # or: alfresco/alfresco-content-repository-community:25.1.0
-       ports:
-         - "8080:8080"
-       environment:
-         JAVA_OPTS: "-Xms1500m -Xmx1500m"
-   ```
-
-   ```bash
-   docker-compose up -d
-   ```
-
-2. **Run Integration Tests**
-
-   ```bash
-   pytest tests/ -m integration
-   ```
-
-### Test Coverage
-
-Current test coverage: **80%** of code lines tested with **106/106 tests passing** (100% success rate)
-
-- **Core Components**: 80%+ test coverage
-- **Pydantic Models**: 100% test coverage (1,400+ classes)  
-- **Live Integration**: 100% functional validation (tested with Community Edition 23.2.0 and 25.1)
-- **Individual Clients**: 81% test coverage each
-- **Authentication**: 81% test coverage
-- **Client Factory**: 94% test coverage
-- **Master Client**: 70% test coverage
-
-### Test Runner Script
-
-Use the convenient test runner for professional output:
-
-```bash
-# From project root
-python run_tests.py
-
-# From tests directory  
-cd tests && python ../run_tests.py
-```
-
-The test runner automatically detects your location and provides:
-- Colored output and progress indicators
-- Coverage reporting with visual display
-- Live integration test status
-- Performance metrics and timing
-- Auto-adjusts working directory as needed
 
 ## 🔌 Event System
 
@@ -515,78 +454,42 @@ await event_client.create_subscription("node-events")
 await event_client.start_listening()
 ```
 
-## 🤖 MCP Server / LLM Integration ([see python-alfresco-mcp-server](https://github.com/stevereiner/python-alfresco-mcp-server))
 
-Perfect for Model Context Protocol (MCP) servers with FastMCP 2.0 and type-safe Pydantic v2 models:
+## 🔧 For Developing the Python Alfresco API Package
 
-### FastMCP 2.0 Server Example
+For complete development documentation including the **3-step generation process** (Pydantic models → HTTP clients → High-level APIs), see **[📖 Package Developers Guide](docs/PACKAGE_DEVELOPERS_GUIDE.md)**.
 
-```python
-from fastmcp import FastMCP
-from python_alfresco_api import ClientFactory
 
-# Create MCP server with FastMCP 2.0
-mcp = FastMCP("Alfresco Content Management")
+## 🧪 Testing
 
-# Initialize Alfresco client
-factory = ClientFactory(
-    base_url="http://localhost:8080",
-    username="admin", 
-    password="admin"
-)
+### Run Tests
 
-@mcp.tool()
-def search_documents(query: str) -> str:
-    """Search for documents in Alfresco"""
-    search_client = factory.create_search_client()
-    results = search_client.search({
-        "query": {"query": query, "language": "afts"},
-        "paging": {"maxItems": 10}
-    })
-    return f"Found {results.list.pagination.totalItems} documents"
+```bash
+cd python-alfresco-api
 
-@mcp.tool()
-def get_repository_info() -> str:
-    """Get Alfresco repository information"""
-    discovery_client = factory.create_discovery_client()
-    info = discovery_client.get_repository_info()
-    return f"Connected to {info.entry.repository.name} v{info.entry.repository.version.major}.{info.entry.repository.version.minor}"
+# Simple - just run all tests pytest
+pytest
 
-if __name__ == "__main__":
-    mcp.run()
+# Run all tests with coverage
+pytest --cov=python_alfresco_api --cov-report=html
+
+# Or use the custom test runner for enhanced output
+python run_tests.py
 ```
 
-### Master Client with FastMCP 2.0
+### Live Integration Tests
 
-```python
-from fastmcp import FastMCP
-from python_alfresco_api import ClientFactory
+To run tests against a live Alfresco server 
+(Note: This package was developed and tested with Community Edition)
 
-mcp = FastMCP("Alfresco Master Client")
+   ```bash
 
-# Use master client for dot syntax access
-master = ClientFactory(
-    base_url="http://localhost:8080",
-    username="admin",
-    password="admin"
-).create_master_client()
+   # Run one test (test live with Alfresco)
+   pytest tests/test_mcp_v11_true_high_level_apis_fixed.py -v
+ 
+   ```
 
-@mcp.tool()
-def list_root_nodes() -> str:
-    """List root nodes in Alfresco"""
-    nodes = master.core.get_nodes()
-    return f"Found {len(nodes.list.entries)} root nodes"
-
-@mcp.tool()  
-def search_content(query: str) -> str:
-    """Search content with master client"""
-    results = master.search.search({
-        "query": {"query": query, "language": "afts"}
-    })
-    return f"Search returned {results.list.pagination.totalItems} results"
-```
-
-## 📁 Project Structure
+## 🔄 Project Structure
 
 ```
 python-alfresco-api/
@@ -594,16 +497,16 @@ python-alfresco-api/
 │   ├── __init__.py                 # Main exports
 │   ├── auth_util.py               # Authentication utility
 │   ├── client_factory.py          # Client factory pattern
-│   ├── master_client.py           # Unified master client
-│   ├── clients/                   # Individual API clients
+│   ├── clients/                   # Individual API clients + utilities
 │   │   ├── auth_client.py
 │   │   ├── core_client.py
 │   │   ├── discovery_client.py
 │   │   ├── search_client.py
 │   │   ├── workflow_client.py
 │   │   ├── model_client.py
-│   │   └── search_sql_client.py
-│   ├── models/                    # Pydantic v2 models
+│   │   ├── search_sql_client.py
+│   │   └── conversion_utils.py    # Pydantic ↔ attrs conversion utilities
+│   ├── models/                    # Pydantic v2 models (available for separate use)
 │   │   ├── alfresco_auth_models.py
 │   │   ├── alfresco_core_models.py
 │   │   ├── alfresco_discovery_models.py
@@ -612,11 +515,17 @@ python-alfresco-api/
 │   │   ├── alfresco_model_models.py
 │   │   └── alfresco_search_sql_models.py
 │   ├── raw_clients/               # Generated HTTP clients
+│   ├── utils/                     # Utility functions
+│   │   ├── content_utils.py
+│   │   ├── node_utils.py
+│   │   ├── search_utils.py
+│   │   ├── version_utils.py
+│   │   └── mcp_formatters.py
 │   └── events/                    # Event system (Community + Enterprise)
 │       ├── __init__.py            # Event exports
 │       ├── event_client.py        # Unified event client (AlfrescoEventClient)
 │       └── models.py              # Event models (EventSubscription, EventNotification)
-├── config/                        # OpenAPI client configurations
+├── config/                        # Code generation configurations
 │   ├── auth.yaml                  # Auth API config → auth_client
 │   ├── core.yaml                  # Core API config → core_client
 │   ├── discovery.yaml             # Discovery API config → discovery_client
@@ -632,73 +541,26 @@ python-alfresco-api/
 │   └── openapi3/                  # Converted OpenAPI 3.0 specs
 ├── tests/                         # Comprehensive test suite
 ├── scripts/                       # Generation scripts
-├── docs/                          # Documentation
-├── examples/                      # Usage examples
+├── docs/                          # Comprehensive documentation
+│   ├── PYDANTIC_MODELS_GUIDE.md  # Complete Pydantic models guide
+│   ├── CLIENT_TYPES_GUIDE.md     # Client architecture guide  
+│   ├── CONVERSION_UTILITIES_DESIGN.md # Model conversion utilities
+│   ├── REQUEST_TYPES_GUIDE.md    # Node & Search request documentation
+│   └── API_DOCUMENTATION_INDEX.md # Complete API reference
+├── examples/                      # Working usage examples
 ├── requirements.txt               # Runtime dependencies
 ├── requirements-dev.txt           # Development dependencies
 ├── run_tests.py                   # Test runner with nice display
 └── README.md                      # This file
 ```
 
-## 🔄 Development Workflow
 
-### Standard Development (No Regeneration Needed)
-
-For most development work, you can develop directly without regenerating code:
-
-```bash
-git clone https://github.com/your-org/python-alfresco-api.git
-cd python-alfresco-api
-
-# Install with all development dependencies (RECOMMENDED)
-pip install -e .[dev]
-```
-
-**All OpenAPI specifications are checked in** - you can develop immediately:
-- `openapi/openapi2/` - Original specifications  
-- `openapi/openapi2-processed/` - Processed specifications
-- `openapi/openapi3/` - OpenAPI 3.0 specifications
-
-### Development Tasks
-
-```bash
-# Run tests with nice display
-python run_tests.py
-
-# Run specific test suites
-pytest tests/test_current_architecture.py
-pytest tests/test_enhanced_coverage.py
-
-# Format code
-black python_alfresco_api/
-isort python_alfresco_api/
-
-# Type checking
-mypy python_alfresco_api/
-```
-
-### Making Changes
-
-1. **Modify existing code** - No regeneration needed
-2. **Add new features** - Work with existing generated clients
-3. **Update documentation** - Edit docs/ and examples/
-4. **Add tests** - Extend the test suite
-
-### Code Regeneration (Only When Needed)
-
-**Only regenerate when updating OpenAPI specifications:**
-
-```bash
-# Update OpenAPI specs in openapi/openapi2/
-# Then regenerate
-python scripts/generate_hybrid_pipeline.py
-```
 
 ## 📋 Requirements
 
 ### Runtime Requirements
 
-- **Python**: 3.8+
+- **Python**: 3.10+
 - **pydantic**: >=2.0.0,<3.0.0
 - **requests**: >=2.31.0
 - **httpx**: >=0.24.0 (for async support)
@@ -710,15 +572,9 @@ python scripts/generate_hybrid_pipeline.py
 - **ujson**: >=5.7.0 (faster JSON parsing)
 - **requests-oauthlib**: >=1.3.0 (OAuth support)
 
-### Development Requirements
+## 🛠️ Contributing
 
-### Code Rebuild/Regeneration Requirements
-
-- **datamodel-code-generator**: >=0.21.0
-- **openapi-python-client**: >=0.15.0
-- **pytest**: >=7.4.0
-- **black**: >=23.0.0
-- **mypy**: >=1.5.0
+For development workflows, code generation, testing, and contribution guidelines, see **[📖 Package Developers Guide](docs/PACKAGE_DEVELOPERS_GUIDE.md)**.
 
 ## 🤝 Contributing
 
@@ -740,12 +596,13 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## 🔗 Related Projects
 
-- **Model Context Protocol (MCP)**: [MCP Documentation](https://modelcontextprotocol.io/docs) - Standard for AI-data source integration
+- **Model Context Protocol (MCP)**: [MCP Documentation](https://modelcontextprotocol.io/docs) - Standard for AI-data source and function integration
 - **Alfresco Community Edition**: [Community Documentation](https://support.hyland.com/r/Alfresco/Alfresco-Content-Services-Community-Edition/25.1/Alfresco-Content-Services-Community-Edition/Introduction)
 - **Alfresco Enterprise Edition**: [Enterprise Documentation](https://support.hyland.com/r/Alfresco/Alfresco-Content-Services/25.1/Alfresco-Content-Services/Introduction)
 - **Pydantic**: [Type validation library](https://pydantic.dev/)
-- **datamodel-code-generator**: [Pydantic model generator](https://github.com/koxudaxi/datamodel-code-generator)
-- **openapi-python-client**: [HTTP client generator](https://github.com/openapi-generators/openapi-python-client)
+- **Datamodel-code-generator**: [Pydantic model generator](https://github.com/koxudaxi/datamodel-code-generator)
+- **Openapi-python-client**: [HTTP client generator](https://github.com/openapi-generators/openapi-python-client)
+- **MCP Server based on Python Alfresco API**: [python-alfresco-mcp-server](https://github.com/stevereiner/python-alfresco-mcp-server)
 
 ## ⭐ Star History
 

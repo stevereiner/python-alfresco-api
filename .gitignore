@@ -138,6 +138,11 @@ dmypy.json
 *.swo
 *~
 
+# Cursor AI editor
+.cursormemory
+.cursor/
+*.cursormemory
+
 # macOS
 .DS_Store
 

@@ -1,0 +1,74 @@
+# Python Alfresco API Configuration
+# Copy this file to .env and customize for your environment
+# The .env file will be ignored by git for security
+
+# === REQUIRED: Alfresco Connection ===
+ALFRESCO_URL=http://localhost:8080
+ALFRESCO_USERNAME=admin
+ALFRESCO_PASSWORD=admin
+
+# === OPTIONAL: Connection Settings ===
+ALFRESCO_VERIFY_SSL=false
+
+# === ALTERNATIVE VARIABLE NAMES (all supported) ===
+# ALFRESCO_BASE_URL=http://localhost:8080  # Alternative to ALFRESCO_URL
+# ALFRESCO_SSL_VERIFY=false                # Alternative to ALFRESCO_VERIFY_SSL
+
+# === SSL Certificate Options ===
+# true  - Enable SSL verification (default)
+# false - Disable SSL verification (NOT recommended for production)
+# /path/to/cert.pem - Use custom certificate bundle (like raw client)
+# ALFRESCO_VERIFY_SSL=/etc/ssl/certs/custom-ca.pem
+
+# === OAUTH2 CONFIGURATION (Enterprise/Cloud) ===
+# OAuth2 Client Credentials for enterprise/cloud environments
+# OAUTH2_CLIENT_ID=your-client-id
+# ALFRESCO_OAUTH2_CLIENT_ID=your-alfresco-client-id
+# OAUTH2_CLIENT_SECRET=your-client-secret
+# ALFRESCO_OAUTH2_CLIENT_SECRET=your-alfresco-client-secret
+
+# OAuth2 Token Endpoints
+# OAUTH2_TOKEN_ENDPOINT=https://your-auth-server.com/oauth2/token
+# ALFRESCO_OAUTH2_TOKEN_ENDPOINT=https://your-alfresco-auth.com/oauth2/token
+
+# OAuth2 Scopes (optional)
+# OAUTH2_SCOPE=read write
+# ALFRESCO_OAUTH2_SCOPE=alfresco-api
+
+# Existing OAuth2 Tokens (if available)
+# OAUTH2_ACCESS_TOKEN=your-existing-access-token
+# OAUTH2_REFRESH_TOKEN=your-existing-refresh-token
+
+# === OPTIONAL: Event System Configuration ===
+# Only needed if using AlfrescoEventClient
+ALFRESCO_HOST=localhost
+ACTIVEMQ_PORT=61616
+EVENT_GATEWAY_PORT=7070
+EVENT_MODE=community
+
+# === EXAMPLES FOR DIFFERENT ENVIRONMENTS ===
+
+# Development (default):
+# ALFRESCO_URL=http://localhost:8080
+# ALFRESCO_USERNAME=admin
+# ALFRESCO_PASSWORD=admin
+# ALFRESCO_VERIFY_SSL=false
+
+# Docker Compose:
+# ALFRESCO_URL=http://alfresco:8080
+# ALFRESCO_USERNAME=admin
+# ALFRESCO_PASSWORD=admin
+# ALFRESCO_VERIFY_SSL=false
+
+# Production:
+# ALFRESCO_URL=https://alfresco.company.com
+# ALFRESCO_USERNAME=service-account
+# ALFRESCO_PASSWORD=secure-password-from-vault
+# ALFRESCO_VERIFY_SSL=true
+
+# === NOTES ===
+# - Environment variables take precedence over ClientFactory parameters
+# - Boolean values: true/false, yes/no, 1/0 (case insensitive)
+# - For production, use environment variables or secure secret management
+# - The python-dotenv package is optional but recommended for .env support
+# - Install with: pip install python-dotenv 

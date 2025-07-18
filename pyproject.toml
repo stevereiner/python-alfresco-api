@@ -4,25 +4,24 @@ build-backend = "hatchling.build"
 
 [project]
 name = "python-alfresco-api"
-version = "1.0.2"
-description = "Python client for Alfresco Content Services REST API with event support"
+version = "1.1.0"
+description = "Python Client for all Alfresco Content Services REST APIs and event support"
 authors = [
-    {name = "Python Alfresco API Team", email = "dev@example.com"}
+    {name = "Steve Reiner", email = "stevereiner@integratedsemantics.com"}
 ]
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {text = "Apache-2.0"}
-requires-python = ">=3.8"
-keywords = ["alfresco", "content-management", "rest-api", "events", "activemq"]
+requires-python = ">=3.10"
+keywords = ["alfresco", "content-management", "rest-api", "ecm", "document-management"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Office/Business :: Office Suites",
 ]
@@ -63,10 +62,10 @@ packages = ["python_alfresco_api"]
 
 [tool.black]
 line-length = 100
-target-version = ['py38']
+target-version = ['py310']
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -74,7 +73,7 @@ ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100
-target-version = "py38"
+target-version = "py310"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -84,13 +83,21 @@ python_functions = ["test_*"]
 addopts = "-v --tb=short --ignore=tests/test_event_detection.py --ignore=tests/test_event_gateway_comprehensive.py --ignore=tests/test_current_architecture.py --ignore=tests/test_enhanced_coverage.py --ignore=tests/test_mcp_integration.py --ignore=tests/test_event_community_enterprise.py --ignore=tests/test_integration_live_server.py"
 markers = [
     "event: marks tests as event system tests (may require ActiveMQ/Event Gateway)",
-    "integration: marks tests as integration tests requiring live server",
+    "integration: marks tests as integration tests requiring live Alfresco server",
     "asyncio: marks tests as async tests",
 ]
 
 [tool.coverage.run]
-source = ["alfresco_mcp_server"]
-omit = ["tests/*", "setup.py"]
+source = ["python_alfresco_api"]
+omit = [
+    "tests/*", 
+    "setup.py", 
+    "python_alfresco_api/models/*",
+    "scripts/*",
+    "examples/*",
+    "publish_to_pypi.py",
+    "run_tests.py"
+]
 
 [tool.coverage.report]
 exclude_lines = [
