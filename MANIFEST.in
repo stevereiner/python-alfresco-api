@@ -1,15 +1,17 @@
-# MANIFEST.in for python-alfresco-api v1.0
+# MANIFEST.in for python-alfresco-api v1.1
 # Include additional files in the package distribution
 
 # Include documentation files
 include README.md
 include LICENSE
 include CHANGELOG.md
+include CHANGELOG_V1_1_0.md
+include sample-dot-env.txt
 
 # Include requirements files
 include requirements.txt
 include requirements-dev.txt
-include tests/requirements-test.txt
+#include tests/requirements-test.txt
 
 # Include configuration files
 include setup.py
@@ -37,14 +39,18 @@ recursive-include tests *.py
 recursive-include tests *.yaml
 recursive-include tests *.json
 recursive-include tests *.txt
+include run_tests.py
 
 # Include OpenAPI specifications
-recursive-include openapi *.yaml
-recursive-include openapi *.yml
+#recursive-include openapi *.yaml
+#recursive-include openapi *.yml
 
 # Include scripts
 recursive-include scripts *.py
 recursive-include scripts *.sh
+
+# Exclude cursor files
+exclude *.cursormemory
 
 # Exclude development and build files
 exclude .gitignore

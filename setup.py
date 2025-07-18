@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-Setup script for python-alfresco-api v1.0
+Setup script for python-alfresco-api v1.1
 
-A modern, type-safe Python client library for Alfresco Content Services REST APIs 
-with comprehensive Pydantic v2 model integration and async support.
+Python Client for all Alfresco Content Services REST APIs, with Pydantic v2 Models, and Event Support
 """
 
 from setuptools import setup, find_packages
@@ -58,18 +57,18 @@ extras_require['all'] = (
 
 setup(
     name="python-alfresco-api",
-    version="1.0.0",
-    author="Python Alfresco API Team",
-    author_email="team@python-alfresco-api.org",
-    description="Modern, type-safe Python client for Alfresco Content Services REST APIs with Pydantic v2 integration",
+    version="1.1.0",
+    author="Steve Reiner",
+    author_email="stevereiner@integratedsemantics.com",
+    description="Python Client for all Alfresco Content Services REST APIs, with Pydantic v2 Models, and Event Support",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/your-org/python-alfresco-api",
+    url="https://github.com/stevereiner/python-alfresco-api",
     project_urls={
-        "Bug Reports": "https://github.com/your-org/python-alfresco-api/issues",
-        "Source": "https://github.com/your-org/python-alfresco-api",
-        "Documentation": "https://your-org.github.io/python-alfresco-api/",
-        "Examples": "https://github.com/your-org/python-alfresco-api/tree/main/examples",
+        "Bug Reports": "https://github.com/stevereiner/python-alfresco-api/issues",
+        "Source": "https://github.com/stevereiner/python-alfresco-api",
+        "Documentation": "https://github.com/stevereiner/python-alfresco-api/docs",
+        "Examples": "https://github.com/stevereiner/python-alfresco-api/examples",
     },
     packages=find_packages(include=["python_alfresco_api", "python_alfresco_api.*"]),
     classifiers=[
@@ -79,13 +78,11 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Content Management System",
         "Topic :: Office/Business :: Office Suites",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Framework :: Pydantic",
-        "Framework :: AsyncIO",
         "Typing :: Typed",
     ],
     python_requires=">=3.8",
@@ -102,11 +99,9 @@ setup(
         "content-management",
         "rest-api",
         "pydantic",
-        "async",
-        "type-safe",
+        "ecm",
         "enterprise",
         "document-management",
-        "llm",
         "mcp",
         "model-context-protocol",
         "ai-integration"
