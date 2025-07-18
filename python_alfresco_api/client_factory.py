@@ -5,15 +5,23 @@ Provides easy instantiation of individual clients with shared configuration.
 Perfect for enterprise applications and microservices.
 """
 
-from typing import Optional, Dict, Any
-from .auth_util import AuthUtil
-from .clients.auth_client import AlfrescoAuthClient
-from .clients.core_client import AlfrescoCoreClient
-from .clients.discovery_client import AlfrescoDiscoveryClient
-from .clients.search_client import AlfrescoSearchClient
-from .clients.workflow_client import AlfrescoWorkflowClient
-from .clients.model_client import AlfrescoModelClient
-from .clients.search_sql_client import AlfrescoSearchSqlClient
+import os
+from typing import Optional, Dict, Any, Union
+from .auth_util import AuthUtil, SimpleAuthUtil
+from .clients.auth import AlfrescoAuthClient
+from .clients.core import AlfrescoCoreClient
+from .clients.discovery import AlfrescoDiscoveryClient
+from .clients.search import AlfrescoSearchClient
+from .clients.workflow import AlfrescoWorkflowClient
+from .clients.model import AlfrescoModelClient
+from .clients.search_sql import AlfrescoSearchSqlClient
+
+# Try to import python-dotenv for .env file support (optional)
+try:
+    from dotenv import load_dotenv
+    DOTENV_AVAILABLE = True
+except ImportError:
+    DOTENV_AVAILABLE = False
 
 class MasterClient:
     """
@@ -33,65 +41,148 @@ class MasterClient:
 
 class ClientFactory:
     """
-    Factory for creating Alfresco API clients.
+    Factory for creating Alfresco API clients with centralized authentication.
     
-    Supports both individual client creation and shared authentication.
+    Handles ALL authentication complexity - clients are simple and focused.
+    Supports multiple authentication strategies: Basic, OAuth2, Custom.
     """
     
     def __init__(
         self,
-        base_url: str,
+        base_url: Optional[str] = None,
         username: Optional[str] = None,
         password: Optional[str] = None,
-        verify_ssl: bool = True,
-        timeout: int = 30
+        auth_util = None,  # Pass existing auth_util (any type)
+        verify_ssl: Optional[Union[bool, str]] = None,
+        timeout: int = 30,
+        load_env: bool = True,
+        env_file: Optional[str] = None
     ):
         """
-        Initialize the client factory.
+        Initialize the client factory with centralized authentication management.
+        
+        This is the ONLY place in the entire package that handles authentication complexity.
+        All clients receive a simple, ready-to-use auth_util.
         
         Args:
-            base_url: Base URL of Alfresco instance
-            username: Optional username for authentication
-            password: Optional password for authentication  
-            verify_ssl: Whether to verify SSL certificates
+            base_url: Base URL of Alfresco instance (overrides env)
+            username: Username for authentication (overrides env)
+            password: Password for authentication (overrides env)
+            auth_util: Pre-configured auth util (SimpleAuthUtil, AuthUtil, OAuth2AuthUtil, etc.)
+            verify_ssl: SSL verification - True, False, or path to certificate bundle (overrides env)
             timeout: Request timeout in seconds
+            load_env: Whether to automatically load from environment/env file
+            env_file: Specific .env file path (default: .env in current directory)
         """
-        self.base_url = base_url
-        self.verify_ssl = verify_ssl
+        # Centralized environment loading (ONLY place in entire package)
+        from .auth_util import load_env_config
+        config = load_env_config(
+            base_url=base_url,
+            username=username, 
+            password=password,
+            verify_ssl=verify_ssl,
+            load_env=load_env,
+            env_file=env_file
+        )
+        
+        # Store resolved configuration
+        self._base_url = config['base_url']
+        self.verify_ssl = config['verify_ssl']
         self.timeout = timeout
         
-        # Initialize auth utility if credentials provided
-        self.auth = None
-        if username and password:
-            self.auth = AuthUtil(base_url, username, password, verify_ssl, timeout)
+        # Handle authentication centrally - support all patterns
+        if auth_util is not None:
+            # Use provided auth_util (any type: SimpleAuthUtil, AuthUtil, OAuth2AuthUtil)
+            self.auth = auth_util
+        elif config['username'] and config['password']:
+            # Create full AuthUtil with query parameter support (including from env)
+            self.auth = AuthUtil(
+                base_url=config['base_url'],
+                username=config['username'], 
+                password=config['password'],
+                verify_ssl=config['verify_ssl'],
+                timeout=timeout
+            )
+        else:
+            # No authentication available
+            raise ValueError(
+                f"Authentication required: provide 'auth_util' or both 'username' and 'password'\n"
+                f"Current config: username={config['username']}, password={'***' if config['password'] else None}\n"
+                f"Try setting ALFRESCO_USERNAME and ALFRESCO_PASSWORD environment variables\n"
+                f"Or pass auth_util=SimpleAuthUtil('user', 'pass') to ClientFactory"
+            )
+    
+    @property
+    def base_url(self) -> str:
+        """Get the server base URL."""
+        return self._base_url
+    
+    @classmethod
+    def from_env(cls, env_file: Optional[str] = None) -> 'ClientFactory':
+        """
+        Create ClientFactory entirely from environment variables/.env file.
+        
+        Args:
+            env_file: Optional path to .env file
+            
+        Returns:
+            ClientFactory instance configured from environment
+        """
+        return cls(load_env=True, env_file=env_file)
+    
+    def get_config_info(self) -> Dict[str, Any]:
+        """Get current configuration information for debugging."""
+        # Get auth info safely
+        auth_type = type(self.auth).__name__
+        if hasattr(self.auth, 'username'):
+            auth_info = f"{auth_type} (user: {self.auth.username})"
+        elif hasattr(self.auth, 'client_id'):
+            # This is for OAuth2AuthUtil
+            auth_info = f"{auth_type} (client: {getattr(self.auth, 'client_id', 'unknown')})"
+        else:
+            auth_info = auth_type
+            
+        return {
+            "base_url": self._base_url,
+            "auth_type": auth_info,
+            "verify_ssl": self.verify_ssl,
+            "timeout": self.timeout,
+            "has_auth": self.auth is not None,
+            "dotenv_available": DOTENV_AVAILABLE
+        }
     
     def create_auth_client(self) -> AlfrescoAuthClient:
-        """Create Authentication API client"""
-        return AlfrescoAuthClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        """Create Authentication API client with shared authentication"""
+        return AlfrescoAuthClient(self)
     
     def create_core_client(self) -> AlfrescoCoreClient:
-        """Create Core API client"""
-        return AlfrescoCoreClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        """Create Core API client with shared authentication"""
+        return AlfrescoCoreClient(self)
     
     def create_discovery_client(self) -> AlfrescoDiscoveryClient:
-        """Create Discovery API client"""
-        return AlfrescoDiscoveryClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        """Create Discovery API client with shared authentication"""
+        return AlfrescoDiscoveryClient(self)
+    
+    def create_discovery_client_v11(self):
+        """Create Discovery Client v1.1 with clean, high-level methods - now uses hierarchical structure"""
+        # V1.1 is now the hierarchical structure, so just return the regular discovery client
+        return self.create_discovery_client()
     
     def create_search_client(self) -> AlfrescoSearchClient:
-        """Create Search API client"""
-        return AlfrescoSearchClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        """Create Search API client with shared authentication"""
+        return AlfrescoSearchClient(self)
     
     def create_workflow_client(self) -> AlfrescoWorkflowClient:
-        """Create Workflow API client"""
-        return AlfrescoWorkflowClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        """Create Workflow API client with shared authentication"""
+        return AlfrescoWorkflowClient(self)
     
     def create_model_client(self) -> AlfrescoModelClient:
-        """Create Model API client"""
-        return AlfrescoModelClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        """Create Model API client with shared authentication"""
+        return AlfrescoModelClient(self)
     
     def create_search_sql_client(self) -> AlfrescoSearchSqlClient:
-        """Create Search SQL API client"""
-        return AlfrescoSearchSqlClient(self.base_url, self.auth, self.verify_ssl, self.timeout)
+        """Create Search SQL API client with shared authentication"""
+        return AlfrescoSearchSqlClient(self)
     
     def create_all_clients(self) -> Dict[str, Any]:
         """Create all available clients"""
@@ -109,3 +200,31 @@ class ClientFactory:
         """Create master client with dot syntax access"""
         clients = self.create_all_clients()
         return MasterClient(clients)
+
+    def create_lazy_master_client(self):
+        """
+        Create master client with lazy-loaded API access.
+        
+        Provides unified dot-syntax access to all Alfresco APIs while maintaining
+        high performance through lazy loading - sub-clients are only created
+        when first accessed.
+        
+        Returns:
+            AlfrescoMasterClient: Master client with lazy-loaded API access
+            
+        Examples:
+            ```python
+            # Create master client
+            factory = ClientFactory(base_url="http://localhost:8080")
+            client = factory.create_lazy_master_client()
+            
+            # Access Core API (lazy loaded)
+            node = client.core.nodes.get("abc123-def456")
+            
+            # Access other APIs (lazy loaded)
+            results = client.search.search.search("annual report")
+            info = client.discovery.discovery.get_info()
+            ```
+        """
+        from .clients import AlfrescoMasterClient
+        return AlfrescoMasterClient(self)

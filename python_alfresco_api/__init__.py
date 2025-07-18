@@ -12,25 +12,33 @@ datamodel-code-generator + openapi-python-client
 """
 
 from .client_factory import ClientFactory
-from .auth_util import AuthUtil
+from .auth_util import AuthUtil, OAuth2AuthUtil
 
-# Individual clients
-from .clients.auth_client import AlfrescoAuthClient
-from .clients.core_client import AlfrescoCoreClient  
-from .clients.discovery_client import AlfrescoDiscoveryClient
-from .clients.search_client import AlfrescoSearchClient
-from .clients.workflow_client import AlfrescoWorkflowClient
-from .clients.model_client import AlfrescoModelClient
-from .clients.search_sql_client import AlfrescoSearchSqlClient
+# Individual clients - V1.1 hierarchical structure
+from .clients.auth import AlfrescoAuthClient
+from .clients.core import AlfrescoCoreClient  
+from .clients.discovery import AlfrescoDiscoveryClient
+from .clients.search import AlfrescoSearchClient
+from .clients.workflow import AlfrescoWorkflowClient
+from .clients.model import AlfrescoModelClient
+from .clients.search_sql import AlfrescoSearchSqlClient
 
 # Pydantic models for LLM integration
 from .models import *
+
+# Conversion utilities for Pydantic ↔ attrs model transformation  
+from .clients.conversion_utils import (
+    pydantic_to_attrs_dict,
+    attrs_to_pydantic,
+    create_converter_pair
+)
 
 __version__ = "1.0.0"
 __all__ = [
     # Factory & utilities
     "ClientFactory",
     "AuthUtil",
+    "OAuth2AuthUtil",
     
     # Individual clients
     "AlfrescoAuthClient",
@@ -39,5 +47,10 @@ __all__ = [
     "AlfrescoSearchClient",
     "AlfrescoWorkflowClient", 
     "AlfrescoModelClient",
-    "AlfrescoSearchSqlClient"
+    "AlfrescoSearchSqlClient",
+    
+    # Conversion utilities
+    "pydantic_to_attrs_dict",
+    "attrs_to_pydantic", 
+    "create_converter_pair"
 ]
