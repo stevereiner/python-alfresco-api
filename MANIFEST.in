@@ -11,7 +11,7 @@ include sample-dot-env.txt
 # Include requirements files
 include requirements.txt
 include requirements-dev.txt
-#include tests/requirements-test.txt
+include requirements-codegen.txt
 
 # Include configuration files
 include setup.py
@@ -51,6 +51,7 @@ recursive-include scripts *.sh
 
 # Exclude cursor files
 exclude *.cursormemory
+recursive-exclude memory-bank *
 
 # Exclude development and build files
 exclude .gitignore
@@ -72,6 +73,5 @@ recursive-exclude * dist
 recursive-exclude * venv
 recursive-exclude * .venv
 
-# Include model files
-recursive-include python_alfresco_api/models *.py
-recursive-include python_alfresco_api/raw_clients *.py 
+# Include all Python files in package
+recursive-include python_alfresco_api/ *.py 

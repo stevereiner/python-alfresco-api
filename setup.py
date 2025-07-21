@@ -59,7 +59,7 @@ setup(
     name="python-alfresco-api",
     version="1.1.0",
     author="Steve Reiner",
-    author_email="stevereiner@integratedsemantics.com",
+    author_email="example@example.com",
     description="Python Client for all Alfresco Content Services REST APIs, with Pydantic v2 Models, and Event Support",
     long_description=long_description,
     long_description_content_type="text/markdown",
