@@ -1,13 +1,25 @@
 # Changelog
 
 All notable changes to python-alfresco-api will be documented in this file.
-
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [1.1.0] - 2025-07-18
+## [1.1.0] - 2025-07-21
+
+### Changes
+  - Updated __init__.py files to have all things in __all_  so they get included in the package 
+  - Now have basic requirements.txt, requirements-dev.txt for development.txt,  and new requirements-codegen.txt for advanced development where raw clients, 
+    high level clients, or documentation  needs to be regenerated
+  - Run_tests.py performance test is now the time of running the whole test suite, not a few client creates
+  - Pyproject has added includes for package and sdist
+  - Fix gitignore to not cause downloads/ dirignored so core/downloads and raw core /downloads get checked in
+ 
+### Documentation
+  - Readme: reworded build with source description
+  - Readme: tests section at the end now develop and test
+  - Removed docs for eliminated core.folders (use ops in nodes)
 
 ### Added
   - Implemented hierarchical client architecture with three-tier organization  and lazy loading (3 tiers doesn't count optional master). This is generated from raw clients (previously had 7 files one per client). 
