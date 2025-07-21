@@ -8,7 +8,7 @@ import zipfile
 import os
 from pathlib import Path
 
-def check_package_contents(wheel_path="dist/python_alfresco_api-1.1.0-py3-none-any.whl"):
+def check_package_contents(wheel_path="dist/python_alfresco_api-1.1.1-py3-none-any.whl"):
     """Check what's included in the wheel package"""
     
     if not os.path.exists(wheel_path):

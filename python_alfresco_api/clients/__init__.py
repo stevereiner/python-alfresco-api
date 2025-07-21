@@ -55,6 +55,6 @@ __all__ = [
 ]
 
 # Module metadata for discovery
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __description__ = "Alfresco API Clients with three-tier architecture and lazy loading"
 __author__ = "Python Alfresco API Project"

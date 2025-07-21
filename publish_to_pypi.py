@@ -103,7 +103,7 @@ def main():
     
     print("\n🎉 PYPI PUBLISHING COMPLETE!")
     print("=" * 30)
-    print("✅ python-alfresco-api v1.1.0 published to PyPI")
+    print("✅ python-alfresco-api v1.1.1 published to PyPI")
     print("🔗 Package URL: https://pypi.org/project/python-alfresco-api/")
     print("🛠️  Install with: pip install python-alfresco-api")
     

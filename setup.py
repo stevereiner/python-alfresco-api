@@ -57,7 +57,7 @@ extras_require['all'] = (
 
 setup(
     name="python-alfresco-api",
-    version="1.1.0",
+    version="1.1.1",
     author="Steve Reiner",
     author_email="example@example.com",
     description="Python Client for all Alfresco Content Services REST APIs, with Pydantic v2 Models, and Event Support",
