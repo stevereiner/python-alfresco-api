@@ -6,9 +6,8 @@ Auto-generated from actual V1.1 code on 2025-07-15 00:36:43
 
 Main client for Alfresco Core API operations.
 
-Provides lazy-loaded access to ALL 22 Core API operation groups:
+Provides lazy-loaded access to ALL 21 Core API operation groups:
 - nodes: Node management (files, folders, metadata)
-- folders: Folder-specific operations  
 - content: Content upload/download operations
 - versions: Version control (checkout, checkin, cancel)
 - sites: Site/collaboration management
@@ -288,10 +287,7 @@ Access to downloads operations (3 operations).
 ### `favorites`
 Access to favorites operations (8 operations).
 
-### `folders`
-DEPRECATED: Use nodes.create_folder() instead.
 
-Folder operations are now part of the nodes client.
 
 ### `groups`
 Access to groups operations (9 operations).
