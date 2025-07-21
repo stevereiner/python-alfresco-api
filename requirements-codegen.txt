@@ -1,0 +1,21 @@
+# python-alfresco-api v1.1 Code Generation Dependencies
+# Install with: pip install -r requirements-codegen.txt
+# Only needed for regenerating API clients from OpenAPI specs
+
+# Include main runtime dependencies
+-r requirements.txt
+
+# Code generation tools
+datamodel-code-generator[http]>=0.21.0  # For Pydantic model generation
+openapi-python-client>=0.15.0  # For HTTP client generation
+
+# OpenAPI tools
+openapi-spec-validator>=0.6.0
+openapi3>=1.8.0
+openapi-schema-validator>=0.6.0
+
+# YAML processing
+pyyaml>=6.0
+
+# Utility tools for generation scripts
+jq>=1.6.0  # For JSON processing in scripts 

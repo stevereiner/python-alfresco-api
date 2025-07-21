@@ -1,22 +1,31 @@
-# python-alfresco-api v1.0 Runtime Dependencies
+# python-alfresco-api v1.1 Runtime Dependencies
 # Core dependencies for production use
 
 # HTTP client libraries
+httpx>=0.25.0
 requests>=2.31.0
-httpx>=0.24.0
 aiohttp>=3.8.0
 
 # Data validation and serialization
 pydantic>=2.0.0,<3.0.0
+attrs>=23.1.0
 
-# Optional event system dependencies
-stomp.py>=8.1.0  # For ActiveMQ integration (optional)
+# Date handling
+python-dateutil>=2.8.0
+
+# Type hints support for older Python versions
+typing-extensions>=4.7.0
+
+# Configuration
+PyYAML>=6.0
+
+# Event system dependencies
+stomp.py>=8.1.0  # For ActiveMQ integration
+
+# Async testing support moved to requirements-dev.txt
 
 # Async support (built into Python 3.8+)
 # asyncio is built-in, no external package needed
-
-# Type hints support for older Python versions
-typing-extensions>=4.0.0
 
 # JSON handling
 ujson>=5.7.0  # Fast JSON parsing (optional but recommended)
