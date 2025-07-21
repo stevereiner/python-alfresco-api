@@ -111,7 +111,7 @@ pip install python-alfresco-api
 
 ### Development with source
 
-For development your project with source of python-alfresco-api for debugging
+For development of your project using python-alfresco-api to have debugging with source:
 
 ```bash
 # After setting up virtual environment above
@@ -460,7 +460,27 @@ await event_client.start_listening()
 For complete development documentation including the **3-step generation process** (Pydantic models → HTTP clients → High-level APIs), see **[📖 Package Developers Guide](docs/PACKAGE_DEVELOPERS_GUIDE.md)**.
 
 
-## 🧪 Testing
+## 🧪 Development and Testing
+
+### Development Setup
+
+For development, testing, and contributing:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+For most development work on python-alfresco-api, you can develop directly without regenerating code:
+
+```bash
+git clone https://github.com/stevereiner/python-alfresco-api.git
+cd python-alfresco-api
+
+# Install in development mode
+pip install -e .
+```
+
+> **Note**: For proper pytest execution, work from the source directory with `pip install -e .` rather than testing from separate directories. This avoids import path conflicts.
 
 ### Run Tests
 
@@ -473,8 +493,16 @@ pytest
 # Run all tests with coverage
 pytest --cov=python_alfresco_api --cov-report=html
 
-# Or use the custom test runner for enhanced output
+# Custom test runner with additional features
 python run_tests.py
+# Features:
+# - Environment validation (venv, dependencies)
+# - Colored output with progress tracking
+# - Test selection for 44%+ coverage baseline
+# - Performance metrics (client creation speed)
+# - Live Alfresco server detection
+# - HTML coverage reports (htmlcov/index.html)
+# - Test summary with next steps
 ```
 
 ### Live Integration Tests
