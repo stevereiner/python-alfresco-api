@@ -1,17 +1,21 @@
-## [1.1.0] - 2025-07-21
+## [1.1.1] - 2025-07-21
 
 ### Changes
   - Updated __init__.py files to have all things in __all_  so they get included in the package 
-  - Now have basic requirements.txt, requirements-dev.txt for development.txt,  and new requirements-codegen.txt for advanced development where raw clients, 
+  - Now have basic requirements.txt, requirements-dev.txt for development.txt,  and new
+    requirements-codegen.txt for advanced development where raw clients, 
     high level clients, or documentation  needs to be regenerated
   - Run_tests.py performance test is now the time of running the whole test suite, not a few client creates
   - Pyproject has added includes for package and sdist
-  - Fix gitignore to not cause downloads/ dirignored so core/downloads and raw core /downloads get checked in
+  - Fix gitignore to not cause downloads/ ignored so core/downloads and raw core /downloads get checked in
+  - version updated to v1.1.1
  
 ### Documentation
   - Readme: reworded build with source description
   - Readme: tests section at the end now develop and test
   - Removed docs for eliminated core.folders (use ops in nodes)
+
+## [1.1.0] - 2025-07-18
 
 ### Added
   - Implemented hierarchical client architecture with three-tier organization  and lazy loading (3 tiers doesn't count optional master). This is generated from raw clients (previously had 7 files one per client). 
