@@ -10,5 +10,12 @@ from .models import SearchSqlResponse, SearchSqlRequest
 # Import the main client class
 from .search_sql_client import AlfrescoSearchSqlClient
 
-# Export the client class
-__all__ = ['AlfrescoSearchSqlClient', 'SearchSqlResponse', 'SearchSqlRequest']
+# Import all submodules to ensure they get packaged
+from . import sql, models
+
+# Export the client class and submodules
+__all__ = [
+    'AlfrescoSearchSqlClient', 'SearchSqlResponse', 'SearchSqlRequest',
+    # Lazy-loaded submodules and models
+    'sql', 'models'
+]

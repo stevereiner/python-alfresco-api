@@ -9,8 +9,10 @@ Clean imports only - implementation moved to process_definitions_client.py
 
 # Import the main client class
 from .process_definitions_client import ProcessDefinitionsClient
+from . import models
 
 # Export clean public API
 __all__ = [
-    'ProcessDefinitionsClient'
+    'ProcessDefinitionsClient',
+    'models'
 ]

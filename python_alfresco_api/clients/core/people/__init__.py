@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .people_client import PeopleClient
+from . import models
 
-__all__ = ['PeopleClient']
+__all__ = ['PeopleClient', 'models']

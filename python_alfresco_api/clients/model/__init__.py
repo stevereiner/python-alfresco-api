@@ -10,5 +10,12 @@ from .models import ModelResponse, ModelRequest
 # Import the main client class
 from .model_client import AlfrescoModelClient
 
-# Export the client class
-__all__ = ['AlfrescoModelClient', 'ModelResponse', 'ModelRequest']
+# Import all submodules to ensure they get packaged
+from . import types, aspects, models
+
+# Export the client class and submodules
+__all__ = [
+    'AlfrescoModelClient', 'ModelResponse', 'ModelRequest',
+    # Lazy-loaded submodules and models
+    'types', 'aspects', 'models'
+]

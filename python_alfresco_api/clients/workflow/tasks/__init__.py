@@ -9,8 +9,10 @@ Clean imports only - implementation moved to tasks_client.py
 
 # Import the main client class
 from .tasks_client import TasksClient
+from . import models
 
 # Export clean public API
 __all__ = [
-    'TasksClient'
+    'TasksClient',
+    'models'
 ]

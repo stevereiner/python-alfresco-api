@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .preferences_client import PreferencesClient
+from . import models
 
-__all__ = ['PreferencesClient']
+__all__ = ['PreferencesClient', 'models']

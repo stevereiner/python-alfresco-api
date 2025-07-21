@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .sites_client import SitesClient
+from . import models
 
-__all__ = ['SitesClient']
+__all__ = ['SitesClient', 'models']

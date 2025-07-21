@@ -33,6 +33,9 @@ from .clients.conversion_utils import (
     create_converter_pair
 )
 
+# Import raw_clients to ensure they get packaged
+from . import raw_clients
+
 __version__ = "1.0.0"
 __all__ = [
     # Factory & utilities
@@ -52,5 +55,8 @@ __all__ = [
     # Conversion utilities
     "pydantic_to_attrs_dict",
     "attrs_to_pydantic", 
-    "create_converter_pair"
+    "create_converter_pair",
+    
+    # Raw clients
+    "raw_clients"
 ]

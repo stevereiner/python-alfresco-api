@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .types_client import TypesClient
+from . import models
 
-__all__ = ['TypesClient']
+__all__ = ['TypesClient', 'models']

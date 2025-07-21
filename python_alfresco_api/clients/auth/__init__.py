@@ -10,5 +10,8 @@ from .models import AuthResponse, AuthRequest
 # Import the main client class
 from .auth_client import AlfrescoAuthClient
 
-# Export the client class
-__all__ = ['AlfrescoAuthClient', 'AuthResponse', 'AuthRequest']
+# Import models module itself to ensure it gets packaged
+from . import models
+
+# Export the client class, models, and the models module itself
+__all__ = ['AlfrescoAuthClient', 'AuthResponse', 'AuthRequest', 'models']

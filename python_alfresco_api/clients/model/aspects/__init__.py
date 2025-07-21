@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .aspects_client import AspectsClient
+from . import models
 
-__all__ = ['AspectsClient']
+__all__ = ['AspectsClient', 'models']

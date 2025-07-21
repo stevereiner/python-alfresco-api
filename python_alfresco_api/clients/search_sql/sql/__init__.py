@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .sql_client import SqlClient
+from . import models
 
-__all__ = ['SqlClient']
+__all__ = ['SqlClient', 'models']

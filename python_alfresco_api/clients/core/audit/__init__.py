@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .audit_client import AuditClient
+from . import models
 
-__all__ = ['AuditClient']
+__all__ = ['AuditClient', 'models']

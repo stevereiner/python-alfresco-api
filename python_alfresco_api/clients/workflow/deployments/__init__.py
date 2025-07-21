@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .deployments_client import DeploymentsClient
+from . import models
 
-__all__ = ['DeploymentsClient']
+__all__ = ['DeploymentsClient', 'models']

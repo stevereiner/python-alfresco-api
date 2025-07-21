@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .comments_client import CommentsClient
+from . import models
 
-__all__ = ['CommentsClient']
+__all__ = ['CommentsClient', 'models']

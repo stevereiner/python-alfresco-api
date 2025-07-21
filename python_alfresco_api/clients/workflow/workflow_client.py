@@ -190,4 +190,11 @@ class AlfrescoWorkflowClient:
     def __repr__(self) -> str:
         """String representation for debugging."""
         base_url = getattr(self._client_factory, 'base_url', 'unknown')
-        return f"AlfrescoWorkflowClient(base_url='{base_url}')" 
+        return f"AlfrescoWorkflowClient(base_url='{base_url}')"
+
+# Export the main client class and all lazy-loaded sub-modules
+__all__ = [
+    'AlfrescoWorkflowClient',
+    # Lazy-loaded sub-clients (accessed via properties)
+    'deployments', 'process_definitions', 'processes', 'tasks'
+] 

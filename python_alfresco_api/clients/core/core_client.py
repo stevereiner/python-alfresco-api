@@ -437,4 +437,15 @@ class AlfrescoCoreClient:
     def __repr__(self) -> str:
         """String representation for debugging."""
         base_url = getattr(self._client_factory, 'base_url', 'unknown')
-        return f"AlfrescoCoreClient(base_url='{base_url}')" 
+        return f"AlfrescoCoreClient(base_url='{base_url}')"
+
+# Export the main client class and all lazy-loaded sub-modules
+# This ensures packaging systems include all dynamically accessed modules
+__all__ = [
+    'AlfrescoCoreClient',
+    # Lazy-loaded sub-clients (accessed via properties)
+    'actions', 'activities', 'audit', 'comments', 'content', 'downloads',
+    'favorites', 'groups', 'networks', 'nodes', 'people', 'preferences', 
+    'probes', 'queries', 'ratings', 'renditions', 'shared_links', 'sites',
+    'tags', 'trashcan', 'versions'
+] 

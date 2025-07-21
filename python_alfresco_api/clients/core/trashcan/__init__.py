@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .trashcan_client import TrashcanClient
+from . import models
 
-__all__ = ['TrashcanClient']
+__all__ = ['TrashcanClient', 'models']

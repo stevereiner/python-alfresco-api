@@ -22,9 +22,9 @@ from ....raw_clients.alfresco_workflow_client.workflow_client.types import UNSET
 from httpx import Response
 
 # Import model types for proper parameter signatures
-from ....raw_clients.alfresco_workflow_client.workflow_client.models.processdefinitionentry import ProcessDefinitionEntry
-from ....raw_clients.alfresco_workflow_client.workflow_client.models.processdefinitionpaging import ProcessDefinitionPaging
-from ....raw_clients.alfresco_workflow_client.workflow_client.models.taskformmodelpaging import TaskFormModelPaging
+from ....raw_clients.alfresco_workflow_client.workflow_client.models.process_definition_entry import ProcessDefinitionEntry
+from ....raw_clients.alfresco_workflow_client.workflow_client.models.process_definition_paging import ProcessDefinitionPaging
+from ....raw_clients.alfresco_workflow_client.workflow_client.models.task_form_model_paging import TaskFormModelPaging
 
 # Import from Level 3 (operation-specific models)
 from .models import ProcessDefinitionsResponse, ProcessDefinitionsListResponse, CreateProcessDefinitionsRequest

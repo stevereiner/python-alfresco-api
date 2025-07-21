@@ -6,5 +6,6 @@ Part of the V1.1 hierarchical architecture.
 """
 
 from .versions_client import VersionsClient
+from . import models
 
-__all__ = ['VersionsClient'] 
+__all__ = ['VersionsClient', 'models'] 

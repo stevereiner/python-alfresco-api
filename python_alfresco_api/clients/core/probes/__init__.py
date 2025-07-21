@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .probes_client import ProbesClient
+from . import models
 
-__all__ = ['ProbesClient']
+__all__ = ['ProbesClient', 'models']

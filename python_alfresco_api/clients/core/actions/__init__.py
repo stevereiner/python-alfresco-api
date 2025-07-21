@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .actions_client import ActionsClient
+from . import models
 
-__all__ = ['ActionsClient']
+__all__ = ['ActionsClient', 'models']

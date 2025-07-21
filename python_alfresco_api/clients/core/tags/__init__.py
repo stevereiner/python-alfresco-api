@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .tags_client import TagsClient
+from . import models
 
-__all__ = ['TagsClient']
+__all__ = ['TagsClient', 'models']

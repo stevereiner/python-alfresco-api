@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .shared_links_client import SharedLinksClient
+from . import models
 
-__all__ = ['SharedLinksClient']
+__all__ = ['SharedLinksClient', 'models']

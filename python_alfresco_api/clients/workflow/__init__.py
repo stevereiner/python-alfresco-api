@@ -10,5 +10,12 @@ from .models import WorkflowResponse, WorkflowRequest
 # Import the main client class
 from .workflow_client import AlfrescoWorkflowClient
 
-# Export the client class
-__all__ = ['AlfrescoWorkflowClient', 'WorkflowResponse', 'WorkflowRequest']
+# Import all submodules to ensure they get packaged
+from . import deployments, process_definitions, processes, tasks, models
+
+# Export the client class and submodules
+__all__ = [
+    'AlfrescoWorkflowClient', 'WorkflowResponse', 'WorkflowRequest',
+    # Lazy-loaded submodules and models
+    'deployments', 'process_definitions', 'processes', 'tasks', 'models'
+]

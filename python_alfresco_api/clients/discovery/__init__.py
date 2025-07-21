@@ -10,5 +10,8 @@ from .models import DiscoveryResponse, DiscoveryRequest
 # Import the main client class
 from .discovery_client import AlfrescoDiscoveryClient
 
-# Export the client class
-__all__ = ['AlfrescoDiscoveryClient', 'DiscoveryResponse', 'DiscoveryRequest']
+# Import models module itself to ensure it gets packaged
+from . import models
+
+# Export the client class, models, and the models module itself
+__all__ = ['AlfrescoDiscoveryClient', 'DiscoveryResponse', 'DiscoveryRequest', 'models']

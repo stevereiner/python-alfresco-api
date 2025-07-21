@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .ratings_client import RatingsClient
+from . import models
 
-__all__ = ['RatingsClient']
+__all__ = ['RatingsClient', 'models']

@@ -22,8 +22,9 @@ from ....raw_clients.alfresco_search_sql_client.search_sql_client.types import U
 from httpx import Response
 
 # Import model types for proper parameter signatures
-from ....raw_clients.alfresco_search_sql_client.search_sql_client.models.sqlresultsetpaging import SQLResultSetPaging
-from ....raw_clients.alfresco_search_sql_client.search_sql_client.models.sqlsearchrequest import SQLSearchRequest
+# Fixed import naming: sqlresultsetpaging -> sql_result_set_paging, sqlsearchrequest -> sql_search_request
+from ....raw_clients.alfresco_search_sql_client.search_sql_client.models.sql_result_set_paging import SQLResultSetPaging
+from ....raw_clients.alfresco_search_sql_client.search_sql_client.models.sql_search_request import SQLSearchRequest
 
 # Import from Level 3 (operation-specific models)
 from .models import SqlResponse, SqlListResponse, CreateSqlRequest

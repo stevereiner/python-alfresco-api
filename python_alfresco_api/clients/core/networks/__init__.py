@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .networks_client import NetworksClient
+from . import models
 
-__all__ = ['NetworksClient']
+__all__ = ['NetworksClient', 'models']

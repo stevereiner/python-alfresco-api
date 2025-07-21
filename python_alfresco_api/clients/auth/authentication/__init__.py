@@ -6,5 +6,6 @@ Part of the three-tier V1.1 architecture with complete 4-pattern detailed functi
 """
 
 from .authentication_client import AuthenticationClient
+from . import models
 
-__all__ = ['AuthenticationClient']
+__all__ = ['AuthenticationClient', 'models']
