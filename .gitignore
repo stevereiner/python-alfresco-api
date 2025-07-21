@@ -187,7 +187,6 @@ test-reports/
 coverage-reports/
 
 # Release preparation files (temporary)
-publish_to_pypi.py
 RELEASE_NOTES_*.md
 RELEASE_INSTRUCTIONS.md
 RELEASE_SUMMARY.md
