@@ -8,7 +8,7 @@ Note this uses the remote Alfresco REST APIs. Not for in-process development in 
 A modern, type-safe Python client library for Alfresco Content Services REST APIs with dual model architecture (attrs + Pydantic) and async support.
 
 [![PyPI version](https://img.shields.io/pypi/v/python-alfresco-api.svg)](https://pypi.org/project/python-alfresco-api/)
-[![PyPI downloads](https://img.shields.io/pypi/dm/python-alfresco-api.svg)](https://pypi.org/project/python-alfresco-api/)
+[![PyPI downloads](https://pepy.tech/badge/python-alfresco-api)](https://pepy.tech/project/python-alfresco-api)
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![Pydantic](https://img.shields.io/badge/pydantic-v2-green.svg)](https://pydantic.dev/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
