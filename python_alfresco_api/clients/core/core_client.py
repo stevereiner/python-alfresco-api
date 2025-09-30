@@ -138,13 +138,20 @@ class AlfrescoCoreClient:
         # Import the raw core client directly
         from ...raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
         
-        # Create the raw client with same auth setup
-        return AuthenticatedClient(
-            base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-            token=self._client_factory.auth.get_auth_token(),
-            prefix=self._client_factory.auth.get_auth_prefix(),
-            verify_ssl=self._client_factory.verify_ssl
-        )
+        # Prepare client arguments
+        client_kwargs = {
+            "base_url": f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
+            "token": self._client_factory.auth.get_auth_token(),
+            "prefix": self._client_factory.auth.get_auth_prefix(),
+            "verify_ssl": self._client_factory.verify_ssl
+        }
+        
+        # Only add timeout if specified (not None)
+        if self._client_factory.timeout is not None:
+            client_kwargs["timeout"] = self._client_factory.timeout
+        
+        # Create the raw client with auth setup
+        return AuthenticatedClient(**client_kwargs)
     
     def _create_httpx_client(self):
         """

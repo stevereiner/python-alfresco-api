@@ -5,7 +5,6 @@
 include README.md
 include LICENSE
 include CHANGELOG.md
-include CHANGELOG_V1_1_0.md
 include sample-dot-env.txt
 
 # Include requirements files

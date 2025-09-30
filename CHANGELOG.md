@@ -6,6 +6,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2025-09-29
+
+### Enhanced
+- **Timeout Configuration System**: Comprehensive overhaul of timeout handling throughout the client hierarchy
+  - Removed hardcoded 30-second defaults from `AuthUtil` and `OAuth2AuthUtil` constructors
+  - Implemented proper None timeout handling - when no timeout specified, system/ticket defaults apply
+  - Enhanced parameter priority chain: `auth_util parameters > explicit parameters > environment variables > None`
+  - Updated all 7 main clients to conditionally pass timeout to `AuthenticatedClient` only when specified
+  - Modified httpx client creation in auth utilities to not get a timeout if None
+
+### Added
+- **Parameter Priority Logic**: Enhanced `ClientFactory` to respect auth_util parameters as highest priority
+  - Auth_util parameters (timeout, base_url, verify_ssl, username, password) take precedence over factory parameters
+  - Added username/password property access from any auth_util type
+  - Comprehensive parameter propagation verification throughout client hierarchy
+- **Environment Configuration**: Extended timeout support in environment variables
+  - Added `ALFRESCO_TIMEOUT` environment variable support
+  - Added `ALFRESCO_FILE_IO_TIMEOUT` configuration option (not used currently)
+  - Updated priority documentation in `sample-dot-env.txt`
+- **Comprehensive Testing**: New test suite `test_client_factory_configuration.py` with 15 test methods
+  - Tests timeout priority chain across all scenarios
+  - Verifies parameter propagation to raw and httpx clients
+  - Validates MCP server pattern compatibility
+  - Tests None timeout handling and system default behavior
+
+### Changed
+- **ClientFactory**: Enhanced constructor parameter handling
+  - Changed `timeout: int = 30` to `timeout: Optional[int] = None`
+  - Improved auth_util parameter extraction and priority logic
+  - **Authentication Utilities**: Improved timeout parameter handling
+  - `AuthUtil` and `OAuth2AuthUtil` now accept `timeout: Optional[int] = None`
+  - httpx client creation doesn't use timeout if None
+  - Updated docstrings to reflect "None = use system defaults" behavior
+
+### Documentation
+- **README.md**: Enhanced Factory Pattern and Authentication sections
+  - Added parameter priority documentation
+  - Clarified timeout behavior when not specified
+  - Added platform-specific .env file setup instructions (copy for Windows, cp for Linux/Mac)
+- **sample-dot-env.txt**: timeout configuration examples
+  - Added timeout configuration section with examples
+  - Documented parameter priority order
+  - Added file I/O timeout option for large operations (not used currently)
+
+### Technical
+- **Content Utilities**: Enhanced `content_utils_highlevel.py`
+  - Improved Share-style create/upload functionality
+  - Better version handling (documents created with version 1.0)
+- **Project Configuration**: Updated version and build configuration
+  - Version bumped from 1.1.1 to 1.1.2 in `pyproject.toml`
+  - Cleaned up manifest includes
+
+
 ## [1.1.1] - 2025-07-21
 
 ### Changes

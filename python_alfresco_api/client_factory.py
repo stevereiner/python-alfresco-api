@@ -54,7 +54,7 @@ class ClientFactory:
         password: Optional[str] = None,
         auth_util = None,  # Pass existing auth_util (any type)
         verify_ssl: Optional[Union[bool, str]] = None,
-        timeout: int = 30,
+        timeout: Optional[int] = None,
         load_env: bool = True,
         env_file: Optional[str] = None
     ):
@@ -69,8 +69,9 @@ class ClientFactory:
             username: Username for authentication (overrides env)
             password: Password for authentication (overrides env)
             auth_util: Pre-configured auth util (SimpleAuthUtil, AuthUtil, OAuth2AuthUtil, etc.)
+                      If provided, its parameters (timeout, base_url, verify_ssl) take priority
             verify_ssl: SSL verification - True, False, or path to certificate bundle (overrides env)
-            timeout: Request timeout in seconds
+            timeout: Request timeout in seconds (overrides env, but auth_util.timeout takes precedence)
             load_env: Whether to automatically load from environment/env file
             env_file: Specific .env file path (default: .env in current directory)
         """
@@ -81,6 +82,7 @@ class ClientFactory:
             username=username, 
             password=password,
             verify_ssl=verify_ssl,
+            timeout=timeout,
             load_env=load_env,
             env_file=env_file
         )
@@ -88,21 +90,45 @@ class ClientFactory:
         # Store resolved configuration
         self._base_url = config['base_url']
         self.verify_ssl = config['verify_ssl']
-        self.timeout = timeout
+        self.timeout = config['timeout']  # May be None if not specified
         
         # Handle authentication centrally - support all patterns
         if auth_util is not None:
             # Use provided auth_util (any type: SimpleAuthUtil, AuthUtil, OAuth2AuthUtil)
+            # Respect auth_util's existing configuration if it has parameters
             self.auth = auth_util
+            
+            # If auth_util has its own timeout, use it; otherwise use our resolved timeout
+            if hasattr(auth_util, 'timeout') and auth_util.timeout is not None:
+                self.timeout = auth_util.timeout
+            
+            # If auth_util has its own base_url, use it; otherwise keep our resolved base_url
+            if hasattr(auth_util, 'base_url') and auth_util.base_url:
+                self._base_url = auth_util.base_url
+                
+            # If auth_util has its own verify_ssl, use it; otherwise keep our resolved verify_ssl
+            if hasattr(auth_util, 'verify_ssl') and auth_util.verify_ssl is not None:
+                self.verify_ssl = auth_util.verify_ssl
+                
+            # Store auth_util credentials for access (don't override the auth_util itself)
+            self._auth_username = getattr(auth_util, 'username', None)
+            self._auth_password = getattr(auth_util, 'password', None)
         elif config['username'] and config['password']:
             # Create full AuthUtil with query parameter support (including from env)
-            self.auth = AuthUtil(
-                base_url=config['base_url'],
-                username=config['username'], 
-                password=config['password'],
-                verify_ssl=config['verify_ssl'],
-                timeout=timeout
-            )
+            # Only pass timeout if it's specified (not None)
+            auth_kwargs = {
+                'base_url': config['base_url'],
+                'username': config['username'], 
+                'password': config['password'],
+                'verify_ssl': config['verify_ssl']
+            }
+            if config['timeout'] is not None:
+                auth_kwargs['timeout'] = config['timeout']
+            
+            self.auth = AuthUtil(**auth_kwargs)
+            # Store credentials for access
+            self._auth_username = config['username']
+            self._auth_password = config['password']
         else:
             # No authentication available
             raise ValueError(
@@ -116,6 +142,16 @@ class ClientFactory:
     def base_url(self) -> str:
         """Get the server base URL."""
         return self._base_url
+    
+    @property
+    def username(self) -> Optional[str]:
+        """Get the authentication username."""
+        return getattr(self, '_auth_username', None)
+    
+    @property
+    def password(self) -> Optional[str]:
+        """Get the authentication password."""
+        return getattr(self, '_auth_password', None)
     
     @classmethod
     def from_env(cls, env_file: Optional[str] = None) -> 'ClientFactory':

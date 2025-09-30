@@ -9,6 +9,7 @@ ALFRESCO_PASSWORD=admin
 
 # === OPTIONAL: Connection Settings ===
 ALFRESCO_VERIFY_SSL=false
+# ALFRESCO_TIMEOUT=30
 
 # === ALTERNATIVE VARIABLE NAMES (all supported) ===
 # ALFRESCO_BASE_URL=http://localhost:8080  # Alternative to ALFRESCO_URL
@@ -19,6 +20,11 @@ ALFRESCO_VERIFY_SSL=false
 # false - Disable SSL verification (NOT recommended for production)
 # /path/to/cert.pem - Use custom certificate bundle (like raw client)
 # ALFRESCO_VERIFY_SSL=/etc/ssl/certs/custom-ca.pem
+
+# === TIMEOUT CONFIGURATION ===
+# Request timeout in seconds (no default - uses system/client defaults if not set)
+# ALFRESCO_TIMEOUT=60  # For search or other operations
+# ALFRESCO_FILE_IO_TIMEOUT=600  # For large file uploads/downloads (10 minutes) (not used currently)
 
 # === OAUTH2 CONFIGURATION (Enterprise/Cloud) ===
 # OAuth2 Client Credentials for enterprise/cloud environments
@@ -67,7 +73,9 @@ EVENT_MODE=community
 # ALFRESCO_VERIFY_SSL=true
 
 # === NOTES ===
-# - Environment variables take precedence over ClientFactory parameters
+# - Parameter priority order: auth_util parameters > other explicit parameters > environment variables > None (no defaults)
+# - If auth_util is provided, its parameters (timeout, base_url, verify_ssl, username, password) take highest priority
+# - If no timeout is specified anywhere, None is used (allows system/ticket defaults to apply)
 # - Boolean values: true/false, yes/no, 1/0 (case insensitive)
 # - For production, use environment variables or secure secret management
 # - The python-dotenv package is optional but recommended for .env support

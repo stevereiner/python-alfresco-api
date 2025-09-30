@@ -24,6 +24,7 @@ def load_env_config(
     username: Optional[str] = None,
     password: Optional[str] = None,
     verify_ssl: Optional[Union[bool, str]] = None,
+    timeout: Optional[int] = None,
     load_env: bool = True,
     env_file: Optional[str] = None
 ) -> Dict[str, Any]:
@@ -37,6 +38,7 @@ def load_env_config(
         username: Explicit username (overrides env) 
         password: Explicit password (overrides env)
         verify_ssl: SSL verification - True/False or path to certificate bundle (overrides env)
+        timeout: Request timeout in seconds (overrides env)
         load_env: Whether to load from environment/.env file
         env_file: Specific .env file path
         
@@ -54,6 +56,19 @@ def load_env_config(
     resolved_base_url = base_url or os.getenv('ALFRESCO_URL') or os.getenv('ALFRESCO_BASE_URL') or 'http://localhost:8080'
     resolved_username = username or os.getenv('ALFRESCO_USERNAME') or 'admin'
     resolved_password = password or os.getenv('ALFRESCO_PASSWORD') or 'admin'
+    
+    # Handle timeout with environment variable support
+    if timeout is not None:
+        resolved_timeout = timeout
+    else:
+        timeout_env = os.getenv('ALFRESCO_TIMEOUT')
+        if timeout_env:
+            try:
+                resolved_timeout = int(timeout_env)
+            except ValueError:
+                resolved_timeout = None  # Invalid value, don't set timeout
+        else:
+            resolved_timeout = None  # No timeout specified, let system/client defaults apply
     
     # Handle SSL verification (supports bool or certificate path like raw client)
     if verify_ssl is not None:
@@ -73,7 +88,8 @@ def load_env_config(
         'base_url': resolved_base_url,
         'username': resolved_username,
         'password': resolved_password,
-        'verify_ssl': resolved_verify_ssl
+        'verify_ssl': resolved_verify_ssl,
+        'timeout': resolved_timeout
     }
 
 class SimpleAuthUtil:
@@ -130,7 +146,7 @@ class AuthUtil:
         username: str,
         password: str,
         verify_ssl: Union[bool, str] = True,
-        timeout: int = 30
+        timeout: Optional[int] = None
     ):
         """
         Initialize authentication utility.
@@ -140,7 +156,7 @@ class AuthUtil:
             username: Alfresco username
             password: Alfresco password
             verify_ssl: SSL verification - True, False, or path to certificate bundle
-            timeout: Request timeout in seconds
+            timeout: Request timeout in seconds (None = use system defaults)
         """
         self.base_url = base_url.rstrip('/')
         self.username = username
@@ -167,7 +183,12 @@ class AuthUtil:
             auth_url = f"{self.base_url}/alfresco/api/-default-/public/authentication/versions/1/tickets"
             auth_data = {"userId": self.username, "password": self.password}
             
-            async with httpx.AsyncClient(verify=self.verify_ssl, timeout=self.timeout) as client:
+            # Create httpx client with timeout only if specified
+            client_kwargs = {"verify": self.verify_ssl}
+            if self.timeout is not None:
+                client_kwargs["timeout"] = self.timeout
+            
+            async with httpx.AsyncClient(**client_kwargs) as client:
                 response = await client.post(auth_url, json=auth_data)
                 
                 if response.status_code == 201:
@@ -338,7 +359,7 @@ class OAuth2AuthUtil:
         refresh_token: Optional[str] = None,
         # Standard auth util parameters
         verify_ssl: Union[bool, str] = True,
-        timeout: int = 30,
+        timeout: Optional[int] = None,
         # Environment loading
         load_env: bool = True,
         env_file: Optional[str] = None
@@ -358,7 +379,7 @@ class OAuth2AuthUtil:
             access_token: Existing access token (optional)
             refresh_token: Existing refresh token (optional)
             verify_ssl: SSL verification - True, False, or path to certificate bundle
-            timeout: Request timeout in seconds
+            timeout: Request timeout in seconds (None = use system defaults)
             load_env: Whether to load configuration from environment
             env_file: Optional path to .env file
         """
@@ -477,7 +498,12 @@ class OAuth2AuthUtil:
         if self.scope:
             data["scope"] = self.scope
         
-        async with httpx.AsyncClient(verify=self.verify_ssl, timeout=self.timeout) as client:
+        # Create httpx client with timeout only if specified
+        client_kwargs = {"verify": self.verify_ssl}
+        if self.timeout is not None:
+            client_kwargs["timeout"] = self.timeout
+        
+        async with httpx.AsyncClient(**client_kwargs) as client:
             response = await client.post(
                 self.token_endpoint,
                 data=data,
@@ -516,7 +542,12 @@ class OAuth2AuthUtil:
         if self.client_secret:
             data["client_secret"] = self.client_secret
         
-        async with httpx.AsyncClient(verify=self.verify_ssl, timeout=self.timeout) as client:
+        # Create httpx client with timeout only if specified
+        client_kwargs = {"verify": self.verify_ssl}
+        if self.timeout is not None:
+            client_kwargs["timeout"] = self.timeout
+        
+        async with httpx.AsyncClient(**client_kwargs) as client:
             response = await client.post(
                 self.token_endpoint,
                 data=data,

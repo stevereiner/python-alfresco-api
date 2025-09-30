@@ -273,6 +273,78 @@ def update_content_from_stream_highlevel(
     )
 
 
+def create_and_upload_file_share_style(
+    core_client: AlfrescoCoreClient,
+    file_path: Union[str, Path],
+    parent_id: str = "-my-",
+    filename: Optional[str] = None,
+    description: Optional[str] = None,
+    properties: Optional[Dict[str, Any]] = None,
+    include: Optional[List[str]] = None
+) -> Any:
+    """
+    Create and upload file using Alfresco Share client behavior.
+    
+    Mimics the behavior of the official Alfresco Share client:
+    - Creates documents with version 1.0 (not 1.1!)
+    - Sets title to the full file path (as Share client does)
+    - Uses direct upload approach like Share (not create + update)
+    
+    Args:
+        core_client: The V1.1 hierarchical core client
+        file_path: Path to the file to upload
+        parent_id: Parent node ID (default: '-my-' for user's home)
+        filename: Optional custom filename
+        description: Optional document description
+        properties: Optional additional properties
+        include: Optional include list for response
+        
+    Returns:
+        Final document with content (version 1.0, title = full path)
+        
+    Examples:
+        >>> # Create and upload like Alfresco Share client
+        >>> result = create_and_upload_file_share_style(
+        ...     core_client,
+        ...     r"C:\Documents\report.pdf"
+        ... )
+        >>> # Result will have:
+        >>> # - Version: 1.0 (exactly like Share client)
+        >>> # - Title: "C:\Documents\report.pdf"
+    """
+    # Convert to Path object
+    file_path_obj = Path(file_path)
+    
+    if not file_path_obj.exists():
+        raise FileNotFoundError(f"File does not exist: {file_path}")
+    
+    if not file_path_obj.is_file():
+        raise ValueError(f"Path is not a file: {file_path}")
+    
+    # Use filename or derive from path
+    upload_filename = filename or file_path_obj.name
+    
+    # Build properties dict with Share-style title (full path)
+    doc_properties = properties or {}
+    doc_properties["cm:title"] = str(file_path_obj)  # Full path like Share client
+    if description:
+        doc_properties["cm:description"] = description
+    
+    # Use content_utils.upload_file which does direct upload like Share
+    # This should result in version 1.0, not create+update which makes 1.1
+    from . import content_utils
+    
+    return content_utils.upload_file(
+        core_client=core_client,
+        file_path=file_path_obj,
+        parent_id=parent_id,
+        filename=upload_filename,
+        description=description,
+        properties=doc_properties,
+        auto_rename=True
+    )
+
+
 def create_and_upload_file_highlevel(
     core_client: AlfrescoCoreClient,
     file_path: Union[str, Path],
@@ -281,7 +353,8 @@ def create_and_upload_file_highlevel(
     title: Optional[str] = None,
     description: Optional[str] = None,
     properties: Optional[Dict[str, Any]] = None,
-    include: Optional[List[str]] = None
+    include: Optional[List[str]] = None,
+    share_client_behavior: bool = False
 ) -> Any:
     """
     Create a new document and upload content in one operation.
@@ -297,19 +370,40 @@ def create_and_upload_file_highlevel(
         description: Optional document description
         properties: Optional additional properties
         include: Optional include list for response
+        share_client_behavior: If True, mimics Alfresco Share client behavior
+                              (version 1.0, title = full path)
         
     Returns:
         Final document with content
         
     Examples:
-        >>> # Create and upload in one step
+        >>> # Standard behavior (version 0.1, custom title)
         >>> result = create_and_upload_file_highlevel(
         ...     core_client,
         ...     "report.pdf",
         ...     title="Annual Report",
         ...     description="Company annual report"
         ... )
+        
+        >>> # Share client behavior (version 1.0, title = full path)
+        >>> result = create_and_upload_file_highlevel(
+        ...     core_client,
+        ...     r"C:\Documents\report.pdf",
+        ...     share_client_behavior=True
+        ... )
     """
+    if share_client_behavior:
+        # Use Share client behavior
+        return create_and_upload_file_share_style(
+            core_client=core_client,
+            file_path=file_path,
+            parent_id=parent_id,
+            filename=filename,
+            description=description,
+            properties=properties,
+            include=include
+        )
+    
     # Convert to Path object
     file_path_obj = Path(file_path)
     
@@ -389,5 +483,6 @@ def list_content_operations_highlevel() -> List[str]:
         "update_content_from_string_highlevel", 
         "update_content_from_stream_highlevel",
         "create_and_upload_file_highlevel",
+        "create_and_upload_file_share_style",
         "get_node_info_highlevel"
     ] 

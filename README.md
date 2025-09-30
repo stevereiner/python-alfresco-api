@@ -155,8 +155,11 @@ Community version from Github
 
 For easy configuration, copy the sample environment file:
 ```bash
+# Windows
+copy sample-dot-env.txt .env
+# Mac and Linux
 cp sample-dot-env.txt .env
-# Edit .env with your Alfresco settings
+# Edit .env and your Alfresco settings
 ```
 
 ## Factory Pattern 
@@ -175,6 +178,9 @@ factory = ClientFactory(
     username="admin",
     password="admin"
 )
+
+Note 1: the priority order of ClientFactory parameters: 1. in auth_util passed in, 2. in other parameters passed into ClientFactory, 3. in enviroment .env, etc.
+Note 2. For timeout, if not in 1-3, no default will be used. The settings for tickets or your system will be used.
 
 # Create individual clients (all share same authentication session)
 auth_client = factory.create_auth_client()
@@ -204,6 +210,9 @@ auth_util = AuthUtil(
     username="admin",
     password="admin"
 )
+
+Note 1: the priority order of ClientFactory parameters: 1. in auth_util passed in, 2. in other parameters passed into ClientFactory, 3. in enviroment .env, etc.
+Note 2. For timeout, if not in 1-3, no default will be used. The settings for tickets or your system will be used.
 
 # Use with factory for shared authentication
 factory = ClientFactory(auth_util=auth_util)
