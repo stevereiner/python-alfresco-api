@@ -36,9 +36,9 @@ class NetworksClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -47,31 +47,146 @@ class NetworksClient:
             self._get_network_for_person = _get_network_for_person
             self._list_networks_for_person = _list_networks_for_person
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
-    # Placeholder for networks operations - will be populated from the original file
+    # =================================================================
+    # NETWORKS OPERATIONS - BASIC IMPLEMENTATION (SYNC/ASYNC ONLY)
+    # =================================================================
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
-        return f"AlfrescoNetworksClient(base_url='{base_url}')" 
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
+        return f"AlfrescoNetworksClient(base_url='{base_url}')"
+    
+    # =================================================================
+    # GET NETWORK
+    # =================================================================
+    
+    def get_network(
+        self,
+        network_id: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get network (sync). Gets information about a network."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw networks operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._get_network.sync(
+            network_id=network_id,
+            client=self.raw_client,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def get_network_async(
+        self,
+        network_id: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get network (async). Gets information about a network."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw networks operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._get_network.asyncio(
+            network_id=network_id,
+            client=self.raw_client,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    # =================================================================
+    # GET NETWORK FOR PERSON
+    # =================================================================
+    
+    def get_network_for_person(
+        self,
+        person_id: str,
+        network_id: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get network for person (sync). Gets network information for a person."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw networks operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._get_network_for_person.sync(
+            person_id=person_id,
+            network_id=network_id,
+            client=self.raw_client,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def get_network_for_person_async(
+        self,
+        person_id: str,
+        network_id: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get network for person (async). Gets network information for a person."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw networks operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._get_network_for_person.asyncio(
+            person_id=person_id,
+            network_id=network_id,
+            client=self.raw_client,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    # =================================================================
+    # LIST NETWORKS FOR PERSON
+    # =================================================================
+    
+    def list_networks_for_person(
+        self,
+        person_id: str,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List networks for person (sync). Gets a list of networks for a person."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw networks operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._list_networks_for_person.sync(
+            person_id=person_id,
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def list_networks_for_person_async(
+        self,
+        person_id: str,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List networks for person (async). Gets a list of networks for a person."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw networks operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._list_networks_for_person.asyncio(
+            person_id=person_id,
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        ) 

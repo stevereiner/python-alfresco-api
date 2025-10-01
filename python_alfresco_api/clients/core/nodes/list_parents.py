@@ -32,7 +32,7 @@ def list_parents(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Execute raw sync operation with error handling
     try:
@@ -109,7 +109,7 @@ async def list_parents_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Execute raw async operation with error handling
     try:
@@ -176,7 +176,7 @@ def list_parents_detailed(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Execute raw sync_detailed operation
     return list_parents.sync_detailed(
@@ -215,7 +215,7 @@ async def list_parents_detailed_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Execute raw asyncio_detailed operation
     return await list_parents.asyncio_detailed(

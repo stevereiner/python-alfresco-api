@@ -46,9 +46,9 @@ class RatingsClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -58,28 +58,15 @@ class RatingsClient:
             self._get_rating = _get_rating
             self._list_ratings = _list_ratings
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
 
     # ==================== CREATE_RATING OPERATION ====================
     
@@ -88,7 +75,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import create_rating
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return create_rating.sync(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             body=body,
             fields=fields if fields is not None else UNSET
@@ -99,7 +86,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import create_rating
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await create_rating.asyncio(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             body=body,
             fields=fields if fields is not None else UNSET
@@ -110,7 +97,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import create_rating
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return create_rating.sync_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             body=body,
             fields=fields if fields is not None else UNSET
@@ -121,7 +108,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import create_rating
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await create_rating.asyncio_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             body=body,
             fields=fields if fields is not None else UNSET
@@ -132,22 +119,22 @@ class RatingsClient:
     def delete_rating(self, node_id: str, rating_id: str) -> Any:
         """Delete Rating operation."""
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import delete_rating
-        return delete_rating.sync(client=self._get_raw_client(), node_id=node_id, rating_id=rating_id)
+        return delete_rating.sync(client=self.raw_client, node_id=node_id, rating_id=rating_id)
     
     async def delete_rating_async(self, node_id: str, rating_id: str) -> Any:
         """Delete Rating operation (async)."""
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import delete_rating
-        return await delete_rating.asyncio(client=self._get_raw_client(), node_id=node_id, rating_id=rating_id)
+        return await delete_rating.asyncio(client=self.raw_client, node_id=node_id, rating_id=rating_id)
     
     def delete_rating_detailed(self, node_id: str, rating_id: str) -> Response:
         """Delete Rating operation (detailed)."""
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import delete_rating
-        return delete_rating.sync_detailed(client=self._get_raw_client(), node_id=node_id, rating_id=rating_id)
+        return delete_rating.sync_detailed(client=self.raw_client, node_id=node_id, rating_id=rating_id)
     
     async def delete_rating_detailed_async(self, node_id: str, rating_id: str) -> Response:
         """Delete Rating operation (detailed, async)."""
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import delete_rating
-        return await delete_rating.asyncio_detailed(client=self._get_raw_client(), node_id=node_id, rating_id=rating_id)
+        return await delete_rating.asyncio_detailed(client=self.raw_client, node_id=node_id, rating_id=rating_id)
 
     # ==================== GET_RATING OPERATION ====================
     
@@ -156,7 +143,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import get_rating
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return get_rating.sync(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             rating_id=rating_id,
             fields=fields if fields is not None else UNSET
@@ -167,7 +154,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import get_rating
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await get_rating.asyncio(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             rating_id=rating_id,
             fields=fields if fields is not None else UNSET
@@ -178,7 +165,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import get_rating
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return get_rating.sync_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             rating_id=rating_id,
             fields=fields if fields is not None else UNSET
@@ -189,7 +176,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import get_rating
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await get_rating.asyncio_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             rating_id=rating_id,
             fields=fields if fields is not None else UNSET
@@ -203,7 +190,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import list_ratings
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return list_ratings.sync(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -216,7 +203,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import list_ratings
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await list_ratings.asyncio(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -229,7 +216,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import list_ratings
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return list_ratings.sync_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -242,7 +229,7 @@ class RatingsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.ratings import list_ratings
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await list_ratings.asyncio_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,

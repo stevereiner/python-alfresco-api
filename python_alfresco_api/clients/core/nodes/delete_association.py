@@ -27,7 +27,7 @@ def delete_association(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Execute raw sync operation
     response = delete_association.sync_detailed(
@@ -61,7 +61,7 @@ async def delete_association_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Execute raw async operation
     response = await delete_association.asyncio_detailed(
@@ -98,7 +98,7 @@ def delete_association_detailed(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Execute raw sync_detailed operation
     return delete_association.sync_detailed(
@@ -134,7 +134,7 @@ async def delete_association_detailed_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Execute raw asyncio_detailed operation
     return await delete_association.asyncio_detailed(

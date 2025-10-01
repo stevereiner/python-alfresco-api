@@ -20,24 +20,15 @@ class VersionsClient:
     that are essential for MCP servers and document workflows.
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
     
-    def _get_raw_client(self):
-        """Get the actual raw core client for API calls."""
-        if self._raw_client is None:
-            # Create raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
     def _get_core_client(self):
         """Get the core client from the factory."""
@@ -81,7 +72,7 @@ class VersionsClient:
             ValidationError: Invalid node for versioning
         """
         # Get HTTPx client for direct API call
-        httpx_client = self._get_raw_client().get_httpx_client()
+        httpx_client = self.raw_client.get_httpx_client()
         
         # Enable versioning by updating the node content (triggers versioning)
         # This is the standard way to enable versioning in Alfresco
@@ -241,7 +232,7 @@ class VersionsClient:
             ValidationError: Invalid node for versioning
         """
         # Get HTTPx client for direct API call
-        httpx_client = self._get_raw_client().get_async_httpx_client()
+        httpx_client = self.raw_client.get_async_httpx_client()
         
         # Enable versioning by updating the node content (triggers versioning)
         # This is the standard way to enable versioning in Alfresco

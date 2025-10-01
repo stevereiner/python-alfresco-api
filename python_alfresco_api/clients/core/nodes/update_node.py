@@ -67,7 +67,7 @@ def update_node(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Convert include options
     include_params = UNSET
@@ -143,7 +143,7 @@ async def update_node_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Convert include options
     include_params = UNSET
@@ -206,7 +206,7 @@ def update_node_detailed(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Convert include options
     include_params = UNSET
@@ -264,7 +264,7 @@ async def update_node_detailed_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Convert include options
     include_params = UNSET

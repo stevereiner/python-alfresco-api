@@ -94,9 +94,9 @@ class TasksClient:
     - Process-specific tasks (list)
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -115,28 +115,15 @@ class TasksClient:
             self._update_task = _update_task
             self._update_task_variable = _update_task_variable
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw client directly
-            from ....raw_clients.alfresco_workflow_client.workflow_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/workflow/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
     # ==================== 4-PATTERN OPERATIONS ====================
     # Note: Due to size constraints, showing abbreviated version of 52 methods
@@ -148,25 +135,25 @@ class TasksClient:
         """Create Task Item operation (sync)."""
         if not hasattr(self, '_create_task_item'):
             raise ImportError("Raw client operation not available")
-        return self._create_task_item.sync(client=self._get_raw_client(), task_id=task_id, body=body)
+        return self._create_task_item.sync(client=self.raw_client, task_id=task_id, body=body)
     
     async def create_task_item_async(self, task_id: str, body: ItemBody = UNSET) -> Any:
         """Create Task Item operation (async)."""
         if not hasattr(self, '_create_task_item'):
             raise ImportError("Raw client operation not available")
-        return await self._create_task_item.asyncio(client=self._get_raw_client(), task_id=task_id, body=body)
+        return await self._create_task_item.asyncio(client=self.raw_client, task_id=task_id, body=body)
     
     def create_task_item_detailed(self, task_id: str, body: ItemBody = UNSET) -> Response:
         """Create Task Item operation (detailed sync)."""
         if not hasattr(self, '_create_task_item'):
             raise ImportError("Raw client operation not available")
-        return self._create_task_item.sync_detailed(client=self._get_raw_client(), task_id=task_id, body=body)
+        return self._create_task_item.sync_detailed(client=self.raw_client, task_id=task_id, body=body)
     
     async def create_task_item_detailed_async(self, task_id: str, body: ItemBody = UNSET) -> Response:
         """Create Task Item operation (detailed async)."""
         if not hasattr(self, '_create_task_item'):
             raise ImportError("Raw client operation not available")
-        return await self._create_task_item.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, body=body)
+        return await self._create_task_item.asyncio_detailed(client=self.raw_client, task_id=task_id, body=body)
 
     # ==================== CREATE_TASK_VARIABLES OPERATION - Complete 4-Pattern ====================
     
@@ -174,25 +161,25 @@ class TasksClient:
         """Create Task Variables operation (sync)."""
         if not hasattr(self, '_create_task_variables'):
             raise ImportError("Raw client operation not available")
-        return self._create_task_variables.sync(client=self._get_raw_client(), task_id=task_id, body=body)
+        return self._create_task_variables.sync(client=self.raw_client, task_id=task_id, body=body)
     
     async def create_task_variables_async(self, task_id: str, body: Variable = UNSET) -> Any:
         """Create Task Variables operation (async)."""
         if not hasattr(self, '_create_task_variables'):
             raise ImportError("Raw client operation not available")
-        return await self._create_task_variables.asyncio(client=self._get_raw_client(), task_id=task_id, body=body)
+        return await self._create_task_variables.asyncio(client=self.raw_client, task_id=task_id, body=body)
     
     def create_task_variables_detailed(self, task_id: str, body: Variable = UNSET) -> Response:
         """Create Task Variables operation (detailed sync)."""
         if not hasattr(self, '_create_task_variables'):
             raise ImportError("Raw client operation not available")
-        return self._create_task_variables.sync_detailed(client=self._get_raw_client(), task_id=task_id, body=body)
+        return self._create_task_variables.sync_detailed(client=self.raw_client, task_id=task_id, body=body)
     
     async def create_task_variables_detailed_async(self, task_id: str, body: Variable = UNSET) -> Response:
         """Create Task Variables operation (detailed async)."""
         if not hasattr(self, '_create_task_variables'):
             raise ImportError("Raw client operation not available")
-        return await self._create_task_variables.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, body=body)
+        return await self._create_task_variables.asyncio_detailed(client=self.raw_client, task_id=task_id, body=body)
 
     # ==================== DELETE_TASK_ITEM OPERATION - Complete 4-Pattern ====================
     
@@ -200,25 +187,25 @@ class TasksClient:
         """Delete Task Item operation (sync)."""
         if not hasattr(self, '_delete_task_item'):
             raise ImportError("Raw client operation not available")
-        return self._delete_task_item.sync(client=self._get_raw_client(), task_id=task_id, item_id=item_id)
+        return self._delete_task_item.sync(client=self.raw_client, task_id=task_id, item_id=item_id)
     
     async def delete_task_item_async(self, task_id: str, item_id: str) -> Any:
         """Delete Task Item operation (async)."""
         if not hasattr(self, '_delete_task_item'):
             raise ImportError("Raw client operation not available")
-        return await self._delete_task_item.asyncio(client=self._get_raw_client(), task_id=task_id, item_id=item_id)
+        return await self._delete_task_item.asyncio(client=self.raw_client, task_id=task_id, item_id=item_id)
     
     def delete_task_item_detailed(self, task_id: str, item_id: str) -> Response:
         """Delete Task Item operation (detailed sync)."""
         if not hasattr(self, '_delete_task_item'):
             raise ImportError("Raw client operation not available")
-        return self._delete_task_item.sync_detailed(client=self._get_raw_client(), task_id=task_id, item_id=item_id)
+        return self._delete_task_item.sync_detailed(client=self.raw_client, task_id=task_id, item_id=item_id)
     
     async def delete_task_item_detailed_async(self, task_id: str, item_id: str) -> Response:
         """Delete Task Item operation (detailed async)."""
         if not hasattr(self, '_delete_task_item'):
             raise ImportError("Raw client operation not available")
-        return await self._delete_task_item.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, item_id=item_id)
+        return await self._delete_task_item.asyncio_detailed(client=self.raw_client, task_id=task_id, item_id=item_id)
 
     # ==================== DELETE_TASK_VARIABLE OPERATION - Complete 4-Pattern ====================
     
@@ -226,25 +213,25 @@ class TasksClient:
         """Delete Task Variable operation (sync)."""
         if not hasattr(self, '_delete_task_variable'):
             raise ImportError("Raw client operation not available")
-        return self._delete_task_variable.sync(client=self._get_raw_client(), task_id=task_id, variable_name=variable_name)
+        return self._delete_task_variable.sync(client=self.raw_client, task_id=task_id, variable_name=variable_name)
     
     async def delete_task_variable_async(self, task_id: str, variable_name: str) -> Any:
         """Delete Task Variable operation (async)."""
         if not hasattr(self, '_delete_task_variable'):
             raise ImportError("Raw client operation not available")
-        return await self._delete_task_variable.asyncio(client=self._get_raw_client(), task_id=task_id, variable_name=variable_name)
+        return await self._delete_task_variable.asyncio(client=self.raw_client, task_id=task_id, variable_name=variable_name)
     
     def delete_task_variable_detailed(self, task_id: str, variable_name: str) -> Response:
         """Delete Task Variable operation (detailed sync)."""
         if not hasattr(self, '_delete_task_variable'):
             raise ImportError("Raw client operation not available")
-        return self._delete_task_variable.sync_detailed(client=self._get_raw_client(), task_id=task_id, variable_name=variable_name)
+        return self._delete_task_variable.sync_detailed(client=self.raw_client, task_id=task_id, variable_name=variable_name)
     
     async def delete_task_variable_detailed_async(self, task_id: str, variable_name: str) -> Response:
         """Delete Task Variable operation (detailed async)."""
         if not hasattr(self, '_delete_task_variable'):
             raise ImportError("Raw client operation not available")
-        return await self._delete_task_variable.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, variable_name=variable_name)
+        return await self._delete_task_variable.asyncio_detailed(client=self.raw_client, task_id=task_id, variable_name=variable_name)
 
     # ==================== GET_TASK OPERATION - Complete 4-Pattern ====================
     
@@ -252,25 +239,25 @@ class TasksClient:
         """Get Task operation (sync)."""
         if not hasattr(self, '_get_task'):
             raise ImportError("Raw client operation not available")
-        return self._get_task.sync(client=self._get_raw_client(), task_id=task_id, properties=properties)
+        return self._get_task.sync(client=self.raw_client, task_id=task_id, properties=properties)
     
     async def get_task_async(self, task_id: str, properties: Union[Unset, Any] = UNSET) -> Any:
         """Get Task operation (async)."""
         if not hasattr(self, '_get_task'):
             raise ImportError("Raw client operation not available")
-        return await self._get_task.asyncio(client=self._get_raw_client(), task_id=task_id, properties=properties)
+        return await self._get_task.asyncio(client=self.raw_client, task_id=task_id, properties=properties)
     
     def get_task_detailed(self, task_id: str, properties: Union[Unset, Any] = UNSET) -> Response:
         """Get Task operation (detailed sync)."""
         if not hasattr(self, '_get_task'):
             raise ImportError("Raw client operation not available")
-        return self._get_task.sync_detailed(client=self._get_raw_client(), task_id=task_id, properties=properties)
+        return self._get_task.sync_detailed(client=self.raw_client, task_id=task_id, properties=properties)
     
     async def get_task_detailed_async(self, task_id: str, properties: Union[Unset, Any] = UNSET) -> Response:
         """Get Task operation (detailed async)."""
         if not hasattr(self, '_get_task'):
             raise ImportError("Raw client operation not available")
-        return await self._get_task.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, properties=properties)
+        return await self._get_task.asyncio_detailed(client=self.raw_client, task_id=task_id, properties=properties)
 
     # ==================== GET_TASK_FORM_MODEL OPERATION - Complete 4-Pattern ====================
     
@@ -278,25 +265,25 @@ class TasksClient:
         """Get Task Form Model operation (sync)."""
         if not hasattr(self, '_get_task_form_model'):
             raise ImportError("Raw client operation not available")
-        return self._get_task_form_model.sync(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._get_task_form_model.sync(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def get_task_form_model_async(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Any:
         """Get Task Form Model operation (async)."""
         if not hasattr(self, '_get_task_form_model'):
             raise ImportError("Raw client operation not available")
-        return await self._get_task_form_model.asyncio(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._get_task_form_model.asyncio(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     def get_task_form_model_detailed(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """Get Task Form Model operation (detailed sync)."""
         if not hasattr(self, '_get_task_form_model'):
             raise ImportError("Raw client operation not available")
-        return self._get_task_form_model.sync_detailed(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._get_task_form_model.sync_detailed(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def get_task_form_model_detailed_async(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """Get Task Form Model operation (detailed async)."""
         if not hasattr(self, '_get_task_form_model'):
             raise ImportError("Raw client operation not available")
-        return await self._get_task_form_model.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._get_task_form_model.asyncio_detailed(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
 
     # ==================== LIST_TASKS OPERATION - Complete 4-Pattern ====================
     
@@ -304,25 +291,25 @@ class TasksClient:
         """List Tasks operation (sync)."""
         if not hasattr(self, '_list_tasks'):
             raise ImportError("Raw client operation not available")
-        return self._list_tasks.sync(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
+        return self._list_tasks.sync(client=self.raw_client, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
     
     async def list_tasks_async(self, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Any:
         """List Tasks operation (async)."""
         if not hasattr(self, '_list_tasks'):
             raise ImportError("Raw client operation not available")
-        return await self._list_tasks.asyncio(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
+        return await self._list_tasks.asyncio(client=self.raw_client, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
     
     def list_tasks_detailed(self, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Response:
         """List Tasks operation (detailed sync)."""
         if not hasattr(self, '_list_tasks'):
             raise ImportError("Raw client operation not available")
-        return self._list_tasks.sync_detailed(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
+        return self._list_tasks.sync_detailed(client=self.raw_client, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
     
     async def list_tasks_detailed_async(self, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Response:
         """List Tasks operation (detailed async)."""
         if not hasattr(self, '_list_tasks'):
             raise ImportError("Raw client operation not available")
-        return await self._list_tasks.asyncio_detailed(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
+        return await self._list_tasks.asyncio_detailed(client=self.raw_client, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
 
     # ==================== LIST_TASKS_FOR_PROCESS OPERATION - Complete 4-Pattern ====================
     
@@ -330,25 +317,25 @@ class TasksClient:
         """List Tasks For Process operation (sync)."""
         if not hasattr(self, '_list_tasks_for_process'):
             raise ImportError("Raw client operation not available")
-        return self._list_tasks_for_process.sync(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by)
+        return self._list_tasks_for_process.sync(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by)
     
     async def list_tasks_for_process_async(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET) -> Any:
         """List Tasks For Process operation (async)."""
         if not hasattr(self, '_list_tasks_for_process'):
             raise ImportError("Raw client operation not available")
-        return await self._list_tasks_for_process.asyncio(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by)
+        return await self._list_tasks_for_process.asyncio(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by)
     
     def list_tasks_for_process_detailed(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET) -> Response:
         """List Tasks For Process operation (detailed sync)."""
         if not hasattr(self, '_list_tasks_for_process'):
             raise ImportError("Raw client operation not available")
-        return self._list_tasks_for_process.sync_detailed(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by)
+        return self._list_tasks_for_process.sync_detailed(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by)
     
     async def list_tasks_for_process_detailed_async(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET) -> Response:
         """List Tasks For Process operation (detailed async)."""
         if not hasattr(self, '_list_tasks_for_process'):
             raise ImportError("Raw client operation not available")
-        return await self._list_tasks_for_process.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by)
+        return await self._list_tasks_for_process.asyncio_detailed(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by)
 
     # ==================== LIST_TASK_CANDIDATES OPERATION - Complete 4-Pattern ====================
     
@@ -356,25 +343,25 @@ class TasksClient:
         """List Task Candidates operation (sync)."""
         if not hasattr(self, '_list_task_candidates'):
             raise ImportError("Raw client operation not available")
-        return self._list_task_candidates.sync(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._list_task_candidates.sync(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def list_task_candidates_async(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Any:
         """List Task Candidates operation (async)."""
         if not hasattr(self, '_list_task_candidates'):
             raise ImportError("Raw client operation not available")
-        return await self._list_task_candidates.asyncio(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._list_task_candidates.asyncio(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     def list_task_candidates_detailed(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """List Task Candidates operation (detailed sync)."""
         if not hasattr(self, '_list_task_candidates'):
             raise ImportError("Raw client operation not available")
-        return self._list_task_candidates.sync_detailed(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._list_task_candidates.sync_detailed(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def list_task_candidates_detailed_async(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """List Task Candidates operation (detailed async)."""
         if not hasattr(self, '_list_task_candidates'):
             raise ImportError("Raw client operation not available")
-        return await self._list_task_candidates.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._list_task_candidates.asyncio_detailed(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
 
     # ==================== LIST_TASK_ITEMS OPERATION - Complete 4-Pattern ====================
     
@@ -382,25 +369,25 @@ class TasksClient:
         """List Task Items operation (sync)."""
         if not hasattr(self, '_list_task_items'):
             raise ImportError("Raw client operation not available")
-        return self._list_task_items.sync(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._list_task_items.sync(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def list_task_items_async(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Any:
         """List Task Items operation (async)."""
         if not hasattr(self, '_list_task_items'):
             raise ImportError("Raw client operation not available")
-        return await self._list_task_items.asyncio(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._list_task_items.asyncio(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     def list_task_items_detailed(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """List Task Items operation (detailed sync)."""
         if not hasattr(self, '_list_task_items'):
             raise ImportError("Raw client operation not available")
-        return self._list_task_items.sync_detailed(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._list_task_items.sync_detailed(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def list_task_items_detailed_async(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """List Task Items operation (detailed async)."""
         if not hasattr(self, '_list_task_items'):
             raise ImportError("Raw client operation not available")
-        return await self._list_task_items.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._list_task_items.asyncio_detailed(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties)
 
     # ==================== LIST_TASK_VARIABLES OPERATION - Complete 4-Pattern ====================
     
@@ -408,25 +395,25 @@ class TasksClient:
         """List Task Variables operation (sync)."""
         if not hasattr(self, '_list_task_variables'):
             raise ImportError("Raw client operation not available")
-        return self._list_task_variables.sync(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties, where=where)
+        return self._list_task_variables.sync(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties, where=where)
     
     async def list_task_variables_async(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Any:
         """List Task Variables operation (async)."""
         if not hasattr(self, '_list_task_variables'):
             raise ImportError("Raw client operation not available")
-        return await self._list_task_variables.asyncio(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties, where=where)
+        return await self._list_task_variables.asyncio(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties, where=where)
     
     def list_task_variables_detailed(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Response:
         """List Task Variables operation (detailed sync)."""
         if not hasattr(self, '_list_task_variables'):
             raise ImportError("Raw client operation not available")
-        return self._list_task_variables.sync_detailed(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties, where=where)
+        return self._list_task_variables.sync_detailed(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties, where=where)
     
     async def list_task_variables_detailed_async(self, task_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Response:
         """List Task Variables operation (detailed async)."""
         if not hasattr(self, '_list_task_variables'):
             raise ImportError("Raw client operation not available")
-        return await self._list_task_variables.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties, where=where)
+        return await self._list_task_variables.asyncio_detailed(client=self.raw_client, task_id=task_id, skip_count=skip_count, max_items=max_items, properties=properties, where=where)
 
     # ==================== UPDATE_TASK OPERATION - Complete 4-Pattern ====================
     
@@ -434,25 +421,25 @@ class TasksClient:
         """Update Task operation (sync)."""
         if not hasattr(self, '_update_task'):
             raise ImportError("Raw client operation not available")
-        return self._update_task.sync(client=self._get_raw_client(), task_id=task_id, body=body, select=select)
+        return self._update_task.sync(client=self.raw_client, task_id=task_id, body=body, select=select)
     
     async def update_task_async(self, task_id: str, body: TaskBody = UNSET, select: Union[Unset, Any] = UNSET) -> Any:
         """Update Task operation (async)."""
         if not hasattr(self, '_update_task'):
             raise ImportError("Raw client operation not available")
-        return await self._update_task.asyncio(client=self._get_raw_client(), task_id=task_id, body=body, select=select)
+        return await self._update_task.asyncio(client=self.raw_client, task_id=task_id, body=body, select=select)
     
     def update_task_detailed(self, task_id: str, body: TaskBody = UNSET, select: Union[Unset, Any] = UNSET) -> Response:
         """Update Task operation (detailed sync)."""
         if not hasattr(self, '_update_task'):
             raise ImportError("Raw client operation not available")
-        return self._update_task.sync_detailed(client=self._get_raw_client(), task_id=task_id, body=body, select=select)
+        return self._update_task.sync_detailed(client=self.raw_client, task_id=task_id, body=body, select=select)
     
     async def update_task_detailed_async(self, task_id: str, body: TaskBody = UNSET, select: Union[Unset, Any] = UNSET) -> Response:
         """Update Task operation (detailed async)."""
         if not hasattr(self, '_update_task'):
             raise ImportError("Raw client operation not available")
-        return await self._update_task.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, body=body, select=select)
+        return await self._update_task.asyncio_detailed(client=self.raw_client, task_id=task_id, body=body, select=select)
 
     # ==================== UPDATE_TASK_VARIABLE OPERATION - Complete 4-Pattern ====================
     
@@ -460,27 +447,27 @@ class TasksClient:
         """Update Task Variable operation (sync)."""
         if not hasattr(self, '_update_task_variable'):
             raise ImportError("Raw client operation not available")
-        return self._update_task_variable.sync(client=self._get_raw_client(), task_id=task_id, variable_name=variable_name, body=body)
+        return self._update_task_variable.sync(client=self.raw_client, task_id=task_id, variable_name=variable_name, body=body)
     
     async def update_task_variable_async(self, task_id: str, variable_name: str, body: Variable = UNSET) -> Any:
         """Update Task Variable operation (async)."""
         if not hasattr(self, '_update_task_variable'):
             raise ImportError("Raw client operation not available")
-        return await self._update_task_variable.asyncio(client=self._get_raw_client(), task_id=task_id, variable_name=variable_name, body=body)
+        return await self._update_task_variable.asyncio(client=self.raw_client, task_id=task_id, variable_name=variable_name, body=body)
     
     def update_task_variable_detailed(self, task_id: str, variable_name: str, body: Variable = UNSET) -> Response:
         """Update Task Variable operation (detailed sync)."""
         if not hasattr(self, '_update_task_variable'):
             raise ImportError("Raw client operation not available")
-        return self._update_task_variable.sync_detailed(client=self._get_raw_client(), task_id=task_id, variable_name=variable_name, body=body)
+        return self._update_task_variable.sync_detailed(client=self.raw_client, task_id=task_id, variable_name=variable_name, body=body)
     
     async def update_task_variable_detailed_async(self, task_id: str, variable_name: str, body: Variable = UNSET) -> Response:
         """Update Task Variable operation (detailed async)."""
         if not hasattr(self, '_update_task_variable'):
             raise ImportError("Raw client operation not available")
-        return await self._update_task_variable.asyncio_detailed(client=self._get_raw_client(), task_id=task_id, variable_name=variable_name, body=body)
+        return await self._update_task_variable.asyncio_detailed(client=self.raw_client, task_id=task_id, variable_name=variable_name, body=body)
 
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
         return f"TasksClient(base_url='{base_url}')" 

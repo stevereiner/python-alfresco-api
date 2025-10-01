@@ -147,9 +147,9 @@ class AlfrescoModelClient:
             # Lazy load the types client with graceful error handling
             try:
                 from .types import TypesClient
-                self._types = TypesClient(self._client_factory)
+                self._types = TypesClient(self)
             except (ImportError, TypeError) as e:
-                print(f"⚠️  Types subclient unavailable: {e}")
+                print(f"[WARNING] Types subclient unavailable: {e}")
                 return None
         return self._types
     
@@ -160,9 +160,9 @@ class AlfrescoModelClient:
             # Lazy load the aspects client with graceful error handling
             try:
                 from .aspects import AspectsClient
-                self._aspects = AspectsClient(self._client_factory)
+                self._aspects = AspectsClient(self)
             except (ImportError, TypeError) as e:
-                print(f"⚠️  Aspects subclient unavailable: {e}")
+                print(f"[WARNING] Aspects subclient unavailable: {e}")
                 return None
         return self._aspects
     

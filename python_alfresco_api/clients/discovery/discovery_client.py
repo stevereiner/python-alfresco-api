@@ -137,7 +137,7 @@ class AlfrescoDiscoveryClient:
         if self._discovery is None:
             # Lazy load the discovery client
             from .discovery.discovery_operations import DiscoveryClient
-            self._discovery = DiscoveryClient(self._client_factory)
+            self._discovery = DiscoveryClient(self)
         return self._discovery
     
     # =================================================================

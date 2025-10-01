@@ -41,9 +41,9 @@ class FavoritesClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -57,31 +57,201 @@ class FavoritesClient:
             self._list_favorites = _list_favorites
             self._list_favorite_sites_for_person = _list_favorite_sites_for_person
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
+    
+    # =================================================================
+    # FAVORITES OPERATIONS - 4-PATTERN IMPLEMENTATION
+    # =================================================================
+    
+    def create_favorite(
+        self,
+        person_id: str,
+        target_id: str,
+        target_type: str = "file"
+    ) -> Optional[Any]:
+        """Create favorite (sync). Adds a node to a person's favorites."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw favorites operations not available")
         
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+        from ....raw_clients.alfresco_core_client.core_client.models.favorite_body_create import FavoriteBodyCreate
+        
+        # Create target based on type
+        target_dict = {}
+        if target_type == "file":
+            target_dict["file"] = {"guid": target_id}
+        elif target_type == "folder":
+            target_dict["folder"] = {"guid": target_id}
+        elif target_type == "site":
+            target_dict["site"] = {"guid": target_id}
+        
+        favorite_body = FavoriteBodyCreate(target=target_dict)
+        
+        return self._create_favorite.sync(
+            person_id=person_id,
+            client=self.raw_client,
+            body=favorite_body
+        )
     
-    # Placeholder for favorites operations - will be populated from the original file
+    async def create_favorite_async(
+        self,
+        person_id: str,
+        target_id: str,
+        target_type: str = "file"
+    ) -> Optional[Any]:
+        """Create favorite (async). Adds a node to a person's favorites."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw favorites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.models.favorite_body_create import FavoriteBodyCreate
+        
+        # Create target based on type
+        target_dict = {}
+        if target_type == "file":
+            target_dict["file"] = {"guid": target_id}
+        elif target_type == "folder":
+            target_dict["folder"] = {"guid": target_id}
+        elif target_type == "site":
+            target_dict["site"] = {"guid": target_id}
+        
+        favorite_body = FavoriteBodyCreate(target=target_dict)
+        
+        return await self._create_favorite.asyncio(
+            person_id=person_id,
+            client=self.raw_client,
+            body=favorite_body
+        )
+    
+    def delete_favorite(
+        self,
+        person_id: str,
+        favorite_id: str
+    ) -> Optional[Any]:
+        """Delete favorite (sync). Removes a node from a person's favorites."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw favorites operations not available")
+        
+        return self._delete_favorite.sync(
+            person_id=person_id,
+            favorite_id=favorite_id,
+            client=self.raw_client
+        )
+    
+    async def delete_favorite_async(
+        self,
+        person_id: str,
+        favorite_id: str
+    ) -> Optional[Any]:
+        """Delete favorite (async). Removes a node from a person's favorites."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw favorites operations not available")
+        
+        return await self._delete_favorite.asyncio(
+            person_id=person_id,
+            favorite_id=favorite_id,
+            client=self.raw_client
+        )
+    
+    def get_favorite(
+        self,
+        person_id: str,
+        favorite_id: str,
+        include: Optional[List[str]] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get favorite details (sync). Gets details for a specific favorite."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw favorites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._get_favorite.sync(
+            person_id=person_id,
+            favorite_id=favorite_id,
+            client=self.raw_client,
+            include=include if include is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def get_favorite_async(
+        self,
+        person_id: str,
+        favorite_id: str,
+        include: Optional[List[str]] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get favorite details (async). Gets details for a specific favorite."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw favorites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._get_favorite.asyncio(
+            person_id=person_id,
+            favorite_id=favorite_id,
+            client=self.raw_client,
+            include=include if include is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    def list_favorites(
+        self,
+        person_id: str,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        where: Optional[str] = None,
+        include: Optional[List[str]] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List favorites (sync). Gets a list of favorites for a person."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw favorites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._list_favorites.sync(
+            person_id=person_id,
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            where=where if where is not None else UNSET,
+            include=include if include is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def list_favorites_async(
+        self,
+        person_id: str,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        where: Optional[str] = None,
+        include: Optional[List[str]] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List favorites (async). Gets a list of favorites for a person."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw favorites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._list_favorites.asyncio(
+            person_id=person_id,
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            where=where if where is not None else UNSET,
+            include=include if include is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
-        return f"FavoritesClient(base_url='{base_url}')" 
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
+        return f"AlfrescoFavoritesClient(base_url='{base_url}')" 

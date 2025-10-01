@@ -137,7 +137,7 @@ class AlfrescoSearchClient:
         if self._search is None:
             # Lazy load the search client
             from .search.search_operations import SearchClient
-            self._search = SearchClient(self._client_factory)
+            self._search = SearchClient(self)
         return self._search
     
     # =================================================================

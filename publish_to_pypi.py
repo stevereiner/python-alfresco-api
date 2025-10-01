@@ -29,7 +29,7 @@ def run_command(cmd, check=True):
 
 def main():
     """Main publishing workflow."""
-    print("🚀 PYTHON-ALFRESCO-API v1.1 PyPI PUBLISHING")
+    print("🚀 PYTHON-ALFRESCO-API PyPI PUBLISHING")
     print("=" * 50)
     
     # 1. Verify we're in the right directory
@@ -88,9 +88,15 @@ def main():
     test_response = input("🧪 Upload to Test PyPI first? (yes/no): ").lower().strip()
     if test_response == "yes":
         print("📤 Uploading to Test PyPI...")
-        run_command("python -m twine upload --repository testpypi dist/*")
-        print("✅ Test PyPI upload complete!")
-        print("🔗 Check: https://test.pypi.org/project/python-alfresco-api/")
+        test_result = run_command("python -m twine upload --repository testpypi dist/*", check=False)
+        
+        if test_result.returncode == 0:
+            print("✅ Test PyPI upload complete!")
+            print("🔗 Check: https://test.pypi.org/project/python-alfresco-api/")
+        else:
+            print("⚠️  Test PyPI upload failed (this is common)")
+            print("   Common reasons: 403 errors, authentication issues, server problems")
+            print("   Test PyPI is often unreliable - this won't prevent production upload")
         
         confirm = input("\n📤 Proceed to production PyPI? (yes/no): ").lower().strip()
         if confirm != "yes":
@@ -103,7 +109,7 @@ def main():
     
     print("\n🎉 PYPI PUBLISHING COMPLETE!")
     print("=" * 30)
-    print("✅ python-alfresco-api v1.1.1 published to PyPI")
+    print("✅ python-alfresco-api published to PyPI")
     print("🔗 Package URL: https://pypi.org/project/python-alfresco-api/")
     print("🛠️  Install with: pip install python-alfresco-api")
     

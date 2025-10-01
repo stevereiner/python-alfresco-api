@@ -42,37 +42,24 @@ class ActivitiesClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
         if RAW_OPERATIONS_AVAILABLE:
             self._list_activities_for_person = _list_activities_for_person
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
     # ==================== 4-PATTERN OPERATIONS ====================
 
@@ -88,7 +75,7 @@ class ActivitiesClient:
         if not hasattr(self, '_list_activities_for_person'):
             raise ImportError("Raw client operation not available")
         
-        result = self._list_activities_for_person.sync(client=self._get_raw_client(), person_id=person_id, skip_count=skip_count, max_items=max_items, who=who, site_id=site_id, fields=fields)
+        result = self._list_activities_for_person.sync(client=self.raw_client, person_id=person_id, skip_count=skip_count, max_items=max_items, who=who, site_id=site_id, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -104,7 +91,7 @@ class ActivitiesClient:
         if not hasattr(self, '_list_activities_for_person'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._list_activities_for_person.asyncio(client=self._get_raw_client(), person_id=person_id, skip_count=skip_count, max_items=max_items, who=who, site_id=site_id, fields=fields)
+        result = await self._list_activities_for_person.asyncio(client=self.raw_client, person_id=person_id, skip_count=skip_count, max_items=max_items, who=who, site_id=site_id, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -120,7 +107,7 @@ class ActivitiesClient:
         if not hasattr(self, '_list_activities_for_person'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_activities_for_person.sync_detailed(client=self._get_raw_client(), person_id=person_id, skip_count=skip_count, max_items=max_items, who=who, site_id=site_id, fields=fields)
+        return self._list_activities_for_person.sync_detailed(client=self.raw_client, person_id=person_id, skip_count=skip_count, max_items=max_items, who=who, site_id=site_id, fields=fields)
     
     async def list_activities_for_person_detailed_async(self, person_id: Any, skip_count: Any, max_items: Any, who: Any, site_id: Any, fields: Any):
         """
@@ -132,7 +119,7 @@ class ActivitiesClient:
         if not hasattr(self, '_list_activities_for_person'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_activities_for_person.asyncio_detailed(client=self._get_raw_client(), person_id=person_id, skip_count=skip_count, max_items=max_items, who=who, site_id=site_id, fields=fields)
+        return await self._list_activities_for_person.asyncio_detailed(client=self.raw_client, person_id=person_id, skip_count=skip_count, max_items=max_items, who=who, site_id=site_id, fields=fields)
 
     
     def __repr__(self) -> str:

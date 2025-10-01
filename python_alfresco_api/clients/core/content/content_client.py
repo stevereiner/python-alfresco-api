@@ -49,24 +49,15 @@ class ContentClient:
     that are essential for MCP servers and content workflows.
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
     
-    def _get_raw_client(self):
-        """Get the actual raw core client for API calls."""
-        if self._raw_client is None:
-            # Create raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
     # ==================== SYNC METHODS ====================
     
@@ -113,7 +104,7 @@ class ContentClient:
             ValueError: If invalid parameters
         """
         # Get the raw client
-        raw_client = self._get_raw_client()
+        raw_client = self.raw_client
         
         # Use the nodes API to create a file node with content
         try:
@@ -224,7 +215,7 @@ class ContentClient:
             IOError: If download fails
         """
         # Get the raw client
-        raw_client = self._get_raw_client()
+        raw_client = self.raw_client
         
         # Use the raw client API to get node content
         try:
@@ -294,7 +285,7 @@ class ContentClient:
             ... )
         """
         # Get the raw client
-        raw_client = self._get_raw_client()
+        raw_client = self.raw_client
         
         # Use the nodes API to update node content
         try:

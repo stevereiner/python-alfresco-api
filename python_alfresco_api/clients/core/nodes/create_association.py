@@ -33,7 +33,7 @@ def create_association(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Create the body object using from_dict to ensure proper field mapping
     body_dict = {
@@ -94,7 +94,7 @@ async def create_association_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Create the body object using from_dict to ensure proper field mapping
     body_dict = {
@@ -158,7 +158,7 @@ def create_association_detailed(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Create the body object using from_dict to ensure proper field mapping
     body_dict = {
@@ -204,7 +204,7 @@ async def create_association_detailed_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Create the body object using from_dict to ensure proper field mapping
     body_dict = {

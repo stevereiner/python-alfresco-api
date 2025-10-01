@@ -54,9 +54,9 @@ class SitesClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -83,31 +83,259 @@ class SitesClient:
             self._update_site_membership = _update_site_membership
             self._update_site_membership_request_for_person = _update_site_membership_request_for_person
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
+    
+    # =================================================================
+    # SITES OPERATIONS - 4-PATTERN IMPLEMENTATION
+    # =================================================================
+    
+    def create_site(
+        self,
+        site_id: str,
+        title: str,
+        description: Optional[str] = None,
+        visibility: str = "PUBLIC",
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Create site (sync). Creates a new site."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
         
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+        from ....raw_clients.alfresco_core_client.core_client.models.site_body_create import SiteBodyCreate
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        site_body = SiteBodyCreate(
+            id=site_id,
+            title=title,
+            description=description,
+            visibility=visibility
+        )
+        
+        return self._create_site.sync(
+            client=self.raw_client,
+            body=site_body,
+            fields=fields if fields is not None else UNSET
+        )
     
-    # Placeholder for sites operations - will be populated from the original file
+    async def create_site_async(
+        self,
+        site_id: str,
+        title: str,
+        description: Optional[str] = None,
+        visibility: str = "PUBLIC",
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Create site (async). Creates a new site."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.models.site_body_create import SiteBodyCreate
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        site_body = SiteBodyCreate(
+            id=site_id,
+            title=title,
+            description=description,
+            visibility=visibility
+        )
+        
+        return await self._create_site.asyncio(
+            client=self.raw_client,
+            body=site_body,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    def get_site(
+        self,
+        site_id: str,
+        relations: Optional[List[str]] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get site details (sync). Gets details for a specific site."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._get_site.sync(
+            site_id=site_id,
+            client=self.raw_client,
+            relations=relations if relations is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def get_site_async(
+        self,
+        site_id: str,
+        relations: Optional[List[str]] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get site details (async). Gets details for a specific site."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._get_site.asyncio(
+            site_id=site_id,
+            client=self.raw_client,
+            relations=relations if relations is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    def list_sites(
+        self,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        order_by: Optional[List[str]] = None,
+        relations: Optional[List[str]] = None,
+        fields: Optional[List[str]] = None,
+        where: Optional[str] = None
+    ) -> Optional[Any]:
+        """List sites (sync). Gets a list of sites."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._list_sites.sync(
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            order_by=order_by if order_by is not None else UNSET,
+            relations=relations if relations is not None else UNSET,
+            fields=fields if fields is not None else UNSET,
+            where=where if where is not None else UNSET
+        )
+    
+    async def list_sites_async(
+        self,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        order_by: Optional[List[str]] = None,
+        relations: Optional[List[str]] = None,
+        fields: Optional[List[str]] = None,
+        where: Optional[str] = None
+    ) -> Optional[Any]:
+        """List sites (async). Gets a list of sites."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._list_sites.asyncio(
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            order_by=order_by if order_by is not None else UNSET,
+            relations=relations if relations is not None else UNSET,
+            fields=fields if fields is not None else UNSET,
+            where=where if where is not None else UNSET
+        )
+    
+    def update_site(
+        self,
+        site_id: str,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        visibility: Optional[str] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Update site (sync). Updates details for a specific site."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.models.site_body_update import SiteBodyUpdate
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        site_body = SiteBodyUpdate()
+        if title is not None:
+            site_body.title = title
+        if description is not None:
+            site_body.description = description
+        if visibility is not None:
+            site_body.visibility = visibility
+        
+        return self._update_site.sync(
+            site_id=site_id,
+            client=self.raw_client,
+            body=site_body,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def update_site_async(
+        self,
+        site_id: str,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        visibility: Optional[str] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Update site (async). Updates details for a specific site."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.models.site_body_update import SiteBodyUpdate
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        site_body = SiteBodyUpdate()
+        if title is not None:
+            site_body.title = title
+        if description is not None:
+            site_body.description = description
+        if visibility is not None:
+            site_body.visibility = visibility
+        
+        return await self._update_site.asyncio(
+            site_id=site_id,
+            client=self.raw_client,
+            body=site_body,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    def delete_site(
+        self,
+        site_id: str,
+        permanent: bool = False
+    ) -> Optional[Any]:
+        """Delete site (sync). Deletes a specific site."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._delete_site.sync(
+            site_id=site_id,
+            client=self.raw_client,
+            permanent=permanent if permanent is not None else UNSET
+        )
+    
+    async def delete_site_async(
+        self,
+        site_id: str,
+        permanent: bool = False
+    ) -> Optional[Any]:
+        """Delete site (async). Deletes a specific site."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw sites operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._delete_site.asyncio(
+            site_id=site_id,
+            client=self.raw_client,
+            permanent=permanent if permanent is not None else UNSET
+        )
+    
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
         return f"AlfrescoSitesClient(base_url='{base_url}')" 

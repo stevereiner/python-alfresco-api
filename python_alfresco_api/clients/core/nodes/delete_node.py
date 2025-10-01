@@ -42,7 +42,7 @@ def delete_node(client, node_id: str, permanent: bool = False) -> None:
     from ....raw_clients.alfresco_core_client.core_client.api.nodes import delete_node
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Execute raw sync operation - calls sync httpx directly
     delete_node.sync_detailed(
@@ -74,7 +74,7 @@ async def delete_node_async(client, node_id: str, permanent: bool = False) -> No
     from ....raw_clients.alfresco_core_client.core_client.api.nodes import delete_node
     
     # Get raw client  
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Execute raw operation (delete_node only has asyncio_detailed)
     await delete_node.asyncio_detailed(
@@ -98,7 +98,7 @@ def delete_node_detailed(client, node_id: str, permanent: bool = False):
     from ....raw_clients.alfresco_core_client.core_client.api.nodes import delete_node
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Execute raw sync_detailed operation
     return delete_node.sync_detailed(
@@ -122,7 +122,7 @@ async def delete_node_detailed_async(client, node_id: str, permanent: bool = Fal
     from ....raw_clients.alfresco_core_client.core_client.api.nodes import delete_node
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Execute raw asyncio_detailed operation
     return await delete_node.asyncio_detailed(

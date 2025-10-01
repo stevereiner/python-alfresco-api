@@ -137,7 +137,7 @@ class AlfrescoAuthClient:
         if self._authentication is None:
             # Lazy load the authentication client
             from .authentication import AuthenticationClient
-            self._authentication = AuthenticationClient(self._client_factory)
+            self._authentication = AuthenticationClient(self)
         return self._authentication
     
     # =================================================================

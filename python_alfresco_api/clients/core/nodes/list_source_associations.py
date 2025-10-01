@@ -58,7 +58,7 @@ def list_source_associations(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Convert parameters
     where_param = UNSET if where is None else where
@@ -136,7 +136,7 @@ async def list_source_associations_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Convert parameters
     where_param = UNSET if where is None else where
@@ -221,7 +221,7 @@ def list_source_associations_detailed(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Convert parameters
     where_param = UNSET if where is None else where
@@ -266,7 +266,7 @@ async def list_source_associations_detailed_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = client._get_raw_client()
+    raw_client = client.raw_client
     
     # Convert parameters
     where_param = UNSET if where is None else where

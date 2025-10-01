@@ -67,9 +67,9 @@ class ProcessesClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -86,28 +86,15 @@ class ProcessesClient:
             self._list_process_items = _list_process_items
             self._list_process_variables = _list_process_variables
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw client directly
-            from ....raw_clients.alfresco_workflow_client.workflow_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/workflow/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
     # ==================== 4-PATTERN OPERATIONS ====================
 
@@ -129,7 +116,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_process.sync(client=self._get_raw_client(), body=body)
+        return self._create_process.sync(client=self.raw_client, body=body)
     
     async def create_process_async(self, body: ProcessBody = UNSET) -> Any:
         """
@@ -147,7 +134,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_process.asyncio(client=self._get_raw_client(), body=body)
+        return await self._create_process.asyncio(client=self.raw_client, body=body)
     
     def create_process_detailed(self, body: ProcessBody = UNSET) -> Response:
         """
@@ -165,7 +152,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_process.sync_detailed(client=self._get_raw_client(), body=body)
+        return self._create_process.sync_detailed(client=self.raw_client, body=body)
     
     async def create_process_detailed_async(self, body: ProcessBody = UNSET) -> Response:
         """
@@ -183,7 +170,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_process.asyncio_detailed(client=self._get_raw_client(), body=body)
+        return await self._create_process.asyncio_detailed(client=self.raw_client, body=body)
 
     # ==================== CREATE_PROCESS_ITEM OPERATION - Complete 4-Pattern ====================
     
@@ -204,7 +191,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_item'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_process_item.sync(client=self._get_raw_client(), process_id=process_id, body=body)
+        return self._create_process_item.sync(client=self.raw_client, process_id=process_id, body=body)
     
     async def create_process_item_async(self, process_id: str, body: ItemBody = UNSET) -> Any:
         """
@@ -223,7 +210,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_item'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_process_item.asyncio(client=self._get_raw_client(), process_id=process_id, body=body)
+        return await self._create_process_item.asyncio(client=self.raw_client, process_id=process_id, body=body)
     
     def create_process_item_detailed(self, process_id: str, body: ItemBody = UNSET) -> Response:
         """
@@ -242,7 +229,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_item'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_process_item.sync_detailed(client=self._get_raw_client(), process_id=process_id, body=body)
+        return self._create_process_item.sync_detailed(client=self.raw_client, process_id=process_id, body=body)
     
     async def create_process_item_detailed_async(self, process_id: str, body: ItemBody = UNSET) -> Response:
         """
@@ -261,7 +248,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_item'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_process_item.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, body=body)
+        return await self._create_process_item.asyncio_detailed(client=self.raw_client, process_id=process_id, body=body)
 
     # ==================== CREATE_PROCESS_VARIABLE OPERATION - Complete 4-Pattern ====================
     
@@ -283,7 +270,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_variable'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_process_variable.sync(client=self._get_raw_client(), process_id=process_id, variable_name=variable_name, body=body)
+        return self._create_process_variable.sync(client=self.raw_client, process_id=process_id, variable_name=variable_name, body=body)
     
     async def create_process_variable_async(self, process_id: str, variable_name: str, body: VariableBody = UNSET) -> Any:
         """
@@ -303,7 +290,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_variable'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_process_variable.asyncio(client=self._get_raw_client(), process_id=process_id, variable_name=variable_name, body=body)
+        return await self._create_process_variable.asyncio(client=self.raw_client, process_id=process_id, variable_name=variable_name, body=body)
     
     def create_process_variable_detailed(self, process_id: str, variable_name: str, body: VariableBody = UNSET) -> Response:
         """
@@ -323,7 +310,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_variable'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_process_variable.sync_detailed(client=self._get_raw_client(), process_id=process_id, variable_name=variable_name, body=body)
+        return self._create_process_variable.sync_detailed(client=self.raw_client, process_id=process_id, variable_name=variable_name, body=body)
     
     async def create_process_variable_detailed_async(self, process_id: str, variable_name: str, body: VariableBody = UNSET) -> Response:
         """
@@ -343,7 +330,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_variable'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_process_variable.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, variable_name=variable_name, body=body)
+        return await self._create_process_variable.asyncio_detailed(client=self.raw_client, process_id=process_id, variable_name=variable_name, body=body)
 
     # ==================== CREATE_PROCESS_VARIABLES OPERATION - Complete 4-Pattern ====================
     
@@ -364,7 +351,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_variables'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_process_variables.sync(client=self._get_raw_client(), process_id=process_id, body=body)
+        return self._create_process_variables.sync(client=self.raw_client, process_id=process_id, body=body)
     
     async def create_process_variables_async(self, process_id: str, body: VariableBody = UNSET) -> Any:
         """
@@ -383,7 +370,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_variables'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_process_variables.asyncio(client=self._get_raw_client(), process_id=process_id, body=body)
+        return await self._create_process_variables.asyncio(client=self.raw_client, process_id=process_id, body=body)
     
     def create_process_variables_detailed(self, process_id: str, body: VariableBody = UNSET) -> Response:
         """
@@ -402,7 +389,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_variables'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_process_variables.sync_detailed(client=self._get_raw_client(), process_id=process_id, body=body)
+        return self._create_process_variables.sync_detailed(client=self.raw_client, process_id=process_id, body=body)
     
     async def create_process_variables_detailed_async(self, process_id: str, body: VariableBody = UNSET) -> Response:
         """
@@ -421,7 +408,7 @@ class ProcessesClient:
         if not hasattr(self, '_create_process_variables'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_process_variables.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, body=body)
+        return await self._create_process_variables.asyncio_detailed(client=self.raw_client, process_id=process_id, body=body)
 
     # ==================== DELETE_PROCESS OPERATION - Complete 4-Pattern ====================
     
@@ -441,7 +428,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process'):
             raise ImportError("Raw client operation not available")
         
-        return self._delete_process.sync(client=self._get_raw_client(), process_id=process_id)
+        return self._delete_process.sync(client=self.raw_client, process_id=process_id)
     
     async def delete_process_async(self, process_id: str) -> Any:
         """
@@ -459,7 +446,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process'):
             raise ImportError("Raw client operation not available")
         
-        return await self._delete_process.asyncio(client=self._get_raw_client(), process_id=process_id)
+        return await self._delete_process.asyncio(client=self.raw_client, process_id=process_id)
     
     def delete_process_detailed(self, process_id: str) -> Response:
         """
@@ -477,7 +464,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process'):
             raise ImportError("Raw client operation not available")
         
-        return self._delete_process.sync_detailed(client=self._get_raw_client(), process_id=process_id)
+        return self._delete_process.sync_detailed(client=self.raw_client, process_id=process_id)
     
     async def delete_process_detailed_async(self, process_id: str) -> Response:
         """
@@ -495,7 +482,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process'):
             raise ImportError("Raw client operation not available")
         
-        return await self._delete_process.asyncio_detailed(client=self._get_raw_client(), process_id=process_id)
+        return await self._delete_process.asyncio_detailed(client=self.raw_client, process_id=process_id)
 
     # ==================== DELETE_PROCESS_ITEM OPERATION - Complete 4-Pattern ====================
     
@@ -516,7 +503,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process_item'):
             raise ImportError("Raw client operation not available")
         
-        return self._delete_process_item.sync(client=self._get_raw_client(), process_id=process_id, item_id=item_id)
+        return self._delete_process_item.sync(client=self.raw_client, process_id=process_id, item_id=item_id)
     
     async def delete_process_item_async(self, process_id: str, item_id: str) -> Any:
         """
@@ -535,7 +522,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process_item'):
             raise ImportError("Raw client operation not available")
         
-        return await self._delete_process_item.asyncio(client=self._get_raw_client(), process_id=process_id, item_id=item_id)
+        return await self._delete_process_item.asyncio(client=self.raw_client, process_id=process_id, item_id=item_id)
     
     def delete_process_item_detailed(self, process_id: str, item_id: str) -> Response:
         """
@@ -554,7 +541,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process_item'):
             raise ImportError("Raw client operation not available")
         
-        return self._delete_process_item.sync_detailed(client=self._get_raw_client(), process_id=process_id, item_id=item_id)
+        return self._delete_process_item.sync_detailed(client=self.raw_client, process_id=process_id, item_id=item_id)
     
     async def delete_process_item_detailed_async(self, process_id: str, item_id: str) -> Response:
         """
@@ -573,7 +560,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process_item'):
             raise ImportError("Raw client operation not available")
         
-        return await self._delete_process_item.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, item_id=item_id)
+        return await self._delete_process_item.asyncio_detailed(client=self.raw_client, process_id=process_id, item_id=item_id)
 
     # ==================== DELETE_PROCESS_VARIABLE OPERATION - Complete 4-Pattern ====================
     
@@ -594,7 +581,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process_variable'):
             raise ImportError("Raw client operation not available")
         
-        return self._delete_process_variable.sync(client=self._get_raw_client(), process_id=process_id, variable_name=variable_name)
+        return self._delete_process_variable.sync(client=self.raw_client, process_id=process_id, variable_name=variable_name)
     
     async def delete_process_variable_async(self, process_id: str, variable_name: str) -> Any:
         """
@@ -613,7 +600,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process_variable'):
             raise ImportError("Raw client operation not available")
         
-        return await self._delete_process_variable.asyncio(client=self._get_raw_client(), process_id=process_id, variable_name=variable_name)
+        return await self._delete_process_variable.asyncio(client=self.raw_client, process_id=process_id, variable_name=variable_name)
     
     def delete_process_variable_detailed(self, process_id: str, variable_name: str) -> Response:
         """
@@ -632,7 +619,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process_variable'):
             raise ImportError("Raw client operation not available")
         
-        return self._delete_process_variable.sync_detailed(client=self._get_raw_client(), process_id=process_id, variable_name=variable_name)
+        return self._delete_process_variable.sync_detailed(client=self.raw_client, process_id=process_id, variable_name=variable_name)
     
     async def delete_process_variable_detailed_async(self, process_id: str, variable_name: str) -> Response:
         """
@@ -651,7 +638,7 @@ class ProcessesClient:
         if not hasattr(self, '_delete_process_variable'):
             raise ImportError("Raw client operation not available")
         
-        return await self._delete_process_variable.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, variable_name=variable_name)
+        return await self._delete_process_variable.asyncio_detailed(client=self.raw_client, process_id=process_id, variable_name=variable_name)
 
     # ==================== GET_PROCESS OPERATION - Complete 4-Pattern ====================
     
@@ -672,7 +659,7 @@ class ProcessesClient:
         if not hasattr(self, '_get_process'):
             raise ImportError("Raw client operation not available")
         
-        return self._get_process.sync(client=self._get_raw_client(), process_id=process_id, properties=properties)
+        return self._get_process.sync(client=self.raw_client, process_id=process_id, properties=properties)
     
     async def get_process_async(self, process_id: str, properties: Union[Unset, Any] = UNSET) -> Any:
         """
@@ -691,7 +678,7 @@ class ProcessesClient:
         if not hasattr(self, '_get_process'):
             raise ImportError("Raw client operation not available")
         
-        return await self._get_process.asyncio(client=self._get_raw_client(), process_id=process_id, properties=properties)
+        return await self._get_process.asyncio(client=self.raw_client, process_id=process_id, properties=properties)
     
     def get_process_detailed(self, process_id: str, properties: Union[Unset, Any] = UNSET) -> Response:
         """
@@ -710,7 +697,7 @@ class ProcessesClient:
         if not hasattr(self, '_get_process'):
             raise ImportError("Raw client operation not available")
         
-        return self._get_process.sync_detailed(client=self._get_raw_client(), process_id=process_id, properties=properties)
+        return self._get_process.sync_detailed(client=self.raw_client, process_id=process_id, properties=properties)
     
     async def get_process_detailed_async(self, process_id: str, properties: Union[Unset, Any] = UNSET) -> Response:
         """
@@ -729,7 +716,7 @@ class ProcessesClient:
         if not hasattr(self, '_get_process'):
             raise ImportError("Raw client operation not available")
         
-        return await self._get_process.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, properties=properties)
+        return await self._get_process.asyncio_detailed(client=self.raw_client, process_id=process_id, properties=properties)
 
     # ==================== LIST_PROCESSES OPERATION - Complete 4-Pattern ====================
     
@@ -753,7 +740,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_processes'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_processes.sync(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
+        return self._list_processes.sync(client=self.raw_client, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
     
     async def list_processes_async(self, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Any:
         """
@@ -775,7 +762,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_processes'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_processes.asyncio(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
+        return await self._list_processes.asyncio(client=self.raw_client, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
     
     def list_processes_detailed(self, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Response:
         """
@@ -797,7 +784,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_processes'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_processes.sync_detailed(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
+        return self._list_processes.sync_detailed(client=self.raw_client, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
     
     async def list_processes_detailed_async(self, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET, order_by: Union[Unset, Any] = UNSET, where: Union[Unset, Any] = UNSET) -> Response:
         """
@@ -819,7 +806,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_processes'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_processes.asyncio_detailed(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
+        return await self._list_processes.asyncio_detailed(client=self.raw_client, skip_count=skip_count, max_items=max_items, properties=properties, order_by=order_by, where=where)
 
     # ==================== LIST_PROCESS_ITEMS OPERATION - Complete 4-Pattern ====================
     
@@ -842,7 +829,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_process_items'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_process_items.sync(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._list_process_items.sync(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def list_process_items_async(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Any:
         """
@@ -863,7 +850,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_process_items'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_process_items.asyncio(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._list_process_items.asyncio(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     def list_process_items_detailed(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """
@@ -884,7 +871,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_process_items'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_process_items.sync_detailed(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._list_process_items.sync_detailed(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def list_process_items_detailed_async(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """
@@ -905,7 +892,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_process_items'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_process_items.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._list_process_items.asyncio_detailed(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
 
     # ==================== LIST_PROCESS_VARIABLES OPERATION - Complete 4-Pattern ====================
     
@@ -928,7 +915,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_process_variables'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_process_variables.sync(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._list_process_variables.sync(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def list_process_variables_async(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Any:
         """
@@ -949,7 +936,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_process_variables'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_process_variables.asyncio(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._list_process_variables.asyncio(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     def list_process_variables_detailed(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """
@@ -970,7 +957,7 @@ class ProcessesClient:
         if not hasattr(self, '_list_process_variables'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_process_variables.sync_detailed(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return self._list_process_variables.sync_detailed(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
     
     async def list_process_variables_detailed_async(self, process_id: str, skip_count: Union[Unset, Any] = UNSET, max_items: Union[Unset, Any] = UNSET, properties: Union[Unset, Any] = UNSET) -> Response:
         """
@@ -991,9 +978,9 @@ class ProcessesClient:
         if not hasattr(self, '_list_process_variables'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_process_variables.asyncio_detailed(client=self._get_raw_client(), process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
+        return await self._list_process_variables.asyncio_detailed(client=self.raw_client, process_id=process_id, skip_count=skip_count, max_items=max_items, properties=properties)
 
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
         return f"ProcessesClient(base_url='{base_url}')" 

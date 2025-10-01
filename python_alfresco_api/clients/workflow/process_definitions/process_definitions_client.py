@@ -55,9 +55,9 @@ class ProcessDefinitionsClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -67,28 +67,15 @@ class ProcessDefinitionsClient:
             self._get_process_definition_start_form_model = _get_process_definition_start_form_model
             self._list_process_definitions = _list_process_definitions
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw client directly
-            from ....raw_clients.alfresco_workflow_client.workflow_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/workflow/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
     # ==================== 4-PATTERN OPERATIONS ====================
 
@@ -106,7 +93,7 @@ class ProcessDefinitionsClient:
         return self._get_process_definition.sync(
             process_definition_id=process_definition_id,
             properties=properties,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     async def get_process_definition_async(self, process_definition_id: str, properties: Union[Unset, Any] = UNSET) -> Any:
@@ -121,7 +108,7 @@ class ProcessDefinitionsClient:
         return await self._get_process_definition.asyncio(
             process_definition_id=process_definition_id,
             properties=properties,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     def get_process_definition_detailed(self, process_definition_id: str, properties: Union[Unset, Any] = UNSET) -> Response:
@@ -137,7 +124,7 @@ class ProcessDefinitionsClient:
         return self._get_process_definition.sync_detailed(
             process_definition_id=process_definition_id,
             properties=properties,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     async def get_process_definition_detailed_async(self, process_definition_id: str, properties: Union[Unset, Any] = UNSET) -> Response:
@@ -153,7 +140,7 @@ class ProcessDefinitionsClient:
         return await self._get_process_definition.asyncio_detailed(
             process_definition_id=process_definition_id,
             properties=properties,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
 
     # ==================== GET_PROCESS_DEFINITION_IMAGE OPERATION - Complete 4-Pattern ====================
@@ -169,7 +156,7 @@ class ProcessDefinitionsClient:
         
         return self._get_process_definition_image.sync(
             process_definition_id=process_definition_id,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     async def get_process_definition_image_async(self, process_definition_id: str) -> Any:
@@ -183,7 +170,7 @@ class ProcessDefinitionsClient:
         
         return await self._get_process_definition_image.asyncio(
             process_definition_id=process_definition_id,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     def get_process_definition_image_detailed(self, process_definition_id: str) -> Response:
@@ -198,7 +185,7 @@ class ProcessDefinitionsClient:
         
         return self._get_process_definition_image.sync_detailed(
             process_definition_id=process_definition_id,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     async def get_process_definition_image_detailed_async(self, process_definition_id: str) -> Response:
@@ -213,7 +200,7 @@ class ProcessDefinitionsClient:
         
         return await self._get_process_definition_image.asyncio_detailed(
             process_definition_id=process_definition_id,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
 
     # ==================== GET_PROCESS_DEFINITION_START_FORM_MODEL OPERATION - Complete 4-Pattern ====================
@@ -229,7 +216,7 @@ class ProcessDefinitionsClient:
         
         return self._get_process_definition_start_form_model.sync(
             process_definition_id=process_definition_id,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     async def get_process_definition_start_form_model_async(self, process_definition_id: str) -> Any:
@@ -243,7 +230,7 @@ class ProcessDefinitionsClient:
         
         return await self._get_process_definition_start_form_model.asyncio(
             process_definition_id=process_definition_id,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     def get_process_definition_start_form_model_detailed(self, process_definition_id: str) -> Response:
@@ -258,7 +245,7 @@ class ProcessDefinitionsClient:
         
         return self._get_process_definition_start_form_model.sync_detailed(
             process_definition_id=process_definition_id,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     async def get_process_definition_start_form_model_detailed_async(self, process_definition_id: str) -> Response:
@@ -273,7 +260,7 @@ class ProcessDefinitionsClient:
         
         return await self._get_process_definition_start_form_model.asyncio_detailed(
             process_definition_id=process_definition_id,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
 
     # ==================== LIST_PROCESS_DEFINITIONS OPERATION - Complete 4-Pattern ====================
@@ -305,7 +292,7 @@ class ProcessDefinitionsClient:
             sort=sort,
             properties=properties,
             include=include,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     async def list_process_definitions_async(self, skip_count: Union[Unset, int] = UNSET, max_items: Union[Unset, int] = UNSET, deployment_id: Union[Unset, str] = UNSET, name: Union[Unset, str] = UNSET, name_like: Union[Unset, str] = UNSET, category: Union[Unset, str] = UNSET, category_not_equals: Union[Unset, str] = UNSET, key: Union[Unset, str] = UNSET, key_like: Union[Unset, str] = UNSET, resource_name: Union[Unset, str] = UNSET, resource_name_like: Union[Unset, str] = UNSET, version: Union[Unset, int] = UNSET, latest: Union[Unset, bool] = UNSET, suspended: Union[Unset, bool] = UNSET, sort: Union[Unset, str] = UNSET, properties: Union[Unset, Any] = UNSET, include: Union[Unset, List[str]] = UNSET) -> Any:
@@ -335,7 +322,7 @@ class ProcessDefinitionsClient:
             sort=sort,
             properties=properties,
             include=include,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     def list_process_definitions_detailed(self, skip_count: Union[Unset, int] = UNSET, max_items: Union[Unset, int] = UNSET, deployment_id: Union[Unset, str] = UNSET, name: Union[Unset, str] = UNSET, name_like: Union[Unset, str] = UNSET, category: Union[Unset, str] = UNSET, category_not_equals: Union[Unset, str] = UNSET, key: Union[Unset, str] = UNSET, key_like: Union[Unset, str] = UNSET, resource_name: Union[Unset, str] = UNSET, resource_name_like: Union[Unset, str] = UNSET, version: Union[Unset, int] = UNSET, latest: Union[Unset, bool] = UNSET, suspended: Union[Unset, bool] = UNSET, sort: Union[Unset, str] = UNSET, properties: Union[Unset, Any] = UNSET, include: Union[Unset, List[str]] = UNSET) -> Response:
@@ -366,7 +353,7 @@ class ProcessDefinitionsClient:
             sort=sort,
             properties=properties,
             include=include,
-            client=self._get_raw_client()
+            client=self.raw_client
         )
     
     async def list_process_definitions_detailed_async(self, skip_count: Union[Unset, int] = UNSET, max_items: Union[Unset, int] = UNSET, deployment_id: Union[Unset, str] = UNSET, name: Union[Unset, str] = UNSET, name_like: Union[Unset, str] = UNSET, category: Union[Unset, str] = UNSET, category_not_equals: Union[Unset, str] = UNSET, key: Union[Unset, str] = UNSET, key_like: Union[Unset, str] = UNSET, resource_name: Union[Unset, str] = UNSET, resource_name_like: Union[Unset, str] = UNSET, version: Union[Unset, int] = UNSET, latest: Union[Unset, bool] = UNSET, suspended: Union[Unset, bool] = UNSET, sort: Union[Unset, str] = UNSET, properties: Union[Unset, Any] = UNSET, include: Union[Unset, List[str]] = UNSET) -> Response:
@@ -397,5 +384,5 @@ class ProcessDefinitionsClient:
             sort=sort,
             properties=properties,
             include=include,
-            client=self._get_raw_client()
+            client=self.raw_client
         ) 

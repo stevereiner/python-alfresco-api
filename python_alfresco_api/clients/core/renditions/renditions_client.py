@@ -44,9 +44,9 @@ class RenditionsClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -55,72 +55,59 @@ class RenditionsClient:
             self._get_rendition = _get_rendition
             self._list_renditions = _list_renditions
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
 
     # ==================== CREATE_RENDITION OPERATION ====================
     
     def create_rendition(self, node_id: str, body: Any) -> Any:
         """Create Rendition operation."""
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import create_rendition
-        return create_rendition.sync(client=self._get_raw_client(), node_id=node_id, body=body)
+        return create_rendition.sync(client=self.raw_client, node_id=node_id, body=body)
     
     async def create_rendition_async(self, node_id: str, body: Any) -> Any:
         """Create Rendition operation (async)."""
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import create_rendition
-        return await create_rendition.asyncio(client=self._get_raw_client(), node_id=node_id, body=body)
+        return await create_rendition.asyncio(client=self.raw_client, node_id=node_id, body=body)
     
     def create_rendition_detailed(self, node_id: str, body: Any) -> Response:
         """Create Rendition operation (detailed)."""
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import create_rendition
-        return create_rendition.sync_detailed(client=self._get_raw_client(), node_id=node_id, body=body)
+        return create_rendition.sync_detailed(client=self.raw_client, node_id=node_id, body=body)
     
     async def create_rendition_detailed_async(self, node_id: str, body: Any) -> Response:
         """Create Rendition operation (detailed, async)."""
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import create_rendition
-        return await create_rendition.asyncio_detailed(client=self._get_raw_client(), node_id=node_id, body=body)
+        return await create_rendition.asyncio_detailed(client=self.raw_client, node_id=node_id, body=body)
 
     # ==================== GET_RENDITION OPERATION ====================
     
     def get_rendition(self, node_id: str, rendition_id: str) -> Any:
         """Get Rendition operation."""
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import get_rendition
-        return get_rendition.sync(client=self._get_raw_client(), node_id=node_id, rendition_id=rendition_id)
+        return get_rendition.sync(client=self.raw_client, node_id=node_id, rendition_id=rendition_id)
     
     async def get_rendition_async(self, node_id: str, rendition_id: str) -> Any:
         """Get Rendition operation (async)."""
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import get_rendition
-        return await get_rendition.asyncio(client=self._get_raw_client(), node_id=node_id, rendition_id=rendition_id)
+        return await get_rendition.asyncio(client=self.raw_client, node_id=node_id, rendition_id=rendition_id)
     
     def get_rendition_detailed(self, node_id: str, rendition_id: str) -> Response:
         """Get Rendition operation (detailed)."""
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import get_rendition
-        return get_rendition.sync_detailed(client=self._get_raw_client(), node_id=node_id, rendition_id=rendition_id)
+        return get_rendition.sync_detailed(client=self.raw_client, node_id=node_id, rendition_id=rendition_id)
     
     async def get_rendition_detailed_async(self, node_id: str, rendition_id: str) -> Response:
         """Get Rendition operation (detailed, async)."""
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import get_rendition
-        return await get_rendition.asyncio_detailed(client=self._get_raw_client(), node_id=node_id, rendition_id=rendition_id)
+        return await get_rendition.asyncio_detailed(client=self.raw_client, node_id=node_id, rendition_id=rendition_id)
 
     # ==================== LIST_RENDITIONS OPERATION ====================
     
@@ -129,7 +116,7 @@ class RenditionsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import list_renditions
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return list_renditions.sync(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             where=where if where is not None else UNSET
         )
@@ -139,7 +126,7 @@ class RenditionsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import list_renditions
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await list_renditions.asyncio(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             where=where if where is not None else UNSET
         )
@@ -149,7 +136,7 @@ class RenditionsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import list_renditions
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return list_renditions.sync_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             where=where if where is not None else UNSET
         )
@@ -159,7 +146,7 @@ class RenditionsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.renditions import list_renditions
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await list_renditions.asyncio_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             node_id=node_id,
             where=where if where is not None else UNSET
         )

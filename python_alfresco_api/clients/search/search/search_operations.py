@@ -43,37 +43,24 @@ class SearchClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
         if RAW_OPERATIONS_AVAILABLE:
             self._search = _search
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw client directly
-            from ....raw_clients.alfresco_search_client.search_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup as core client
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/search/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
     # ==================== 4-PATTERN OPERATIONS ====================
 
@@ -95,7 +82,7 @@ class SearchClient:
         if not hasattr(self, '_search'):
             raise ImportError("Raw client operation not available")
         
-        return self._search.sync(client=self._get_raw_client(), body=body)  # type: ignore
+        return self._search.sync(client=self.raw_client, body=body)  # type: ignore
     
     async def search_async(self, body: Union[SearchRequest, Unset] = UNSET) -> Any:
         """
@@ -113,7 +100,7 @@ class SearchClient:
         if not hasattr(self, '_search'):
             raise ImportError("Raw client operation not available")
         
-        return await self._search.asyncio(client=self._get_raw_client(), body=body)  # type: ignore
+        return await self._search.asyncio(client=self.raw_client, body=body)  # type: ignore
     
     def search_detailed(self, body: Union[SearchRequest, Unset] = UNSET):
         """
@@ -131,7 +118,7 @@ class SearchClient:
         if not hasattr(self, '_search'):
             raise ImportError("Raw client operation not available")
         
-        return self._search.sync_detailed(client=self._get_raw_client(), body=body)  # type: ignore
+        return self._search.sync_detailed(client=self.raw_client, body=body)  # type: ignore
     
     async def search_detailed_async(self, body: Union[SearchRequest, Unset] = UNSET):
         """
@@ -149,9 +136,9 @@ class SearchClient:
         if not hasattr(self, '_search'):
             raise ImportError("Raw client operation not available")
         
-        return await self._search.asyncio_detailed(client=self._get_raw_client(), body=body)  # type: ignore
+        return await self._search.asyncio_detailed(client=self.raw_client, body=body)  # type: ignore
 
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
         return f"SearchClient(base_url='{base_url}')" 

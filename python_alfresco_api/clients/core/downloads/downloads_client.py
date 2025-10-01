@@ -44,9 +44,9 @@ class DownloadsClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -55,50 +55,37 @@ class DownloadsClient:
             self._create_download = _create_download
             self._get_download = _get_download
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
 
     # ==================== CANCEL_DOWNLOAD OPERATION ====================
     
     def cancel_download(self, download_id: str) -> Any:
         """Cancel Download operation."""
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import cancel_download
-        return cancel_download.sync(client=self._get_raw_client(), download_id=download_id)
+        return cancel_download.sync(client=self.raw_client, download_id=download_id)
     
     async def cancel_download_async(self, download_id: str) -> Any:
         """Cancel Download operation (async)."""
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import cancel_download
-        return await cancel_download.asyncio(client=self._get_raw_client(), download_id=download_id)
+        return await cancel_download.asyncio(client=self.raw_client, download_id=download_id)
     
     def cancel_download_detailed(self, download_id: str) -> Response:
         """Cancel Download operation (detailed)."""
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import cancel_download
-        return cancel_download.sync_detailed(client=self._get_raw_client(), download_id=download_id)
+        return cancel_download.sync_detailed(client=self.raw_client, download_id=download_id)
     
     async def cancel_download_detailed_async(self, download_id: str) -> Response:
         """Cancel Download operation (detailed, async)."""
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import cancel_download
-        return await cancel_download.asyncio_detailed(client=self._get_raw_client(), download_id=download_id)
+        return await cancel_download.asyncio_detailed(client=self.raw_client, download_id=download_id)
 
     # ==================== CREATE_DOWNLOAD OPERATION ====================
     
@@ -107,7 +94,7 @@ class DownloadsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import create_download
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return create_download.sync(
-            client=self._get_raw_client(), 
+            client=self.raw_client, 
             body=body, 
             fields=fields if fields is not None else UNSET
         )
@@ -117,7 +104,7 @@ class DownloadsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import create_download
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await create_download.asyncio(
-            client=self._get_raw_client(), 
+            client=self.raw_client, 
             body=body, 
             fields=fields if fields is not None else UNSET
         )
@@ -127,7 +114,7 @@ class DownloadsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import create_download
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return create_download.sync_detailed(
-            client=self._get_raw_client(), 
+            client=self.raw_client, 
             body=body, 
             fields=fields if fields is not None else UNSET
         )
@@ -137,7 +124,7 @@ class DownloadsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import create_download
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await create_download.asyncio_detailed(
-            client=self._get_raw_client(), 
+            client=self.raw_client, 
             body=body, 
             fields=fields if fields is not None else UNSET
         )
@@ -149,7 +136,7 @@ class DownloadsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import get_download
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return get_download.sync(
-            client=self._get_raw_client(), 
+            client=self.raw_client, 
             download_id=download_id, 
             fields=fields if fields is not None else UNSET
         )
@@ -159,7 +146,7 @@ class DownloadsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import get_download
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await get_download.asyncio(
-            client=self._get_raw_client(), 
+            client=self.raw_client, 
             download_id=download_id, 
             fields=fields if fields is not None else UNSET
         )
@@ -169,7 +156,7 @@ class DownloadsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import get_download
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return get_download.sync_detailed(
-            client=self._get_raw_client(), 
+            client=self.raw_client, 
             download_id=download_id, 
             fields=fields if fields is not None else UNSET
         )
@@ -179,7 +166,7 @@ class DownloadsClient:
         from ....raw_clients.alfresco_core_client.core_client.api.downloads import get_download
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await get_download.asyncio_detailed(
-            client=self._get_raw_client(), 
+            client=self.raw_client, 
             download_id=download_id, 
             fields=fields if fields is not None else UNSET
         )

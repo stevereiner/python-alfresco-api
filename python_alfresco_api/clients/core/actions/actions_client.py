@@ -45,9 +45,9 @@ class ActionsClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -57,28 +57,15 @@ class ActionsClient:
             self._list_actions = _list_actions
             self._node_actions = _node_actions
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
     # ==================== 4-PATTERN OPERATIONS ====================
 
@@ -94,7 +81,7 @@ class ActionsClient:
         if not hasattr(self, '_action_details'):
             raise ImportError("Raw client operation not available")
         
-        result = self._action_details.sync(client=self._get_raw_client(), action_definition_id=action_definition_id)
+        result = self._action_details.sync(client=self.raw_client, action_definition_id=action_definition_id)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -110,7 +97,7 @@ class ActionsClient:
         if not hasattr(self, '_action_details'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._action_details.asyncio(client=self._get_raw_client(), action_definition_id=action_definition_id)
+        result = await self._action_details.asyncio(client=self.raw_client, action_definition_id=action_definition_id)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -126,7 +113,7 @@ class ActionsClient:
         if not hasattr(self, '_action_details'):
             raise ImportError("Raw client operation not available")
         
-        return self._action_details.sync_detailed(client=self._get_raw_client(), action_definition_id=action_definition_id)
+        return self._action_details.sync_detailed(client=self.raw_client, action_definition_id=action_definition_id)
     
     async def action_details_detailed_async(self, action_definition_id: Any):
         """
@@ -138,7 +125,7 @@ class ActionsClient:
         if not hasattr(self, '_action_details'):
             raise ImportError("Raw client operation not available")
         
-        return await self._action_details.asyncio_detailed(client=self._get_raw_client(), action_definition_id=action_definition_id)
+        return await self._action_details.asyncio_detailed(client=self.raw_client, action_definition_id=action_definition_id)
 
     # ==================== ACTION_EXEC OPERATION ====================
     
@@ -152,7 +139,7 @@ class ActionsClient:
         if not hasattr(self, '_action_exec'):
             raise ImportError("Raw client operation not available")
         
-        result = self._action_exec.sync(client=self._get_raw_client(), body=body)
+        result = self._action_exec.sync(client=self.raw_client, body=body)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -168,7 +155,7 @@ class ActionsClient:
         if not hasattr(self, '_action_exec'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._action_exec.asyncio(client=self._get_raw_client(), body=body)
+        result = await self._action_exec.asyncio(client=self.raw_client, body=body)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -184,7 +171,7 @@ class ActionsClient:
         if not hasattr(self, '_action_exec'):
             raise ImportError("Raw client operation not available")
         
-        return self._action_exec.sync_detailed(client=self._get_raw_client(), body=body)
+        return self._action_exec.sync_detailed(client=self.raw_client, body=body)
     
     async def action_exec_detailed_async(self, body: Any):
         """
@@ -196,7 +183,7 @@ class ActionsClient:
         if not hasattr(self, '_action_exec'):
             raise ImportError("Raw client operation not available")
         
-        return await self._action_exec.asyncio_detailed(client=self._get_raw_client(), body=body)
+        return await self._action_exec.asyncio_detailed(client=self.raw_client, body=body)
 
     # ==================== LIST_ACTIONS OPERATION ====================
     
@@ -210,7 +197,7 @@ class ActionsClient:
         if not hasattr(self, '_list_actions'):
             raise ImportError("Raw client operation not available")
         
-        result = self._list_actions.sync(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
+        result = self._list_actions.sync(client=self.raw_client, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -226,7 +213,7 @@ class ActionsClient:
         if not hasattr(self, '_list_actions'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._list_actions.asyncio(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
+        result = await self._list_actions.asyncio(client=self.raw_client, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -242,7 +229,7 @@ class ActionsClient:
         if not hasattr(self, '_list_actions'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_actions.sync_detailed(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
+        return self._list_actions.sync_detailed(client=self.raw_client, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
     
     async def list_actions_detailed_async(self, skip_count: Any, max_items: Any, order_by: Any, fields: Any):
         """
@@ -254,7 +241,7 @@ class ActionsClient:
         if not hasattr(self, '_list_actions'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_actions.asyncio_detailed(client=self._get_raw_client(), skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
+        return await self._list_actions.asyncio_detailed(client=self.raw_client, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
 
     # ==================== NODE_ACTIONS OPERATION ====================
     
@@ -268,7 +255,7 @@ class ActionsClient:
         if not hasattr(self, '_node_actions'):
             raise ImportError("Raw client operation not available")
         
-        result = self._node_actions.sync(client=self._get_raw_client(), node_id=node_id, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
+        result = self._node_actions.sync(client=self.raw_client, node_id=node_id, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -284,7 +271,7 @@ class ActionsClient:
         if not hasattr(self, '_node_actions'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._node_actions.asyncio(client=self._get_raw_client(), node_id=node_id, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
+        result = await self._node_actions.asyncio(client=self.raw_client, node_id=node_id, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -300,7 +287,7 @@ class ActionsClient:
         if not hasattr(self, '_node_actions'):
             raise ImportError("Raw client operation not available")
         
-        return self._node_actions.sync_detailed(client=self._get_raw_client(), node_id=node_id, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
+        return self._node_actions.sync_detailed(client=self.raw_client, node_id=node_id, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
     
     async def node_actions_detailed_async(self, node_id: Any, skip_count: Any, max_items: Any, order_by: Any, fields: Any):
         """
@@ -312,7 +299,7 @@ class ActionsClient:
         if not hasattr(self, '_node_actions'):
             raise ImportError("Raw client operation not available")
         
-        return await self._node_actions.asyncio_detailed(client=self._get_raw_client(), node_id=node_id, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
+        return await self._node_actions.asyncio_detailed(client=self.raw_client, node_id=node_id, skip_count=skip_count, max_items=max_items, order_by=order_by, fields=fields)
     
     def __repr__(self) -> str:
         """String representation for debugging."""

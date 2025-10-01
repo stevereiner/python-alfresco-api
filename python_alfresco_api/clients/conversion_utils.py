@@ -184,7 +184,7 @@ def enhanced_search_example():
 
 if __name__ == "__main__":
     """Test the conversion utilities."""
-    print("🔧 Testing Conversion Utilities")
+    print("[TESTING] Testing Conversion Utilities")
     
     # Test 1: Enhanced create node
     print("\n1. Enhanced create node conversion:")
@@ -194,4 +194,4 @@ if __name__ == "__main__":
     print("\n2. Enhanced search example:")
     enhanced_search_example()
     
-    print("\n✅ Conversion utilities proof-of-concept complete!") 
+    print("\n[SUCCESS] Conversion utilities proof-of-concept complete!") 

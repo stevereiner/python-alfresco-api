@@ -220,8 +220,8 @@ class AlfrescoCoreClient:
         """Access to versions operations (checkout, checkin, cancel checkout)."""
         if not hasattr(self, '_versions_client'):
             from .versions import VersionsClient
-            self._versions_client = VersionsClient(self._client_factory)
-            print(f"    🔒 Loaded: versions operations (checkout, checkin, cancel checkout)")
+            self._versions_client = VersionsClient(self)
+            print(f"    [LOADED] versions operations (checkout, checkin, cancel checkout)")
         return self._versions_client
     
     @property  
@@ -229,8 +229,8 @@ class AlfrescoCoreClient:
         """Access to content operations (upload, download, update content)."""
         if not hasattr(self, '_content_client'):
             from .content import ContentClient
-            self._content_client = ContentClient(self._client_factory)
-            print(f"    📁 Loaded: content operations (upload, download, update)")
+            self._content_client = ContentClient(self)
+            print(f"    [LOADED] content operations (upload, download, update)")
         return self._content_client
     
     @property
@@ -248,162 +248,162 @@ class AlfrescoCoreClient:
     def sites(self):
         """Access to sites operations (28 operations)."""
         if not hasattr(self, '_sites_client'):
-            print("🔧 Loading sites operations...")
+            print("[LOADING] sites operations...")
             from .sites import SitesClient
-            self._sites_client = SitesClient(self._client_factory)
+            self._sites_client = SitesClient(self)
         return self._sites_client
         
     @property
     def people(self):
         """Access to people operations (8 operations)."""
         if not hasattr(self, '_people_client'):
-            print("🔧 Loading people operations...")
+            print("[LOADING] people operations...")
             from .people import PeopleClient
-            self._people_client = PeopleClient(self._client_factory)
+            self._people_client = PeopleClient(self)
         return self._people_client
         
     @property
     def groups(self):
         """Access to groups operations (9 operations)."""
         if not hasattr(self, '_groups_client'):
-            print("🔧 Loading groups operations...")
+            print("[LOADING] groups operations...")
             from .groups import GroupsClient
-            self._groups_client = GroupsClient(self._client_factory)
+            self._groups_client = GroupsClient(self)
         return self._groups_client
         
     @property
     def shared_links(self):
         """Access to shared_links operations (7 operations)."""
         if not hasattr(self, '_shared_links_client'):
-            print("🔧 Loading shared_links operations...")
+            print("[LOADING] shared_links operations...")
             from .shared_links import SharedLinksClient
-            self._shared_links_client = SharedLinksClient(self._client_factory)
+            self._shared_links_client = SharedLinksClient(self)
         return self._shared_links_client
         
     @property
     def comments(self):
         """Access to comments operations (4 operations)."""
         if not hasattr(self, '_comments_client'):
-            print("🔧 Loading comments operations...")
+            print("[LOADING] comments operations...")
             from .comments import CommentsClient
-            self._comments_client = CommentsClient(self._client_factory)
+            self._comments_client = CommentsClient(self)
         return self._comments_client
         
     @property
     def tags(self):
         """Access to tags operations (6 operations)."""
         if not hasattr(self, '_tags_client'):
-            print("🔧 Loading tags operations...")
+            print("[LOADING] tags operations...")
             from .tags import TagsClient
-            self._tags_client = TagsClient(self._client_factory)
+            self._tags_client = TagsClient(self)
         return self._tags_client
         
     @property
     def favorites(self):
         """Access to favorites operations (8 operations)."""
         if not hasattr(self, '_favorites_client'):
-            print("🔧 Loading favorites operations...")
+            print("[LOADING] favorites operations...")
             from .favorites import FavoritesClient
-            self._favorites_client = FavoritesClient(self._client_factory)
+            self._favorites_client = FavoritesClient(self)
         return self._favorites_client
         
     @property
     def activities(self):
         """Access to activities operations (1 operations)."""
         if not hasattr(self, '_activities_client'):
-            print("🔧 Loading activities operations...")
+            print("[LOADING] activities operations...")
             from .activities import ActivitiesClient
-            self._activities_client = ActivitiesClient(self._client_factory)
+            self._activities_client = ActivitiesClient(self)
         return self._activities_client
         
     @property
     def actions(self):
         """Access to actions operations (4 operations)."""
         if not hasattr(self, '_actions_client'):
-            print("🔧 Loading actions operations...")
+            print("[LOADING] actions operations...")
             from .actions import ActionsClient
-            self._actions_client = ActionsClient(self._client_factory)
+            self._actions_client = ActionsClient(self)
         return self._actions_client
         
     @property
     def audit(self):
         """Access to audit operations (8 operations)."""
         if not hasattr(self, '_audit_client'):
-            print("🔧 Loading audit operations...")
+            print("[LOADING] audit operations...")
             from .audit import AuditClient
-            self._audit_client = AuditClient(self._client_factory)
+            self._audit_client = AuditClient(self)
         return self._audit_client
         
     @property
     def downloads(self):
         """Access to downloads operations (3 operations)."""
         if not hasattr(self, '_downloads_client'):
-            print("🔧 Loading downloads operations...")
+            print("[LOADING] downloads operations...")
             from .downloads import DownloadsClient
-            self._downloads_client = DownloadsClient(self._client_factory)
+            self._downloads_client = DownloadsClient(self)
         return self._downloads_client
         
     @property
     def networks(self):
         """Access to networks operations (3 operations)."""
         if not hasattr(self, '_networks_client'):
-            print("🔧 Loading networks operations...")
+            print("[LOADING] networks operations...")
             from .networks import NetworksClient
-            self._networks_client = NetworksClient(self._client_factory)
+            self._networks_client = NetworksClient(self)
         return self._networks_client
         
     @property
     def preferences(self):
         """Access to preferences operations (2 operations)."""
         if not hasattr(self, '_preferences_client'):
-            print("🔧 Loading preferences operations...")
+            print("[LOADING] preferences operations...")
             from .preferences import PreferencesClient
-            self._preferences_client = PreferencesClient(self._client_factory)
+            self._preferences_client = PreferencesClient(self)
         return self._preferences_client
         
     @property
     def probes(self):
         """Access to probes operations (1 operations)."""
         if not hasattr(self, '_probes_client'):
-            print("🔧 Loading probes operations...")
+            print("[LOADING] probes operations...")
             from .probes import ProbesClient
-            self._probes_client = ProbesClient(self._client_factory)
+            self._probes_client = ProbesClient(self)
         return self._probes_client
         
     @property
     def queries(self):
         """Access to queries operations (3 operations)."""
         if not hasattr(self, '_queries_client'):
-            print("🔧 Loading queries operations...")
+            print("[LOADING] queries operations...")
             from .queries import QueriesClient
-            self._queries_client = QueriesClient(self._client_factory)
+            self._queries_client = QueriesClient(self)
         return self._queries_client
         
     @property
     def ratings(self):
         """Access to ratings operations (4 operations)."""
         if not hasattr(self, '_ratings_client'):
-            print("🔧 Loading ratings operations...")
+            print("[LOADING] ratings operations...")
             from .ratings import RatingsClient
-            self._ratings_client = RatingsClient(self._client_factory)
+            self._ratings_client = RatingsClient(self)
         return self._ratings_client
         
     @property
     def renditions(self):
         """Access to renditions operations (3 operations)."""
         if not hasattr(self, '_renditions_client'):
-            print("🔧 Loading renditions operations...")
+            print("[LOADING] renditions operations...")
             from .renditions import RenditionsClient
-            self._renditions_client = RenditionsClient(self._client_factory)
+            self._renditions_client = RenditionsClient(self)
         return self._renditions_client
         
     @property
     def trashcan(self):
         """Access to trashcan operations (6 operations)."""
         if not hasattr(self, '_trashcan_client'):
-            print("🔧 Loading trashcan operations...")
+            print("[LOADING] trashcan operations...")
             from .trashcan import TrashcanClient
-            self._trashcan_client = TrashcanClient(self._client_factory)
+            self._trashcan_client = TrashcanClient(self)
         return self._trashcan_client
     
     @property

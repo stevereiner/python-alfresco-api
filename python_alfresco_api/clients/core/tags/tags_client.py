@@ -39,9 +39,9 @@ class TagsClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -53,31 +53,253 @@ class TagsClient:
             self._list_tags_for_node = _list_tags_for_node
             self._update_tag = _update_tag
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
+    
+    # =================================================================
+    # TAGS OPERATIONS - BASIC IMPLEMENTATION (SYNC/ASYNC ONLY)
+    # =================================================================
+    
+    def create_tag_for_node(
+        self,
+        node_id: str,
+        tag: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Create tag for node (sync). Adds a tag to a node."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
         
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+        from ....raw_clients.alfresco_core_client.core_client.models.tag_body import TagBody
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        tag_body = TagBody(tag=tag)
+        
+        return self._create_tag_for_node.sync(
+            node_id=node_id,
+            client=self.raw_client,
+            body=tag_body,
+            fields=fields if fields is not None else UNSET
+        )
     
-    # Placeholder for tags operations - will be populated from the original file
+    async def create_tag_for_node_async(
+        self,
+        node_id: str,
+        tag: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Create tag for node (async). Adds a tag to a node."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.models.tag_body import TagBody
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        tag_body = TagBody(tag=tag)
+        
+        return await self._create_tag_for_node.asyncio(
+            node_id=node_id,
+            client=self.raw_client,
+            body=tag_body,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    def delete_tag_from_node(
+        self,
+        node_id: str,
+        tag_id: str
+    ) -> Optional[Any]:
+        """Delete tag from node (sync). Removes a tag from a node."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        return self._delete_tag_from_node.sync(
+            node_id=node_id,
+            tag_id=tag_id,
+            client=self.raw_client
+        )
+    
+    async def delete_tag_from_node_async(
+        self,
+        node_id: str,
+        tag_id: str
+    ) -> Optional[Any]:
+        """Delete tag from node (async). Removes a tag from a node."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        return await self._delete_tag_from_node.asyncio(
+            node_id=node_id,
+            tag_id=tag_id,
+            client=self.raw_client
+        )
+    
+    def get_tag(
+        self,
+        tag_id: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get tag details (sync). Gets details for a specific tag."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._get_tag.sync(
+            tag_id=tag_id,
+            client=self.raw_client,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def get_tag_async(
+        self,
+        tag_id: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get tag details (async). Gets details for a specific tag."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._get_tag.asyncio(
+            tag_id=tag_id,
+            client=self.raw_client,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    def list_tags(
+        self,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List tags (sync). Gets a list of tags."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._list_tags.sync(
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def list_tags_async(
+        self,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List tags (async). Gets a list of tags."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._list_tags.asyncio(
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    def list_tags_for_node(
+        self,
+        node_id: str,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List tags for node (sync). Gets a list of tags for a specific node."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return self._list_tags_for_node.sync(
+            node_id=node_id,
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def list_tags_for_node_async(
+        self,
+        node_id: str,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List tags for node (async). Gets a list of tags for a specific node."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        return await self._list_tags_for_node.asyncio(
+            node_id=node_id,
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    def update_tag(
+        self,
+        tag_id: str,
+        tag: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Update tag (sync). Updates details for a specific tag."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.models.tag_body import TagBody
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        tag_body = TagBody(tag=tag)
+        
+        return self._update_tag.sync(
+            tag_id=tag_id,
+            client=self.raw_client,
+            body=tag_body,
+            fields=fields if fields is not None else UNSET
+        )
+    
+    async def update_tag_async(
+        self,
+        tag_id: str,
+        tag: str,
+        fields: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Update tag (async). Updates details for a specific tag."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw tags operations not available")
+        
+        from ....raw_clients.alfresco_core_client.core_client.models.tag_body import TagBody
+        from ....raw_clients.alfresco_core_client.core_client.types import UNSET
+        
+        tag_body = TagBody(tag=tag)
+        
+        return await self._update_tag.asyncio(
+            tag_id=tag_id,
+            client=self.raw_client,
+            body=tag_body,
+            fields=fields if fields is not None else UNSET
+        )
+    
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
         return f"AlfrescoTagsClient(base_url='{base_url}')" 

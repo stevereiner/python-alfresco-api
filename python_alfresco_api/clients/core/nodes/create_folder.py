@@ -54,7 +54,7 @@ def create_folder(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Create the body object for folder creation
     # Handle properties as regular dict (not model) to avoid to_dict() errors
@@ -161,7 +161,7 @@ async def create_folder_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Create the body object for folder creation
     # Handle properties as regular dict (not model) to avoid to_dict() errors
@@ -268,7 +268,7 @@ def create_folder_detailed(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Create the body object for folder creation
     body = NodeBodyCreate(
@@ -317,7 +317,7 @@ async def create_folder_detailed_async(
     from ....raw_clients.alfresco_core_client.core_client.types import UNSET
     
     # Get raw client
-    raw_client = nodes_client._get_raw_client()
+    raw_client = nodes_client.raw_client
     
     # Create the body object for folder creation
     body = NodeBodyCreate(

@@ -131,12 +131,13 @@ class AlfrescoSearchSqlClient:
         """Check if the search SQL client is available and functional."""
         return self.is_initialized
     
+    @property
     def sql(self):
         """Get the SQL operations client."""
         if self._sql is None:
             # Lazy load the SQL client
             from .sql import SqlClient
-            self._sql = SqlClient(self._client_factory)
+            self._sql = SqlClient(self)
         return self._sql
     
     # =================================================================

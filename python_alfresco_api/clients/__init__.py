@@ -9,11 +9,11 @@ This module provides a three-tier architecture:
 - Level 3: Operation-specific models for ONE operation
 
 Key Benefits:
-- 🚀 Better performance with lazy loading
-- 📦 Organized locality (models exactly where used)
-- 🔧 Structured imports and clear organization
-- 📋 Pydantic v2 models for better type checking in general and for AI/LLM integration
-- ⚡ Dual sync/async APIs (sync for simpler use, async for web apps)
+- [PERFORMANCE] Better performance with lazy loading
+- [ORGANIZATION] Organized locality (models exactly where used)
+- [STRUCTURE] Structured imports and clear organization
+- [MODELS] Pydantic v2 models for better type checking in general and for AI/LLM integration
+- [ASYNC] Dual sync/async APIs (sync for simpler use, async for web apps)
 """
 
 # Modern clients with three-tier architecture and lazy loading

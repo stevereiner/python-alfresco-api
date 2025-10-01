@@ -45,9 +45,9 @@ class CommentsClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -57,28 +57,15 @@ class CommentsClient:
             self._list_comments = _list_comments
             self._update_comment = _update_comment
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
     # ==================== 4-PATTERN OPERATIONS ====================
 
@@ -94,7 +81,7 @@ class CommentsClient:
         if not hasattr(self, '_create_comment'):
             raise ImportError("Raw client operation not available")
         
-        result = self._create_comment.sync(client=self._get_raw_client(), node_id=node_id, body=body, fields=fields)
+        result = self._create_comment.sync(client=self.raw_client, node_id=node_id, body=body, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -110,7 +97,7 @@ class CommentsClient:
         if not hasattr(self, '_create_comment'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._create_comment.asyncio(client=self._get_raw_client(), node_id=node_id, body=body, fields=fields)
+        result = await self._create_comment.asyncio(client=self.raw_client, node_id=node_id, body=body, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -126,7 +113,7 @@ class CommentsClient:
         if not hasattr(self, '_create_comment'):
             raise ImportError("Raw client operation not available")
         
-        return self._create_comment.sync_detailed(client=self._get_raw_client(), node_id=node_id, body=body, fields=fields)
+        return self._create_comment.sync_detailed(client=self.raw_client, node_id=node_id, body=body, fields=fields)
     
     async def create_comment_detailed_async(self, node_id: Any, body: Any, fields: Any):
         """
@@ -138,7 +125,7 @@ class CommentsClient:
         if not hasattr(self, '_create_comment'):
             raise ImportError("Raw client operation not available")
         
-        return await self._create_comment.asyncio_detailed(client=self._get_raw_client(), node_id=node_id, body=body, fields=fields)
+        return await self._create_comment.asyncio_detailed(client=self.raw_client, node_id=node_id, body=body, fields=fields)
 
     # ==================== DELETE_COMMENT OPERATION ====================
     
@@ -152,7 +139,7 @@ class CommentsClient:
         if not hasattr(self, '_delete_comment'):
             raise ImportError("Raw client operation not available")
         
-        result = self._delete_comment.sync(client=self._get_raw_client(), node_id=node_id, comment_id=comment_id)
+        result = self._delete_comment.sync(client=self.raw_client, node_id=node_id, comment_id=comment_id)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -168,7 +155,7 @@ class CommentsClient:
         if not hasattr(self, '_delete_comment'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._delete_comment.asyncio(client=self._get_raw_client(), node_id=node_id, comment_id=comment_id)
+        result = await self._delete_comment.asyncio(client=self.raw_client, node_id=node_id, comment_id=comment_id)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -184,7 +171,7 @@ class CommentsClient:
         if not hasattr(self, '_delete_comment'):
             raise ImportError("Raw client operation not available")
         
-        return self._delete_comment.sync_detailed(client=self._get_raw_client(), node_id=node_id, comment_id=comment_id)
+        return self._delete_comment.sync_detailed(client=self.raw_client, node_id=node_id, comment_id=comment_id)
     
     async def delete_comment_detailed_async(self, node_id: Any, comment_id: Any):
         """
@@ -196,7 +183,7 @@ class CommentsClient:
         if not hasattr(self, '_delete_comment'):
             raise ImportError("Raw client operation not available")
         
-        return await self._delete_comment.asyncio_detailed(client=self._get_raw_client(), node_id=node_id, comment_id=comment_id)
+        return await self._delete_comment.asyncio_detailed(client=self.raw_client, node_id=node_id, comment_id=comment_id)
 
     # ==================== LIST_COMMENTS OPERATION ====================
     
@@ -210,7 +197,7 @@ class CommentsClient:
         if not hasattr(self, '_list_comments'):
             raise ImportError("Raw client operation not available")
         
-        result = self._list_comments.sync(client=self._get_raw_client(), node_id=node_id, skip_count=skip_count, max_items=max_items, fields=fields)
+        result = self._list_comments.sync(client=self.raw_client, node_id=node_id, skip_count=skip_count, max_items=max_items, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -226,7 +213,7 @@ class CommentsClient:
         if not hasattr(self, '_list_comments'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._list_comments.asyncio(client=self._get_raw_client(), node_id=node_id, skip_count=skip_count, max_items=max_items, fields=fields)
+        result = await self._list_comments.asyncio(client=self.raw_client, node_id=node_id, skip_count=skip_count, max_items=max_items, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -242,7 +229,7 @@ class CommentsClient:
         if not hasattr(self, '_list_comments'):
             raise ImportError("Raw client operation not available")
         
-        return self._list_comments.sync_detailed(client=self._get_raw_client(), node_id=node_id, skip_count=skip_count, max_items=max_items, fields=fields)
+        return self._list_comments.sync_detailed(client=self.raw_client, node_id=node_id, skip_count=skip_count, max_items=max_items, fields=fields)
     
     async def list_comments_detailed_async(self, node_id: Any, skip_count: Any, max_items: Any, fields: Any):
         """
@@ -254,7 +241,7 @@ class CommentsClient:
         if not hasattr(self, '_list_comments'):
             raise ImportError("Raw client operation not available")
         
-        return await self._list_comments.asyncio_detailed(client=self._get_raw_client(), node_id=node_id, skip_count=skip_count, max_items=max_items, fields=fields)
+        return await self._list_comments.asyncio_detailed(client=self.raw_client, node_id=node_id, skip_count=skip_count, max_items=max_items, fields=fields)
 
     # ==================== UPDATE_COMMENT OPERATION ====================
     
@@ -268,7 +255,7 @@ class CommentsClient:
         if not hasattr(self, '_update_comment'):
             raise ImportError("Raw client operation not available")
         
-        result = self._update_comment.sync(client=self._get_raw_client(), node_id=node_id, comment_id=comment_id, body=body, fields=fields)
+        result = self._update_comment.sync(client=self.raw_client, node_id=node_id, comment_id=comment_id, body=body, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -284,7 +271,7 @@ class CommentsClient:
         if not hasattr(self, '_update_comment'):
             raise ImportError("Raw client operation not available")
         
-        result = await self._update_comment.asyncio(client=self._get_raw_client(), node_id=node_id, comment_id=comment_id, body=body, fields=fields)
+        result = await self._update_comment.asyncio(client=self.raw_client, node_id=node_id, comment_id=comment_id, body=body, fields=fields)
         
         # Convert to standardized response
         from ..models import BaseEntry
@@ -300,7 +287,7 @@ class CommentsClient:
         if not hasattr(self, '_update_comment'):
             raise ImportError("Raw client operation not available")
         
-        return self._update_comment.sync_detailed(client=self._get_raw_client(), node_id=node_id, comment_id=comment_id, body=body, fields=fields)
+        return self._update_comment.sync_detailed(client=self.raw_client, node_id=node_id, comment_id=comment_id, body=body, fields=fields)
     
     async def update_comment_detailed_async(self, node_id: Any, comment_id: Any, body: Any, fields: Any):
         """
@@ -312,7 +299,7 @@ class CommentsClient:
         if not hasattr(self, '_update_comment'):
             raise ImportError("Raw client operation not available")
         
-        return await self._update_comment.asyncio_detailed(client=self._get_raw_client(), node_id=node_id, comment_id=comment_id, body=body, fields=fields)
+        return await self._update_comment.asyncio_detailed(client=self.raw_client, node_id=node_id, comment_id=comment_id, body=body, fields=fields)
     
     def __repr__(self) -> str:
         """String representation for debugging."""

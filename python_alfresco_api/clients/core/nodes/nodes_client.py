@@ -79,12 +79,18 @@ class NodesClient:
     - client.nodes.create_association_async(node_id, target_id, assoc_type)
     """
     
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, parent_client):
+        self.parent_client = parent_client
     
-    def _get_raw_client(self):
-        """Get raw client for operations"""
-        return self.client._get_raw_client()
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
+    
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
     # ==========================================
     # SYNC VERSIONS

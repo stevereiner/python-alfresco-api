@@ -47,9 +47,9 @@ class TypesClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
+    def __init__(self, parent_client):
         """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
+        self.parent_client = parent_client
         self._raw_client = None
         
         # Store raw operation references
@@ -57,31 +57,104 @@ class TypesClient:
             self._get_type = _get_type
             self._list_types = _list_types
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw model client directly
-            from ....raw_clients.alfresco_model_client.model_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/model/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
     
-    # Placeholder for types operations - will be populated from the original file
+    # =================================================================
+    # TYPES OPERATIONS - BASIC IMPLEMENTATION (SYNC/ASYNC ONLY)
+    # =================================================================
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
-        return f"AlfrescoTypesClient(base_url='{base_url}')" 
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
+        return f"AlfrescoTypesClient(base_url='{base_url}')"
+    
+    # =================================================================
+    # LIST TYPES
+    # =================================================================
+    
+    def list_types(
+        self,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        where: Optional[str] = None,
+        include: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List types (sync). Gets a list of types."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw types operations not available")
+        
+        from ....raw_clients.alfresco_model_client.model_client.types import UNSET
+        
+        return self._list_types.sync(
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            where=where if where is not None else UNSET,
+            include=include if include is not None else UNSET
+        )
+    
+    async def list_types_async(
+        self,
+        skip_count: Optional[int] = None,
+        max_items: Optional[int] = None,
+        where: Optional[str] = None,
+        include: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """List types (async). Gets a list of types."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw types operations not available")
+        
+        from ....raw_clients.alfresco_model_client.model_client.types import UNSET
+        
+        return await self._list_types.asyncio(
+            client=self.raw_client,
+            skip_count=skip_count if skip_count is not None else UNSET,
+            max_items=max_items if max_items is not None else UNSET,
+            where=where if where is not None else UNSET,
+            include=include if include is not None else UNSET
+        )
+    
+    # =================================================================
+    # GET TYPE
+    # =================================================================
+    
+    def get_type(
+        self,
+        type_name: str,
+        include: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get type (sync). Gets information about a type."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw types operations not available")
+        
+        from ....raw_clients.alfresco_model_client.model_client.types import UNSET
+        
+        return self._get_type.sync(
+            type_name=type_name,
+            client=self.raw_client,
+            include=include if include is not None else UNSET
+        )
+    
+    async def get_type_async(
+        self,
+        type_name: str,
+        include: Optional[List[str]] = None
+    ) -> Optional[Any]:
+        """Get type (async). Gets information about a type."""
+        if not RAW_OPERATIONS_AVAILABLE:
+            raise ImportError("Raw types operations not available")
+        
+        from ....raw_clients.alfresco_model_client.model_client.types import UNSET
+        
+        return await self._get_type.asyncio(
+            type_name=type_name,
+            client=self.raw_client,
+            include=include if include is not None else UNSET
+        ) 

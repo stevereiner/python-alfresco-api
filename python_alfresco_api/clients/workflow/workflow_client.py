@@ -149,9 +149,9 @@ class AlfrescoWorkflowClient:
             # Lazy load the deployments client with graceful error handling
             try:
                 from .deployments import DeploymentsClient
-                self._deployments = DeploymentsClient(self._client_factory)
+                self._deployments = DeploymentsClient(self)
             except ImportError as e:
-                print(f"⚠️  Deployments subclient unavailable: {e}")
+                print(f"[WARNING] Deployments subclient unavailable: {e}")
                 return None
         return self._deployments
     
@@ -162,9 +162,9 @@ class AlfrescoWorkflowClient:
             # Lazy load the process definitions client with graceful error handling
             try:
                 from .process_definitions import ProcessDefinitionsClient
-                self._process_definitions = ProcessDefinitionsClient(self._client_factory)
+                self._process_definitions = ProcessDefinitionsClient(self)
             except ImportError as e:
-                print(f"⚠️  Process definitions subclient unavailable: {e}")
+                print(f"[WARNING] Process definitions subclient unavailable: {e}")
                 return None
         return self._process_definitions
     
@@ -175,9 +175,9 @@ class AlfrescoWorkflowClient:
             # Lazy load the processes client with graceful error handling
             try:
                 from .processes import ProcessesClient
-                self._processes = ProcessesClient(self._client_factory)
+                self._processes = ProcessesClient(self)
             except ImportError as e:
-                print(f"⚠️  Processes subclient unavailable: {e}")
+                print(f"[WARNING] Processes subclient unavailable: {e}")
                 return None
         return self._processes
     
@@ -188,9 +188,9 @@ class AlfrescoWorkflowClient:
             # Lazy load the tasks client with graceful error handling
             try:
                 from .tasks import TasksClient
-                self._tasks = TasksClient(self._client_factory)
+                self._tasks = TasksClient(self)
             except ImportError as e:
-                print(f"⚠️  Tasks subclient unavailable: {e}")
+                print(f"[WARNING] Tasks subclient unavailable: {e}")
                 return None
         return self._tasks
     

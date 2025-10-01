@@ -56,8 +56,8 @@ def _normalize_search_response(search_results):
     
     # Ensure we have the expected structure
     if not hasattr(search_results, 'list_'):
-        print(f"⚠️ Unexpected search response structure: {type(search_results)}")
-        print(f"⚠️ Available attributes: {[attr for attr in dir(search_results) if not attr.startswith('_')]}")
+        print(f"[WARNING] Unexpected search response structure: {type(search_results)}")
+        print(f"[WARNING] Available attributes: {[attr for attr in dir(search_results) if not attr.startswith('_')]}")
         return None
     
     return search_results
@@ -113,11 +113,11 @@ def simple_search(
         try:
             # Try NEW detailed search for richer results when available
             if hasattr(search_client, 'search') and hasattr(search_client.search, 'search_detailed'):
-                print("🔍 Using detailed search API")
+                print("[SEARCH] Using detailed search API")
                 
                 # Use the detailed search method (sync version)
                 result = search_client.search.search_detailed(search_request)
-                print("✅ Used detailed search API successfully")
+                print("[SUCCESS] Used detailed search API successfully")
                 
                 # Normalize the response to handle different structures
                 normalized_result = _normalize_search_response(result)
@@ -131,8 +131,8 @@ def simple_search(
                 
         except Exception as e:
             # Fall back to standard search methods
-            print(f"⚠️ Detailed search failed: {e}")
-            print("🔄 Falling back to standard search...")
+            print(f"[WARNING] Detailed search failed: {e}")
+            print("[FALLBACK] Falling back to standard search...")
             
             # Handle both cases: main search client and operation-specific client
             if hasattr(search_client, 'search_content'):
@@ -145,13 +145,13 @@ def simple_search(
                 return result
             else:
                 # Fallback: log available methods for debugging
-                print(f"⚠️ search_client does not have usable search method")
+                print(f"[WARNING] search_client does not have usable search method")
                 print(f"Available methods: {[attr for attr in dir(search_client) if not attr.startswith('_')]}")
                 return None
             
     except Exception as e:
         # Only log exceptions for debugging
-        print(f"❌ Exception in simple_search: {e}")
+        print(f"[ERROR] Exception in simple_search: {e}")
         return None
 
 

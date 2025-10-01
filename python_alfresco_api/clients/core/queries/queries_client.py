@@ -44,10 +44,9 @@ class QueriesClient:
     - Detailed sync/async for full HTTP response access
     """
     
-    def __init__(self, client_factory):
-        """Initialize with client factory for raw client access."""
-        self._client_factory = client_factory
-        self._raw_client = None
+    def __init__(self, parent_client):
+        """Initialize with parent client for delegation."""
+        self.parent_client = parent_client
         
         # Store raw operation references
         if RAW_OPERATIONS_AVAILABLE:
@@ -55,28 +54,15 @@ class QueriesClient:
             self._find_people = _find_people
             self._find_sites = _find_sites
     
-    def _get_raw_client(self):
-        """Get or create the raw client."""
-        if self._raw_client is None:
-            # Import the raw core client directly
-            from ....raw_clients.alfresco_core_client.core_client.client import AuthenticatedClient
-            
-            # Create the raw client with same auth setup
-            self._raw_client = AuthenticatedClient(
-                base_url=f"{self._client_factory.base_url}/alfresco/api/-default-/public/alfresco/versions/1",
-                token=self._client_factory.auth.get_auth_token(),
-                prefix=self._client_factory.auth.get_auth_prefix(),
-                verify_ssl=self._client_factory.verify_ssl
-            )
-        return self._raw_client
+    @property
+    def raw_client(self):
+        """Delegate to parent client's raw client."""
+        return self.parent_client.raw_client
     
-    def get_httpx_client(self):
-        """
-        Get direct access to raw httpx client for advanced operations.
-        
-        Perfect for MCP servers that need raw HTTP access.
-        """
-        return self._get_raw_client().get_httpx_client()
+    @property
+    def httpx_client(self):
+        """Delegate to parent client's httpx client."""
+        return self.parent_client.httpx_client
 
     # ==================== FIND_NODES OPERATION ====================
     
@@ -88,7 +74,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_nodes
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return find_nodes.sync(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             root_node_id=root_node_id if root_node_id is not None else UNSET,
             skip_count=skip_count if skip_count is not None else UNSET,
@@ -107,7 +93,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_nodes
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await find_nodes.asyncio(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             root_node_id=root_node_id if root_node_id is not None else UNSET,
             skip_count=skip_count if skip_count is not None else UNSET,
@@ -126,7 +112,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_nodes
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return find_nodes.sync_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             root_node_id=root_node_id if root_node_id is not None else UNSET,
             skip_count=skip_count if skip_count is not None else UNSET,
@@ -145,7 +131,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_nodes
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await find_nodes.asyncio_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             root_node_id=root_node_id if root_node_id is not None else UNSET,
             skip_count=skip_count if skip_count is not None else UNSET,
@@ -164,7 +150,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_people
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return find_people.sync(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -178,7 +164,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_people
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await find_people.asyncio(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -192,7 +178,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_people
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return find_people.sync_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -206,7 +192,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_people
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await find_people.asyncio_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -222,7 +208,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_sites
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return find_sites.sync(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -236,7 +222,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_sites
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await find_sites.asyncio(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -250,7 +236,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_sites
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return find_sites.sync_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,
@@ -264,7 +250,7 @@ class QueriesClient:
         from ....raw_clients.alfresco_core_client.core_client.api.queries import find_sites
         from ....raw_clients.alfresco_core_client.core_client.types import UNSET
         return await find_sites.asyncio_detailed(
-            client=self._get_raw_client(),
+            client=self.raw_client,
             term=term,
             skip_count=skip_count if skip_count is not None else UNSET,
             max_items=max_items if max_items is not None else UNSET,

@@ -4,7 +4,32 @@ All notable changes to python-alfresco-api will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.4] - 2025-10-01
+
+### Added
+- Implemented the methods of 15 subclients that had placeholder sections
+- `test_todays_15_subclients.py` test the timeout handling the 15 subclients with the implementation methods added today
+
+### Changed
+- Same timeout fix by using the parent raw client
+- Removed some use of emojis in logging from some files to avoid errors in windows consoles
+- `pyproject.toml` version change from 1.1.2 to 1.1.4 (1.1.3 not in pypi)
+- `publish_to_pypi` removed specific version info, don't stop if test publish doesn't work since the website never works, gives 403
+
+## [1.1.3] - 2025-09-30
+
+### Fixed
+- Fixed timeout handling in 7 top level clients yesterday, this fixed 16 subclient timeout handling
+- To fix 16 subclients timeout handling and improve the code, the subclients use the raw client from the parent client instead recreating their own raw clients
+- Fixed in `authentication_client.py` to import correct raw client model packages
+
+### Changed
+- Subclients now have `raw_client()` and `httpx_client()` properties that return parent client properties and replace any `_get_raw_client()` and `get_httpx_client()` methods
+- Parent clients give subclient constructors themselves instead of client factory
+
+### Added
+- `test_client_factory_configuration.py` now also tests previous 16 subclients handling of timeout setup in addition to previous testing of the 7 parent clients
+
 
 ## [1.1.2] - 2025-09-29
 
