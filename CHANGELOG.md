@@ -4,6 +4,24 @@ All notable changes to python-alfresco-api will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2025-12-14
+
+### Fixed
+- **Custom Content Type Support**: Fixed `NodeType` validation to support custom Alfresco content models (e.g., `fin:stock`, `my:invoice`)
+  - Changed `NodeType` from strict `Enum` to namespace class accepting any string type
+  - Standard types still available as constants (`NodeType.CONTENT`, `NodeType.FOLDER`)
+  - Eliminates `ValidationError` when retrieving nodes with custom types
+- **Create Folder Methods**: Fixed missing `versioning_enabled` and `major_version` parameters in convenience methods
+  - Updated `create_folder()` and `create_folder_async()` to pass required parameters to `CreateNodeRequest`
+  - Prevents linter errors about missing required parameters
+
+### Added
+- **`relative_path` Parameter**: Added explicit `relative_path` parameter to all `get_node` methods
+  - `get_node()`, `get_node_async()`, `get_node_detailed()`, `get_node_detailed_async()`
+  - Automatically converts to REST API's `relativePath` query parameter (snake_case → camelCase)
+  - Enables path-based navigation: `client.nodes.get("-root-", relative_path="Sites/mysite/documentLibrary/file.pdf")`
+- **`**kwargs` Support**: Added `**kwargs` to all `get_node` methods for forward compatibility with future API parameters
+
 ## [1.1.4] - 2025-10-01
 
 ### Added

@@ -53,13 +53,28 @@ class Permission(str, Enum):
     CONSUMER = "SiteConsumer"
 
 
-class NodeType(str, Enum):
-    """Alfresco content model node types."""
+class NodeType:
+    """
+    Alfresco content model node types.
+    
+    This class provides constants for common node types while allowing
+    custom types (e.g., 'my:customDocument', 'acme:invoice').
+    
+    Use as a namespace for common types:
+        NodeType.CONTENT  # "cm:content"
+        NodeType.FOLDER   # "cm:folder"
+    
+    Or use any custom string directly:
+        node_type = "my:customDocument"  # Works with custom content models
+    """
     CONTENT = "cm:content"
     FOLDER = "cm:folder"
     PERSON = "cm:person"
     GROUP = "cm:authorityContainer"
     SITE = "st:site"
+    
+    # Common custom types (for reference)
+    # Users can use any string value for their custom types
     
 
 class VersionType(str, Enum):

@@ -47,10 +47,10 @@ class Node(BaseEntry):
         min_length=1
     )]
     
-    node_type: Annotated[NodeType, Field(
+    node_type: Annotated[str, Field(
         alias="nodeType",
-        description="Alfresco content model type",
-        examples=[NodeType.CONTENT, NodeType.FOLDER]
+        description="Alfresco content model type (e.g., 'cm:content', 'cm:folder', or custom types like 'my:customDocument')",
+        examples=[NodeType.CONTENT, NodeType.FOLDER, "my:customDocument", "acme:invoice"]
     )]
     
     is_file: Annotated[bool, Field(
@@ -166,9 +166,9 @@ class CreateNodeRequest(BaseModel):
         examples=["report.pdf", "My Folder", "data-2024.xlsx"]
     )]
     
-    node_type: Annotated[NodeType, Field(
-        description="Alfresco content model type",
-        examples=[NodeType.CONTENT, NodeType.FOLDER],
+    node_type: Annotated[str, Field(
+        description="Alfresco content model type (e.g., 'cm:content', 'cm:folder', or custom types like 'my:customDocument')",
+        examples=[NodeType.CONTENT, NodeType.FOLDER, "my:customDocument", "acme:invoice"],
         default=NodeType.CONTENT
     )]
     

@@ -96,13 +96,27 @@ class NodesClient:
     # SYNC VERSIONS
     # ==========================================
     
-    def get(self, node_id: str, include: Optional[List[Union[str, IncludeOption]]] = None, fields: Optional[List[str]] = None) -> NodeResponse:
+    def get(
+        self, 
+        node_id: str, 
+        include: Optional[List[Union[str, IncludeOption]]] = None,
+        relative_path: Optional[str] = None,
+        fields: Optional[List[str]] = None,
+        **kwargs
+    ) -> NodeResponse:
         """Get node information - clean and simple."""
-        return get_node(self, node_id, include, fields)
+        return get_node(self, node_id, include, relative_path, fields, **kwargs)
     
-    async def get_async(self, node_id: str, include: Optional[List[Union[str, IncludeOption]]] = None, fields: Optional[List[str]] = None) -> NodeResponse:
+    async def get_async(
+        self, 
+        node_id: str, 
+        include: Optional[List[Union[str, IncludeOption]]] = None,
+        relative_path: Optional[str] = None,
+        fields: Optional[List[str]] = None,
+        **kwargs
+    ) -> NodeResponse:
         """Get node information (async) - clean and simple."""
-        return await get_node_async(self, node_id, include, fields)
+        return await get_node_async(self, node_id, include, relative_path, fields, **kwargs)
     
     def create(self, parent_id: str, request: CreateNodeRequest) -> NodeResponse:
         """Create a new node - clean and simple."""
@@ -252,13 +266,27 @@ class NodesClient:
     # DETAILED VERSIONS
     # ==========================================
     
-    def get_detailed(self, node_id: str, include: Optional[List[Union[str, IncludeOption]]] = None, fields: Optional[List[str]] = None):
+    def get_detailed(
+        self, 
+        node_id: str, 
+        include: Optional[List[Union[str, IncludeOption]]] = None,
+        relative_path: Optional[str] = None,
+        fields: Optional[List[str]] = None,
+        **kwargs
+    ):
         """Get node (detailed) - returns full HTTP response."""
-        return get_node_detailed(self, node_id, include, fields)
+        return get_node_detailed(self, node_id, include, relative_path, fields, **kwargs)
     
-    async def get_detailed_async(self, node_id: str, include: Optional[List[Union[str, IncludeOption]]] = None, fields: Optional[List[str]] = None):
+    async def get_detailed_async(
+        self, 
+        node_id: str, 
+        include: Optional[List[Union[str, IncludeOption]]] = None,
+        relative_path: Optional[str] = None,
+        fields: Optional[List[str]] = None,
+        **kwargs
+    ):
         """Get node (detailed async) - returns full HTTP response."""
-        return await get_node_detailed_async(self, node_id, include, fields)
+        return await get_node_detailed_async(self, node_id, include, relative_path, fields, **kwargs)
     
     def create_detailed(self, parent_id: str, request: CreateNodeRequest):
         """Create node (detailed) - returns full HTTP response."""
@@ -415,7 +443,9 @@ class NodesClient:
             node_type=NodeType.FOLDER,
             properties=properties,
             aspects=[],
-            auto_rename=True
+            auto_rename=True,
+            versioning_enabled=None,
+            major_version=None
         )
         return self.create(parent_id, request)
     
@@ -426,7 +456,9 @@ class NodesClient:
             node_type=NodeType.FOLDER,
             properties=properties,
             aspects=[],
-            auto_rename=True
+            auto_rename=True,
+            versioning_enabled=None,
+            major_version=None
         )
         return await self.create_async(parent_id, request)
     

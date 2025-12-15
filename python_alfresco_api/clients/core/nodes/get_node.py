@@ -11,7 +11,9 @@ def get_node(
     client,
     node_id: str,
     include: Optional[List[Union[str, IncludeOption]]] = None,
-    fields: Optional[List[str]] = None
+    relative_path: Optional[str] = None,
+    fields: Optional[List[str]] = None,
+    **kwargs
 ) -> NodeResponse:
     """
     Get node information by ID (synchronous).
@@ -22,7 +24,9 @@ def get_node(
         client: The nodes client instance
         node_id (str): Node identifier (UUID or special alias like '-my-')
         include (Optional[List[Union[str, IncludeOption]]]): Additional data to include
+        relative_path (Optional[str]): Path relative to the node to retrieve
         fields (Optional[List[str]]): Specific fields to return (limits response size)
+        **kwargs: Additional parameters to pass to the raw client
         
     Returns:
         NodeResponse: Node information with comprehensive metadata
@@ -42,6 +46,12 @@ def get_node(
         node = client.nodes.get(
             "abc123-def456", 
             fields=["id", "name", "nodeType"]
+        )
+        
+        # Get node with relative path (explicit parameter)
+        node = client.nodes.get(
+            "abc123-def456",
+            relative_path="Documents/Report.pdf"
         )
         ```
         
@@ -69,6 +79,9 @@ def get_node(
             for item in include
         ]
     
+    # Convert relative_path to UNSET if None
+    relative_path_param = UNSET if relative_path is None else relative_path
+    
     # Convert fields to UNSET if None
     fields_params = UNSET if fields is None else fields
     
@@ -77,7 +90,9 @@ def get_node(
         client=raw_client,
         node_id=node_id,
         include=include_params,
-        fields=fields_params
+        relative_path=relative_path_param,
+        fields=fields_params,
+        **kwargs  # Pass through any additional parameters
     )
     
     # Validate and return rich model
@@ -90,7 +105,9 @@ async def get_node_async(
     client,
     node_id: str,
     include: Optional[List[Union[str, IncludeOption]]] = None,
-    fields: Optional[List[str]] = None
+    relative_path: Optional[str] = None,
+    fields: Optional[List[str]] = None,
+    **kwargs
 ) -> NodeResponse:
     """
     Get node information by ID (asynchronous).
@@ -99,7 +116,9 @@ async def get_node_async(
         client: The nodes client instance
         node_id: Node identifier (UUID or special alias like '-my-')
         include: Additional data to include (properties, permissions, path, etc.)
+        relative_path: Path relative to the node to retrieve
         fields: Specific fields to return (limits response size)
+        **kwargs: Additional parameters to pass to the raw client
         
     Returns:
         NodeResponse with comprehensive node information
@@ -119,6 +138,12 @@ async def get_node_async(
         node = await client.nodes.get_async(
             "abc123-def456", 
             fields=["id", "name", "nodeType"]
+        )
+        
+        # Get node with relative path (explicit parameter)
+        node = await client.nodes.get_async(
+            "abc123-def456",
+            relative_path="Documents/Report.pdf"
         )
         ```
         
@@ -142,6 +167,9 @@ async def get_node_async(
             for item in include
         ]
     
+    # Convert relative_path to UNSET if None
+    relative_path_param = UNSET if relative_path is None else relative_path
+    
     # Convert fields to UNSET if None
     fields_params = UNSET if fields is None else fields
     
@@ -150,7 +178,9 @@ async def get_node_async(
         client=raw_client,
         node_id=node_id,
         include=include_params,
-        fields=fields_params
+        relative_path=relative_path_param,
+        fields=fields_params,
+        **kwargs  # Pass through any additional parameters
     )
     
     # Validate and return rich model - result is NodeEntry or None
@@ -163,13 +193,23 @@ def get_node_detailed(
     client,
     node_id: str,
     include: Optional[List[Union[str, IncludeOption]]] = None,
-    fields: Optional[List[str]] = None
+    relative_path: Optional[str] = None,
+    fields: Optional[List[str]] = None,
+    **kwargs
 ):
     """
     Get node operation (detailed sync).
     
     Perfect for MCP servers needing full HTTP response details.
     Returns complete Response object with status_code, headers, content, parsed.
+    
+    Args:
+        client: The nodes client instance
+        node_id: Node identifier
+        include: Additional data to include
+        relative_path: Path relative to the node to retrieve
+        fields: Specific fields to return
+        **kwargs: Additional parameters to pass to the raw client
     
     Returns:
         Response: Complete response with status_code, headers, content, parsed
@@ -188,6 +228,9 @@ def get_node_detailed(
             item.value if isinstance(item, IncludeOption) else item
             for item in include
         ]
+    
+    # Convert relative_path to UNSET if None
+    relative_path_param = UNSET if relative_path is None else relative_path
     
     # Convert fields to UNSET if None
     fields_params = UNSET if fields is None else fields
@@ -197,7 +240,9 @@ def get_node_detailed(
         client=raw_client,
         node_id=node_id,
         include=include_params,
-        fields=fields_params
+        relative_path=relative_path_param,
+        fields=fields_params,
+        **kwargs  # Pass through any additional parameters
     )
 
 
@@ -205,13 +250,23 @@ async def get_node_detailed_async(
     client,
     node_id: str,
     include: Optional[List[Union[str, IncludeOption]]] = None,
-    fields: Optional[List[str]] = None
+    relative_path: Optional[str] = None,
+    fields: Optional[List[str]] = None,
+    **kwargs
 ):
     """
     Get node operation (detailed async).
     
     Perfect for MCP servers needing full HTTP response details.
     Returns complete Response object with status_code, headers, content, parsed.
+    
+    Args:
+        client: The nodes client instance
+        node_id: Node identifier
+        include: Additional data to include
+        relative_path: Path relative to the node to retrieve
+        fields: Specific fields to return
+        **kwargs: Additional parameters to pass to the raw client
     
     Returns:
         Response: Complete response with status_code, headers, content, parsed
@@ -231,6 +286,9 @@ async def get_node_detailed_async(
             for item in include
         ]
     
+    # Convert relative_path to UNSET if None
+    relative_path_param = UNSET if relative_path is None else relative_path
+    
     # Convert fields to UNSET if None
     fields_params = UNSET if fields is None else fields
     
@@ -239,7 +297,9 @@ async def get_node_detailed_async(
         client=raw_client,
         node_id=node_id,
         include=include_params,
-        fields=fields_params
+        relative_path=relative_path_param,
+        fields=fields_params,
+        **kwargs  # Pass through any additional parameters
     )
 
 
