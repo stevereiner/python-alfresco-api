@@ -12,7 +12,7 @@ async def main():
     print("🚀 Alfresco Event Client - Quick Start")
     print("=" * 50)
     
-    # 1. Create client (auto-detects Community vs Enterprise)
+    # 1. Create client (auto-detects ActiveMQ)
     print("\n1. Creating event client...")
     event_client = AlfrescoEventClient(
         alfresco_host="localhost",    # No port - handled automatically
@@ -29,8 +29,7 @@ async def main():
     # 3. Show what was detected
     system_info = event_client.get_system_info()
     print("\n3. Detection Results:")
-    print(f"   🏢 Enterprise (Event Gateway): {system_info['event_gateway_available']}")
-    print(f"   🏘️  Community (ActiveMQ): {system_info['activemq_available']}")
+    print(f"   📨 ActiveMQ: {system_info['activemq_available']}")
     print(f"   📚 STOMP library: {system_info['stomp_installed']}")
     print(f"   ⚡ Active system: {system_info.get('active_system', 'none')}")
     

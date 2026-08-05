@@ -36,7 +36,7 @@ from .clients.conversion_utils import (
 # Import raw_clients to ensure they get packaged
 from . import raw_clients
 
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 __all__ = [
     # Factory & utilities
     "ClientFactory",

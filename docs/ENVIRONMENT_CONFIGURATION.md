@@ -49,7 +49,7 @@ set ALFRESCO_VERIFY_SSL=true
 
 For `.env` file support, install the optional dependency:
 ```bash
-pip install python-dotenv
+uv pip install python-dotenv
 ```
 
 ### **Create .env File**

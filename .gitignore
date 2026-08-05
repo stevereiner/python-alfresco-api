@@ -106,6 +106,8 @@ celerybeat.pid
 .venv
 env/
 venv/
+venv-*/
+venv-3.14/
 venv-shared/
 build-env/
 test-env/

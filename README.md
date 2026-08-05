@@ -21,7 +21,7 @@ A modern, type-safe Python client library for Alfresco Content Services REST API
 - **Async/Sync Support**: Both synchronous and asynchronous API calls
 - **Modular Architecture**: Individual client design for scalability
 - **AI/LLM Ready**: Pydantic models available for AI integration, MCP servers, and tool interfaces
-- **Event System**: ActiveMQ and Event Gateway support for Python apps to handle change events 
+- **Event System**: ActiveMQ (STOMP) support for Python apps to handle Alfresco repo change events
 - **Docker Compatible**: Works with Alfresco running in separate Docker Compose setups
 - **Comprehensive Testing**: Extensive unit and live Alfresco integration tests
 
@@ -44,7 +44,7 @@ This is a MCP Server that uses Python Alfresco API
 [![PyPI](https://img.shields.io/pypi/v/python-alfresco-api.svg)](https://pypi.org/project/python-alfresco-api/)
 
 ```bash
-pip install python-alfresco-api
+uv pip install python-alfresco-api
 ```
 - **Requres**: Python: 3.10+
 - **All features included** - No optional dependencies needed! Includes event system, async support, and all 7 Alfresco APIs.
@@ -53,6 +53,8 @@ pip install python-alfresco-api
 
 **Best Practice**: Always use a virtual environment to avoid dependency conflicts
 
+This project uses [uv](https://docs.astral.sh/uv/) for environments and installs. The examples below use Python 3.14 — **install Python 3.14.5 or 3.14.6 first** and use whichever you have (any Python 3.10+ works; adjust the version).
+
 #### Windows
 
 ```powershell
@@ -60,17 +62,17 @@ pip install python-alfresco-api
 git clone https://github.com/stevereiner/python-alfresco-api.git
 cd python-alfresco-api
 
-# Create virtual environment
-python -m venv venv
+# Create a virtual environment with uv (Python 3.14.x)
+uv venv --python 3.14.5 venv-3.14
 
 # Activate virtual environment
-venv\Scripts\activate
+venv-3.14\Scripts\activate
 
 # Verify activation (should show venv path)
 where python
 
-# Install dependencies
-pip install -r requirements.txt
+# Install the package + dependencies (from pyproject.toml)
+uv uv pip install -e .
 
 # Deactivate when done
 deactivate
@@ -83,17 +85,17 @@ deactivate
 git clone https://github.com/stevereiner/python-alfresco-api.git
 cd python-alfresco-api
 
-# Create virtual environment
-python3 -m venv venv
+# Create a virtual environment with uv (Python 3.14.x)
+uv venv --python 3.14.5 venv-3.14
 
 # Activate virtual environment
-source venv/bin/activate
+source venv-3.14/bin/activate
 
 # Verify activation (should show venv path)
 which python
 
-# Install dependencies
-pip install -r requirements.txt
+# Install the package + dependencies (from pyproject.toml)
+uv uv pip install -e .
 
 # Deactivate when done
 deactivate
@@ -105,7 +107,7 @@ deactivate
 Install the package form PyPI use:
 
 ```bash
-pip install python-alfresco-api
+uv pip install python-alfresco-api
 ```
 
 
@@ -123,7 +125,7 @@ cd python-alfresco-api
 # Linux/macOS: source venv/bin/activate
 
 # Install in development mode
-pip install -e .
+uv pip install -e .
 ```
 
 ## Alfresco Installation 
@@ -199,28 +201,65 @@ master_client = factory.create_master_client()
 
 ### Authentication
 
-For standard Alfresco authentication (recommended):
+`ClientFactory(auth_util=...)` accepts any of these auth utilities (all live-tested against Alfresco Community 25.2 / 26.1). The sub-clients call the util synchronously at client-build time, so tokens/tickets are acquired lazily without pre-awaiting.
 
-```python
-from python_alfresco_api import AuthUtil, ClientFactory
+- **Basic** — HTTP Basic. Use `AuthUtil`/`SimpleAuthUtil`, or just pass `username`/`password` straight to `ClientFactory`:
 
-# Primary authentication pattern - Basic Auth with Alfresco
-auth_util = AuthUtil(
-    base_url="http://localhost:8080",
-    username="admin",
-    password="admin"
-)
+  ```python
+  from python_alfresco_api import AuthUtil, ClientFactory
 
-Note 1: the priority order of ClientFactory parameters: 1. in auth_util passed in, 2. in other parameters passed into ClientFactory, 3. in enviroment .env, etc.
-Note 2. For timeout, if not in 1-3, no default will be used. The settings for tickets or your system will be used.
+  auth_util = AuthUtil(
+      base_url="http://localhost:8080",
+      username="admin",
+      password="admin",
+  )
 
-# Use with factory for shared authentication
-factory = ClientFactory(auth_util=auth_util)
-clients = factory.create_all_clients()
-```
+  # Use with factory for shared authentication
+  factory = ClientFactory(auth_util=auth_util)
+  clients = factory.create_all_clients()
+  ```
 
-**Alternative Authentication:**
-- `OAuth2AuthUtil` is available for enterprise OAuth2-based authentication but has not been live tested
+  Note 1: the priority order of `ClientFactory` parameters: 1. `auth_util` passed in, 2. other parameters passed into `ClientFactory`, 3. environment `.env`, etc.
+
+  Note 2: for `timeout`, if not in 1–3, no default will be used — the settings for tickets or your system will be used.
+
+- **Ticket** — `TicketAuthUtil` logs in once at `/authentication/versions/1/tickets`, then sends the ticket as `Authorization: Basic base64(<ticket>)` so the password isn't sent on every request:
+
+  ```python
+  from python_alfresco_api import ClientFactory
+  from python_alfresco_api.auth_util import TicketAuthUtil
+
+  auth = TicketAuthUtil("admin", "admin", base_url="http://localhost:8080")
+  factory = ClientFactory(base_url="http://localhost:8080", auth_util=auth)
+  ```
+
+- **OAuth2 / OIDC Bearer** — `OAuth2AuthUtil` presents a Bearer token, validated by Alfresco's `identity-service` subsystem against any OIDC IdP (e.g. Keycloak). Two modes:
+
+  ```python
+  from python_alfresco_api import ClientFactory
+  from python_alfresco_api.auth_util import OAuth2AuthUtil
+
+  # (a) client_credentials — the util fetches and refreshes its own token
+  auth = OAuth2AuthUtil(
+      base_url="http://localhost:8080",
+      client_id="my-client",
+      client_secret="my-secret",
+      token_endpoint="https://<keycloak>/realms/<realm>/protocol/openid-connect/token",
+      grant_type="client_credentials",
+  )
+
+  # (b) pre-obtained token — pass access_token; add refresh_token + token_endpoint for auto-refresh
+  auth = OAuth2AuthUtil(
+      base_url="http://localhost:8080",
+      client_id="my-client",
+      access_token="<access-token>",
+      refresh_token="<refresh-token>",
+      token_endpoint="https://<keycloak>/realms/<realm>/protocol/openid-connect/token",
+  )
+  factory = ClientFactory(base_url="http://localhost:8080", auth_util=auth)
+  ```
+
+  A provided access token that has already expired is detected from its JWT `exp` claim and auto-refreshed when a `refresh_token` + `token_endpoint` are supplied. `ALFRESCO_OAUTH2_*` environment variables are also read when `load_env=True`.
 
 ### Sync and Async Usage
 
@@ -426,42 +465,28 @@ result = core_client.create_node(pydantic_model)  # Direct usage!
 
 ## 🔌 Event System
 
-### ActiveMQ Integration (Community Edition)
+Alfresco Content Services uses **ActiveMQ** for messaging; repo events are published to the STOMP topic `/topic/alfresco.repo.event2` (STOMP port **61613**; 61616 is OpenWire). ActiveMQ 6.x (ACS 26.1+) enforces broker authentication.
+
+`AlfrescoEventClient` is a lightweight detection + handler-registry helper:
 
 ```python
-from python_alfresco_api.activemq_events import AlfrescoActiveMQEventClient
+from python_alfresco_api.events import AlfrescoEventClient
 
-# Create event client
-event_client = AlfrescoActiveMQEventClient(
-    activemq_host="localhost",
-    activemq_port=61616,
+event_client = AlfrescoEventClient(
+    alfresco_host="localhost",
+    activemq_port=61613,      # ActiveMQ STOMP port
     username="admin",
-    password="admin"
+    password="admin",
 )
 
-# Register event handler
-async def node_created_handler(notification):
-    print(f"Node created: {notification.nodeId}")
+def node_created_handler(notification):
+    print(f"Node created: {notification.node_id}")
 
-event_client.register_event_handler("alfresco.node.created", node_created_handler)
-
-# Start listening
-await event_client.connect()
-await event_client.start_listening()
+event_client.register_event_handler("node.created", node_created_handler)
+print(event_client.get_system_info())   # {'activemq_available': ..., 'active_system': 'activemq'|None, ...}
 ```
 
-### Event Gateway (Enterprise Edition)
-
-```python
-from python_alfresco_api.event_client import AlfrescoEventClient
-
-# Unified event client (auto-detects available systems)
-event_client = AlfrescoEventClient()
-
-# Works with both Community (ActiveMQ) and Enterprise (Event Gateway)
-await event_client.create_subscription("node-events")
-await event_client.start_listening()
-```
+> **Consuming events:** actual event *listening* is intentionally not implemented in this client — subscribe to the STOMP topic directly with `stomp.py`. Note that stomp.py's credential kwarg is `passcode=` (not `password=`), which matters now that ActiveMQ 6.x enforces auth. See flexible-graphrag's `AlfrescoEventBroadcaster` for a complete shared-connection consumer.
 
 
 ## 🔧 For Developing the Python Alfresco API Package
@@ -473,11 +498,13 @@ For complete development documentation including the **3-step generation process
 
 ### Development Setup
 
-For development, testing, and contributing:
+For development, testing, and contributing (installs the `dev` extra — pytest, black, mypy, docs, build tooling):
 
 ```bash
-pip install -r requirements-dev.txt
+uv pip install -e ".[dev]"
 ```
+
+To regenerate models/clients, install the `codegen` extra instead: `uv pip install -e ".[codegen]"`.
 
 For most development work on python-alfresco-api, you can develop directly without regenerating code:
 
@@ -486,10 +513,10 @@ git clone https://github.com/stevereiner/python-alfresco-api.git
 cd python-alfresco-api
 
 # Install in development mode
-pip install -e .
+uv pip install -e .
 ```
 
-> **Note**: For proper pytest execution, work from the source directory with `pip install -e .` rather than testing from separate directories. This avoids import path conflicts.
+> **Note**: For proper pytest execution, work from the source directory with `uv pip install -e .` rather than testing from separate directories. This avoids import path conflicts.
 
 ### Run Tests
 
@@ -585,8 +612,7 @@ python-alfresco-api/
 │   ├── REQUEST_TYPES_GUIDE.md    # Node & Search request documentation
 │   └── API_DOCUMENTATION_INDEX.md # Complete API reference
 ├── examples/                      # Working usage examples
-├── requirements.txt               # Runtime dependencies
-├── requirements-dev.txt           # Development dependencies
+├── pyproject.toml                 # Package metadata, dependencies, and extras (dev, codegen)
 ├── run_tests.py                   # Test runner with nice display
 └── README.md                      # This file
 ```

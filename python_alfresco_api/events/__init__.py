@@ -1,8 +1,9 @@
 """
 Alfresco Event System
 
-Unified event client supporting both Community Edition (ActiveMQ) and Enterprise Edition (Event Gateway).
-Provides automatic detection and graceful fallback capabilities.
+Event client for Alfresco's ActiveMQ messaging (repo events on the STOMP topic
+/topic/alfresco.repo.event2). Detects ActiveMQ availability and registers handlers; consumers
+subscribe to the STOMP topic directly (see AlfrescoEventClient for details).
 """
 
 from .event_client import AlfrescoEventClient

@@ -4,6 +4,20 @@ All notable changes to python-alfresco-api will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-08-04
+
+### Added
+- **OAuth2 and ticket authentication (live-tested)**: `OAuth2AuthUtil` and `TicketAuthUtil` now work end-to-end via `ClientFactory`. Auth utils acquire the token/ticket synchronously at client-build time (previously OAuth2's async token fetch never fired through the sub-clients). Ticket auth self-fetches a login ticket and sends `Authorization: Basic base64(<ticket>)`.
+- **OAuth2 provided-token auto-refresh**: a pre-obtained access token that has expired is detected from its JWT `exp` claim and refreshed when a `refresh_token` + `token_endpoint` are supplied.
+
+### Fixed
+- **`VersionsClient` checkout/checkin/cancel**: used missing `self._client_factory` instead of `parent_client` (raised `AttributeError` from MCP `checkout_document` and similar). Async methods now delegate to the real sync implementations instead of returning mocks.
+- **Subclient `__repr__`**: nine core subclients (`actions`, `activities`, `comments`, `content`, `downloads`, `probes`, `queries`, `ratings`, `renditions`) used `self._client_factory` and always showed `base_url='unknown'`; now use `parent_client._client_factory`. Added `test_all_subclients_repr_uses_parent_client_factory` to load every subclient and exercise `__repr__`.
+
+### Changed
+- **Event client is ActiveMQ/STOMP-only**: `AlfrescoEventClient` reworked around Alfresco's ActiveMQ messaging (STOMP topic `/topic/alfresco.repo.event2`). Removed the Enterprise Event Gateway paths; renamed the `community_port` parameter to `activemq_port` (default `61613`) and the internal `_*_community` methods to `_*_activemq`. The availability check now validates authentication (`passcode=`, `wait=True`), relevant for ActiveMQ 6.x (ACS 26.1+) which enforces broker auth.
+- Updated README authentication and event-system sections to match.
+
 ## [1.1.5] - 2025-12-14
 
 ### Fixed

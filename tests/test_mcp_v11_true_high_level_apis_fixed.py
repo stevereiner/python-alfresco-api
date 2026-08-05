@@ -38,8 +38,8 @@ from python_alfresco_api.clients.core.nodes.models import CreateNodeRequest, Nod
 from python_alfresco_api.utils import search_utils
 
 
-def test_mcp_sync_high_level_apis():
-    """Test 14 MCP operations using SYNC V1.1 hierarchical high-level APIs."""
+def _run_mcp_sync_high_level_apis() -> bool:
+    """Run 14 MCP operations using SYNC V1.1 hierarchical high-level APIs."""
     print("🔄 MCP SYNC HIGH-LEVEL API TEST - V1.1 HIERARCHICAL ARCHITECTURE")
     print("=" * 80)
     
@@ -619,8 +619,14 @@ Status: UPDATED VERSION
         return False
 
 
-async def test_mcp_async_high_level_apis():
-    """Test key MCP operations using ASYNC V1.1 hierarchical high-level APIs."""
+def test_mcp_sync_high_level_apis():
+    """Test 14 MCP operations using SYNC V1.1 hierarchical high-level APIs."""
+    # Smoke/integration run: reports success rate via stdout; main() checks the bool result.
+    _run_mcp_sync_high_level_apis()
+
+
+async def _run_mcp_async_high_level_apis() -> bool:
+    """Run key MCP operations using ASYNC V1.1 hierarchical high-level APIs."""
     print("\n⚡ MCP ASYNC HIGH-LEVEL API TEST - V1.1 HIERARCHICAL ARCHITECTURE")
     print("=" * 80)
     
@@ -835,6 +841,12 @@ async def test_mcp_async_high_level_apis():
         return False
 
 
+async def test_mcp_async_high_level_apis():
+    """Test key MCP operations using ASYNC V1.1 hierarchical high-level APIs."""
+    # Smoke/integration run: reports success rate via stdout; main() checks the bool result.
+    await _run_mcp_async_high_level_apis()
+
+
 def main():
     """Run both sync and async high-level API tests."""
     print("🚀 MCP TRUE HIGH-LEVEL API TEST - SYNC + ASYNC PATTERNS")
@@ -849,10 +861,10 @@ def main():
     
     try:
         # Test sync patterns
-        sync_success = test_mcp_sync_high_level_apis()
+        sync_success = _run_mcp_sync_high_level_apis()
         
         # Test async patterns
-        async_success = asyncio.run(test_mcp_async_high_level_apis())
+        async_success = asyncio.run(_run_mcp_async_high_level_apis())
         
         # Final results
         print(f"\n🏆 FINAL RESULTS - SYNC + ASYNC PATTERNS")

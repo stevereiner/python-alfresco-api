@@ -31,8 +31,8 @@ class VersionsClient:
         return self.parent_client.raw_client
     
     def _get_core_client(self):
-        """Get the core client from the factory."""
-        return self._client_factory.create_core_client()
+        """Get the parent core client."""
+        return self.parent_client
     
     # ==================== SYNC METHODS ====================
     
@@ -110,9 +110,8 @@ class VersionsClient:
             CheckoutResponse: Response with checkout details
         """
         from ....utils import version_utils
-        
-        # Get core client from the same factory
-        core_client = self._client_factory.create_core_client()
+
+        core_client = self._get_core_client()
         
         # Use utility function for implementation
         result = version_utils.checkout_document(core_client, node_id)
@@ -140,9 +139,8 @@ class VersionsClient:
             CheckoutResponse: Response with unlock details
         """
         from ....utils import version_utils
-        
-        # Get core client from the same factory
-        core_client = self._client_factory.create_core_client()
+
+        core_client = self._get_core_client()
         
         # Use utility function for implementation
         result = version_utils.cancel_checkout(core_client, node_id)
@@ -178,9 +176,8 @@ class VersionsClient:
             CheckinResponse: Response with new version details
         """
         from ....utils import version_utils
-        
-        # Get core client from the same factory
-        core_client = self._client_factory.create_core_client()
+
+        core_client = self._get_core_client()
         
         # Use utility function for implementation
         result = version_utils.checkin_document(
@@ -256,46 +253,23 @@ class VersionsClient:
         except Exception as e:
             raise ValueError(f"Failed to enable versioning on node {node_id}: {str(e)}")
     
-    async def checkout_async(self, node_id: str) -> CheckoutResponse:
+    async def checkout_async(self, node_id: str, **kwargs) -> CheckoutResponse:
         """Async version of checkout."""
-        # For now, return a mock response structure
-        return CheckoutResponse(
-            node_id=node_id,
-            locked=True,
-            working_copy_id=f"{node_id}-working-copy",
-            locked_by="current_user",
-            locked_at=datetime.now()
-        )
+        return self.checkout(node_id, **kwargs)
     
-    async def cancel_checkout_async(self, node_id: str) -> CheckoutResponse:
+    async def cancel_checkout_async(self, node_id: str, **kwargs) -> CheckoutResponse:
         """Async version of cancel_checkout."""
-        # For now, return a mock response structure
-        return CheckoutResponse(
-            node_id=node_id,
-            locked=False,
-            working_copy_id=None,
-            locked_by=None,
-            locked_at=None
-        )
+        return self.cancel_checkout(node_id, **kwargs)
     
     async def checkin_async(
         self, 
         node_id: str, 
         comment: Optional[str] = None,
-        major_version: bool = False
+        major_version: bool = False,
+        **kwargs
     ) -> CheckinResponse:
         """Async version of checkin."""
-        # For now, return a mock response structure
-        version_number = "2.0" if major_version else "1.1"
-        
-        return CheckinResponse(
-            node_id=node_id,
-            version_number=version_number,
-            comment=comment or "No comment",
-            major_version=major_version,
-            created_at=datetime.now(),
-            created_by="current_user"
-        )
+        return self.checkin(node_id, comment=comment, major_version=major_version, **kwargs)
     
     # ==================== DETAILED METHODS - Moved from AlfrescoCoreClient ====================
     
@@ -399,5 +373,5 @@ class VersionsClient:
 
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
         return f"AlfrescoVersionsClient(base_url='{base_url}')" 

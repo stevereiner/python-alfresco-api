@@ -89,7 +89,7 @@ print(system_info)
 For Community Edition, you need the `stomp.py` library:
 
 ```bash
-pip install stomp.py
+uv pip install stomp.py
 ```
 
 ### ActiveMQ Configuration
@@ -341,7 +341,7 @@ if __name__ == "__main__":
    - Check authentication credentials
 
 2. **ActiveMQ not available**
-   - Install: `pip install stomp.py`
+   - Install: `uv pip install stomp.py`
    - Verify ActiveMQ is enabled in Alfresco
    - Check port 61613 is accessible
 

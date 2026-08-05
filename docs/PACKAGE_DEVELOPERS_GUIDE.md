@@ -28,10 +28,10 @@ The python-alfresco-api uses a sophisticated 3-step generation pipeline that tra
 
 ### **Development Requirements**
 
-For development, testing, and contributing:
+For development, testing, and contributing (the `dev` extra):
 
 ```bash
-pip install -r requirements-dev.txt
+uv pip install -e ".[dev]"
 ```
 
 ### **Code Generation Requirements**
@@ -43,6 +43,12 @@ pip install -r requirements-dev.txt
 - **pytest**: >=7.4.0 (Testing framework)
 - **black**: >=23.0.0 (Code formatting)
 - **mypy**: >=1.5.0 (Type checking)
+
+Install the code-generation tools with the `codegen` extra:
+
+```bash
+uv pip install -e ".[codegen]"
+```
 
 ## 📋 **Complete Regeneration Process**
 
@@ -221,7 +227,7 @@ git clone https://github.com/your-org/python-alfresco-api.git
 cd python-alfresco-api
 
 # Install in development mode
-pip install -e .
+uv pip install -e .
 ```
 
 ### **Development Tasks**

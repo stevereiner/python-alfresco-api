@@ -7,6 +7,7 @@ Handles ticket-based authentication with automatic renewal.
 
 import asyncio
 import base64
+import json
 import os
 from typing import Optional, Dict, Any, Union
 from datetime import datetime, timedelta
@@ -276,31 +277,77 @@ class TicketAuthUtil:
     Handles both Basic auth and ticket-based authentication.
     """
     
-    def __init__(self, username: str, password: str, base_url: str = ""):
+    def __init__(self, username: str, password: str, base_url: str = "",
+                 verify_ssl: Union[bool, str] = True, timeout: Optional[int] = None):
         """
         Initialize ticket auth utility.
-        
+
         Args:
             username: Alfresco username
-            password: Alfresco password  
-            base_url: Base URL for Alfresco (optional, for future ticket API calls)
+            password: Alfresco password
+            base_url: Base URL for Alfresco (required to self-fetch a ticket)
+            verify_ssl: SSL verification - True, False, or path to certificate bundle
+            timeout: Request timeout in seconds (None = use system defaults)
         """
         self.username = username
         self.password = password
         self.base_url = base_url.rstrip('/')
+        self.verify_ssl = verify_ssl
+        self.timeout = timeout
         self.ticket = None
+        self.ticket_expires = None
         self._authenticated = False
-    
+
+    def authenticate_sync(self) -> bool:
+        """Synchronously fetch an Alfresco login ticket from username/password."""
+        if not self.base_url:
+            return False
+        try:
+            auth_url = f"{self.base_url}/alfresco/api/-default-/public/authentication/versions/1/tickets"
+            client_kwargs = {"verify": self.verify_ssl}
+            if self.timeout is not None:
+                client_kwargs["timeout"] = self.timeout
+            with httpx.Client(**client_kwargs) as client:
+                response = client.post(auth_url, json={"userId": self.username, "password": self.password})
+                if response.status_code == 201:
+                    self.ticket = response.json()["entry"]["id"]
+                    self.ticket_expires = datetime.now() + timedelta(hours=1)
+                    self._authenticated = True
+                    return True
+                print(f"Alfresco ticket authentication failed: {response.status_code} {response.text}")
+        except Exception as e:
+            print(f"Alfresco ticket authentication failed: {e}")
+        self._authenticated = False
+        return False
+
+    def ensure_authenticated_sync(self) -> bool:
+        """Ensure a valid ticket, fetching one if needed."""
+        if self.is_authenticated():
+            return True
+        return self.authenticate_sync()
+
     def get_basic_auth_header(self):
         """Get basic auth header for initial authentication."""
         auth_string = f"{self.username}:{self.password}"
         auth_b64 = base64.b64encode(auth_string.encode()).decode()
         return f'Basic {auth_b64}'
-    
+
     def get_auth_token(self):
-        """Get just the base64 auth token (without 'Basic ' prefix) for AuthenticatedClient."""
-        auth_string = f"{self.username}:{self.password}"
-        return base64.b64encode(auth_string.encode()).decode()
+        """Get the base64 token (no 'Basic ' prefix) for AuthenticatedClient.
+
+        Alfresco accepts a login ticket as `Authorization: Basic base64(<ticket>)`. We lazily
+        fetch a ticket (when base_url is set) and return base64(ticket); if that fails we fall
+        back to base64(username:password) so the client still authenticates.
+        """
+        if not self.is_authenticated() and self.base_url:
+            try:
+                self.ensure_authenticated_sync()
+            except Exception as e:
+                print(f"Alfresco ticket acquisition failed: {e}")
+        if self.is_authenticated() and self.ticket:
+            return base64.b64encode(self.ticket.encode()).decode()
+        # Fallback: basic credentials
+        return base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
     
     def get_ticket_header(self):
         """Get ticket auth header if we have a ticket."""
@@ -332,8 +379,13 @@ class TicketAuthUtil:
                 self._authenticated = True
     
     def is_authenticated(self):
-        """Check if we have a valid ticket."""
-        return self._authenticated and self.ticket is not None
+        """Check if we have a valid (unexpired) ticket."""
+        if not self._authenticated or not self.ticket:
+            return False
+        if self.ticket_expires and datetime.now() >= self.ticket_expires:
+            self._authenticated = False
+            return False
+        return True
 
 class OAuth2AuthUtil:
     """
@@ -416,7 +468,18 @@ class OAuth2AuthUtil:
         
         # For environment variable loading
         self._load_oauth_env_config(load_env, env_file)
-    
+
+        # If an access token was supplied (constructor or env), mark it usable so the
+        # synchronous client-build path can use it immediately. Previously a provided token
+        # was ignored because _authenticated stayed False.
+        if self.access_token:
+            self._authenticated = True
+            # Derive expiry from the token's own JWT `exp` claim when no expires_in was given,
+            # so a *provided* (pasted) token that has since expired is detected as stale and
+            # refreshed via refresh_token — instead of being used blindly and 401ing.
+            if self.token_expires is None:
+                self.token_expires = self._expiry_from_jwt(self.access_token)
+
     def _load_oauth_env_config(self, load_env: bool, env_file: Optional[str]):
         """Load OAuth2-specific configuration from environment."""
         if not load_env:
@@ -569,26 +632,143 @@ class OAuth2AuthUtil:
                 
                 self._authenticated = True
                 return True
-        
+
         return False
-    
+
+    @staticmethod
+    def _expiry_from_jwt(token: str) -> Optional[datetime]:
+        """Best-effort read of a JWT access token's `exp` claim as a local naive datetime.
+
+        Lets a provided access token (which carries no expires_in) still be expiry-checked so
+        it can be refreshed when stale. Returns None for opaque (non-JWT) tokens or on any error.
+        """
+        try:
+            parts = token.split(".")
+            if len(parts) != 3:
+                return None
+            payload_b64 = parts[1]
+            payload_b64 += "=" * (-len(payload_b64) % 4)  # restore base64 padding
+            payload = json.loads(base64.urlsafe_b64decode(payload_b64))
+            exp = payload.get("exp")
+            return datetime.fromtimestamp(exp) if exp else None
+        except Exception:
+            return None
+
+    def _apply_token_response(self, token_data: Dict[str, Any]) -> None:
+        """Apply an OAuth2 token-endpoint response to this util's token state."""
+        self.access_token = token_data.get("access_token")
+        expires_in = token_data.get("expires_in")
+        if expires_in:
+            self.token_expires = datetime.now() + timedelta(seconds=expires_in)
+        elif self.access_token:
+            self.token_expires = self._expiry_from_jwt(self.access_token)
+        if "refresh_token" in token_data:
+            self.refresh_token = token_data["refresh_token"]
+        self._authenticated = bool(self.access_token)
+
+    # --- Synchronous token acquisition ---------------------------------------
+    # The sub-clients call get_auth_token() synchronously at client-build time, so the async
+    # authenticate()/ensure_authenticated() above never fire on their own. These sync variants
+    # let get_auth_token() lazily acquire/refresh a token so OAuth2 works end-to-end without the
+    # caller having to pre-await authenticate().
+
+    def _client_credentials_flow_sync(self) -> bool:
+        """Synchronous OAuth2 client-credentials flow."""
+        if not self.client_id or not self.client_secret or not self.token_endpoint:
+            raise ValueError(
+                "Client credentials flow requires client_id, client_secret, and token_endpoint"
+            )
+        data = {
+            "grant_type": "client_credentials",
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+        }
+        if self.scope:
+            data["scope"] = self.scope
+        client_kwargs = {"verify": self.verify_ssl}
+        if self.timeout is not None:
+            client_kwargs["timeout"] = self.timeout
+        with httpx.Client(**client_kwargs) as client:
+            response = client.post(
+                self.token_endpoint, data=data,
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+            )
+            if response.status_code == 200:
+                self._apply_token_response(response.json())
+                return True
+        return False
+
+    def _refresh_token_flow_sync(self) -> bool:
+        """Synchronous refresh-token flow."""
+        if not self.refresh_token or not self.token_endpoint:
+            return False
+        data = {
+            "grant_type": "refresh_token",
+            "refresh_token": self.refresh_token,
+            "client_id": self.client_id,
+        }
+        if self.client_secret:
+            data["client_secret"] = self.client_secret
+        client_kwargs = {"verify": self.verify_ssl}
+        if self.timeout is not None:
+            client_kwargs["timeout"] = self.timeout
+        with httpx.Client(**client_kwargs) as client:
+            response = client.post(
+                self.token_endpoint, data=data,
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+            )
+            if response.status_code == 200:
+                self._apply_token_response(response.json())
+                return True
+        return False
+
+    def authenticate_sync(self) -> bool:
+        """Synchronous authenticate() — dispatches by grant type."""
+        try:
+            if self.grant_type == "client_credentials":
+                return self._client_credentials_flow_sync()
+            elif self.grant_type == "refresh_token" and self.refresh_token:
+                return self._refresh_token_flow_sync()
+            elif self.grant_type == "authorization_code":
+                # Requires prior user interaction; usable only if an access_token was supplied.
+                return self.is_authenticated()
+            else:
+                raise ValueError(f"Unsupported grant type: {self.grant_type}")
+        except Exception as e:
+            print(f"OAuth2 authentication failed: {e}")
+            self._authenticated = False
+            return False
+
+    def ensure_authenticated_sync(self) -> bool:
+        """Synchronous ensure_authenticated() — refresh if possible, else authenticate."""
+        if self.is_authenticated():
+            return True
+        if self.refresh_token:
+            if self._refresh_token_flow_sync():
+                return True
+        return self.authenticate_sync()
+
     def is_authenticated(self) -> bool:
         """Check if currently authenticated with valid access token."""
         if not self._authenticated or not self.access_token:
             return False
         
-        # Check token expiration
-        if self.token_expires and datetime.now() >= self.token_expires:
+        # Check token expiration (30s skew so we refresh just before it actually expires)
+        if self.token_expires and datetime.now() >= (self.token_expires - timedelta(seconds=30)):
             self._authenticated = False
             return False
-        
+
         return True
     
     def get_auth_headers(self) -> Dict[str, str]:
-        """Get authentication headers for API requests."""
+        """Get authentication headers for API requests (lazily acquiring a token if needed)."""
+        if not self.is_authenticated():
+            try:
+                self.ensure_authenticated_sync()
+            except Exception as e:
+                print(f"OAuth2 token acquisition failed: {e}")
         if not self.is_authenticated():
             return {}
-        
         return {
             "Authorization": f"Bearer {self.access_token}"
         }
@@ -600,10 +780,18 @@ class OAuth2AuthUtil:
         return ""
     
     def get_auth_token(self):
-        """Get just the access token (without 'Bearer ' prefix) for AuthenticatedClient."""
-        if self.is_authenticated():
-            return self.access_token
-        return ""
+        """Get the access token (no 'Bearer ' prefix) for AuthenticatedClient.
+
+        Lazily acquires/refreshes the token synchronously when needed, so the sub-clients'
+        synchronous build path produces a real Bearer header. Previously this returned "" unless
+        the caller had manually pre-awaited authenticate(), which nothing in the build path did.
+        """
+        if not self.is_authenticated():
+            try:
+                self.ensure_authenticated_sync()
+            except Exception as e:
+                print(f"OAuth2 token acquisition failed: {e}")
+        return self.access_token if self.is_authenticated() else ""
     
     def get_auth_prefix(self):
         """Get authentication prefix for headers. OAuth2AuthUtil uses Bearer tokens."""

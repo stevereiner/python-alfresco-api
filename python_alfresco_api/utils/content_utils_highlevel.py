@@ -306,11 +306,11 @@ def create_and_upload_file_share_style(
         >>> # Create and upload like Alfresco Share client
         >>> result = create_and_upload_file_share_style(
         ...     core_client,
-        ...     r"C:\Documents\report.pdf"
+        ...     "C:\\Documents\\report.pdf"
         ... )
         >>> # Result will have:
         >>> # - Version: 1.0 (exactly like Share client)
-        >>> # - Title: "C:\Documents\report.pdf"
+        >>> # - Title: "C:\\Documents\\report.pdf"
     """
     # Convert to Path object
     file_path_obj = Path(file_path)
@@ -388,7 +388,7 @@ def create_and_upload_file_highlevel(
         >>> # Share client behavior (version 1.0, title = full path)
         >>> result = create_and_upload_file_highlevel(
         ...     core_client,
-        ...     r"C:\Documents\report.pdf",
+        ...     "C:\\Documents\\report.pdf",
         ...     share_client_behavior=True
         ... )
     """

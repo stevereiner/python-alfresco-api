@@ -85,5 +85,5 @@ class ProbesClient:
 
     def __repr__(self) -> str:
         """String representation for debugging."""
-        base_url = getattr(self._client_factory, 'base_url', 'unknown')
+        base_url = getattr(self.parent_client._client_factory, 'base_url', 'unknown')
         return f"ProbesClient(base_url='{base_url}')" 
