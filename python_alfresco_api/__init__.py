@@ -36,7 +36,12 @@ from .clients.conversion_utils import (
 # Import raw_clients to ensure they get packaged
 from . import raw_clients
 
-__version__ = "1.2.0"
+# Tolerate Alfresco responses that omit the (spec-required) UserInfo.displayName for JIT /
+# OAuth2 service-account users (defaults displayName -> id). See _compat.py.
+from ._compat import install_shims as _install_shims
+_install_shims()
+
+__version__ = "1.2.1"
 __all__ = [
     # Factory & utilities
     "ClientFactory",

@@ -302,6 +302,8 @@ factory = ClientFactory(auth_util=oauth_util)
 clients = factory.create_all_clients()
 ```
 
+> **Service account vs. user token.** `client_credentials` authenticates as the client's *service account* (e.g. `service-account-<client-id>`) — a just-in-time Alfresco user with **no display name** and only **default permissions** (not an admin, and not Alfresco's `guest`). For content operations prefer a **user token** (authorization-code flow below, or a pre-obtained token) so operations run as a real user with a display name and that user's ACLs. As of **1.2.1** the client also tolerates a missing `displayName` on `UserInfo` (defaults it to the user id), so the service-account path no longer raises `KeyError`.
+
 ### Authorization Code Flow
 
 ```python

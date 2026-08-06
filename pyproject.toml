@@ -38,7 +38,7 @@ exclude = [
 
 [project]
 name = "python-alfresco-api"
-version = "1.2.0"
+version = "1.2.1"
 description = "Python Client for all Alfresco Content Services REST APIs, with Pydantic v2 Models, and Event Support"
 authors = [
     {name = "Steve Reiner", email = "example@example.com"}

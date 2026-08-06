@@ -261,6 +261,8 @@ master_client = factory.create_master_client()
 
   A provided access token that has already expired is detected from its JWT `exp` claim and auto-refreshed when a `refresh_token` + `token_endpoint` are supplied. `ALFRESCO_OAUTH2_*` environment variables are also read when `load_env=True`.
 
+  > **Service account vs. user token.** `client_credentials` authenticates as the client's *service account* (e.g. `service-account-<client-id>`) — a just-in-time Alfresco user with **no display name** and only **default permissions** (not an admin, and not the same as Alfresco's `guest`). For content operations prefer a **user token** (obtain one via a password grant, then pass `access_token`/`refresh_token`) so operations run as a real user with a display name and that user's ACLs. As of **1.2.1** the client also tolerates a missing `displayName` (defaults it to the user id), so the service-account path no longer raises `KeyError`.
+
 ### Sync and Async Usage
 
 ```python
