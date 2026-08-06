@@ -1,4 +1,4 @@
-# Python-Alfresco-API v1.1
+# Python-Alfresco-API v1.2
 
 **A Complete Python client package for developing python code and apps for Alfresco. Great for doing AI development 
 with Python based LangChain, LlamaIndex, neo4j-graphrag, etc. Also great for creating MCP servers (see [python-alfresco-mcp-server](https://github.com/stevereiner/python-alfresco-mcp-server)).**
@@ -19,6 +19,7 @@ A modern, type-safe Python client library for Alfresco Content Services REST API
 - **328+ Complete Domain Models**: attrs-based raw client models with separate Pydantic models available for AI integration
 - **Model Conversion Utilities**: Bridge utilities for attrs ↔ Pydantic transformation when needed
 - **Async/Sync Support**: Both synchronous and asynchronous API calls
+- **Authentication**: Basic, ticket, or OAuth2/OIDC (Bearer) auth to Alfresco — see [Authentication](#authentication)
 - **Modular Architecture**: Individual client design for scalability
 - **AI/LLM Ready**: Pydantic models available for AI integration, MCP servers, and tool interfaces
 - **Event System**: ActiveMQ (STOMP) support for Python apps to handle Alfresco repo change events
@@ -72,7 +73,7 @@ venv-3.14\Scripts\activate
 where python
 
 # Install the package + dependencies (from pyproject.toml)
-uv uv pip install -e .
+uv pip install -e .
 
 # Deactivate when done
 deactivate
@@ -95,7 +96,7 @@ source venv-3.14/bin/activate
 which python
 
 # Install the package + dependencies (from pyproject.toml)
-uv uv pip install -e .
+uv pip install -e .
 
 # Deactivate when done
 deactivate
