@@ -4,6 +4,11 @@ All notable changes to python-alfresco-api will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-09-29
+
+### Added
+- **Ticket pass-through in `TicketAuthUtil`**: a new `ticket=` parameter accepts a login ticket the caller already holds (e.g. one an ADF front end stored at sign-in), so no username or password is needed. A supplied ticket is used as-is and never re-fetched — there are no credentials to re-fetch with — and it never falls back to Basic auth, which would otherwise authenticate as a different identity. Acquire mode (username/password → ticket) is unchanged.
+
 ## [1.2.1] - 2026-08-05
 
 ### Fixed

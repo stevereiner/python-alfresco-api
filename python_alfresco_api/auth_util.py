@@ -277,29 +277,45 @@ class TicketAuthUtil:
     Handles both Basic auth and ticket-based authentication.
     """
     
-    def __init__(self, username: str, password: str, base_url: str = "",
-                 verify_ssl: Union[bool, str] = True, timeout: Optional[int] = None):
+    def __init__(self, username: str = "", password: str = "", base_url: str = "",
+                 verify_ssl: Union[bool, str] = True, timeout: Optional[int] = None,
+                 ticket: Optional[str] = None):
         """
         Initialize ticket auth utility.
 
+        Two modes:
+        - Acquire: pass username/password (+ base_url) and a ticket is fetched on demand.
+        - Pass-through: pass an existing `ticket` obtained elsewhere (e.g. one an ADF
+          front end already holds). No username/password is needed or used, and the
+          ticket is never re-fetched, because there are no credentials to re-fetch with.
+
         Args:
-            username: Alfresco username
-            password: Alfresco password
+            username: Alfresco username (acquire mode)
+            password: Alfresco password (acquire mode)
             base_url: Base URL for Alfresco (required to self-fetch a ticket)
             verify_ssl: SSL verification - True, False, or path to certificate bundle
             timeout: Request timeout in seconds (None = use system defaults)
+            ticket: A pre-obtained Alfresco login ticket (pass-through mode)
         """
         self.username = username
         self.password = password
         self.base_url = base_url.rstrip('/')
         self.verify_ssl = verify_ssl
         self.timeout = timeout
-        self.ticket = None
+        self.ticket = ticket or None
         self.ticket_expires = None
-        self._authenticated = False
+        # A supplied ticket is trusted until Alfresco rejects it. Its remaining lifetime is
+        # unknown (the caller acquired it, not us), so ticket_expires stays None rather than
+        # guessing an hour from now and expiring a ticket that is still good.
+        self._supplied_ticket = bool(ticket)
+        self._authenticated = bool(ticket)
 
     def authenticate_sync(self) -> bool:
         """Synchronously fetch an Alfresco login ticket from username/password."""
+        if self._supplied_ticket:
+            # Nothing to fetch with. Re-fetching would need credentials we were never given,
+            # and falling back to basic auth would silently authenticate as someone else.
+            return bool(self.ticket)
         if not self.base_url:
             return False
         try:
@@ -328,6 +344,9 @@ class TicketAuthUtil:
 
     def get_basic_auth_header(self):
         """Get basic auth header for initial authentication."""
+        if self._supplied_ticket:
+            # There are no credentials in pass-through mode; the ticket is the credential.
+            return f'Basic {base64.b64encode(self.ticket.encode()).decode()}'
         auth_string = f"{self.username}:{self.password}"
         auth_b64 = base64.b64encode(auth_string.encode()).decode()
         return f'Basic {auth_b64}'
@@ -339,13 +358,16 @@ class TicketAuthUtil:
         fetch a ticket (when base_url is set) and return base64(ticket); if that fails we fall
         back to base64(username:password) so the client still authenticates.
         """
-        if not self.is_authenticated() and self.base_url:
+        if not self.is_authenticated() and self.base_url and not self._supplied_ticket:
             try:
                 self.ensure_authenticated_sync()
             except Exception as e:
                 print(f"Alfresco ticket acquisition failed: {e}")
         if self.is_authenticated() and self.ticket:
             return base64.b64encode(self.ticket.encode()).decode()
+        if self._supplied_ticket:
+            # Pass-through mode with no usable ticket: there is no credential to fall back to.
+            raise ValueError("Alfresco ticket authentication failed: supplied ticket is empty")
         # Fallback: basic credentials
         return base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
     
